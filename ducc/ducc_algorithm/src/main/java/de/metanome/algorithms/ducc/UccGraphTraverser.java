@@ -1,6 +1,9 @@
 package de.metanome.algorithms.ducc;
 
-import com.google.common.collect.ImmutableList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
 import de.metanome.algorithm_helper.data_structures.ColumnCombinationBitset;
 import de.metanome.algorithm_helper.data_structures.PositionListIndex;
 import de.metanome.algorithm_integration.ColumnIdentifier;
@@ -10,10 +13,6 @@ import de.metanome.algorithm_integration.results.UniqueColumnCombination;
 import de.metanome.algorithms.ma2013n2.algorithm_helper.data_structures.GraphTraverser;
 import de.metanome.algorithms.ma2013n2.algorithm_helper.data_structures.HoleFinder;
 import de.metanome.algorithms.ma2013n2.algorithm_helper.data_structures.PruningGraph;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 
 public class UccGraphTraverser extends GraphTraverser {
     protected UniqueColumnCombinationResultReceiver resultReceiver;

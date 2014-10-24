@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 
 /**
  * @author Jens Ehrlich
- *         <p/>
  *         TODO docs
  */
 public class AbaloneFixture {
