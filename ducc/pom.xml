@@ -1,0 +1,28 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.metanome.algorithms.ducc</groupId>
+    <artifactId>ducc</artifactId>
+    <packaging>pom</packaging>
+
+    <name>ducc</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <parent>
+        <groupId>de.metanome.algorithms</groupId>
+        <artifactId>algorithms</artifactId>
+        <version>0.0.2-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <modules>
+        <module>ducc_algorithm_helper</module>
+        <module>ducc_algorithm</module>
+        <module>ducc_for_metanome</module>
+        <module>ducc_test_helper</module>
+    </modules>
+</project>
