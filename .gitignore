@@ -9,7 +9,6 @@ release.properties
 *.iml
 *.class
 data/
-io/
 bin/
 target/
 datasets/
