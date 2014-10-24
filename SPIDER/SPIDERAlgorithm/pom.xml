@@ -1,9 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>de.metanome.algorithms.spider</groupId>
   <artifactId>SPIDERAlgorithm</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>SPIDERAlgorithm</name>
@@ -12,19 +10,12 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>snapshots-repo</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-  
+  <parent>
+    <groupId>de.metanome.algorithms.spider</groupId>
+    <artifactId>SPIDER</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -37,18 +28,20 @@
       <groupId>de.uni-potsdam.hpi</groupId>
       <artifactId>utils</artifactId>
       <version>0.0.1-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency>
     
     <dependency>
       <groupId>de.uni-potsdam.hpi</groupId>
       <artifactId>dao</artifactId>
       <version>0.0.1-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency>
     
     <dependency>
       <groupId>de.metanome</groupId>
       <artifactId>algorithm_integration</artifactId>
-      <version>0.0.2-SNAPSHOT</version>
+      <version>${metanome.version}</version>
       <scope>compile</scope>
     </dependency>
     
@@ -56,12 +49,14 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>15.0</version>
+      <scope>compile</scope>
     </dependency>
     
     <dependency>
       <groupId>it.unimi.dsi</groupId>
       <artifactId>fastutil</artifactId>
       <version>6.5.9</version>
+      <scope>compile</scope>
     </dependency>
     
     <dependency>
@@ -75,6 +70,7 @@
       <groupId>org.javolution</groupId>
       <artifactId>javolution</artifactId>
       <version>5.3.1</version>
+      <scope>compile</scope>
     </dependency> 
   </dependencies>
   
