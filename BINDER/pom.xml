@@ -3,28 +3,20 @@
 
   <groupId>de.metanome.algorithms.binder</groupId>
   <artifactId>BINDER</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>BINDER</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <metanome.version>0.0.2-SNAPSHOT</metanome.version>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>snapshots-repo</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories> 
+  <parent>
+    <groupId>de.metanome.algorithms</groupId>
+    <artifactId>algorithms</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent> 
 
   <modules>
     <module>BINDERAlgorithm</module>

@@ -11,9 +11,10 @@
   </properties>
 
   <parent>
-    <groupId>de.metanome.algorithms.spider</groupId>
-    <artifactId>SPIDER</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <groupId>de.metanome.algorithms</groupId>
+    <artifactId>algorithms</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <dependencies>
