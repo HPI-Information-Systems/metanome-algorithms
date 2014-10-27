@@ -1,9 +1,10 @@
 package de.metanome.algorithms.fastfds.modules;
 
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
-import de.metanome.algorithms.depminer.depminer_helper.modules.Algorithm_Group2_Modul;
-import de.metanome.algorithms.depminer.depminer_helper.modules.container.AgreeSet;
+import de.metanome.algorithms.fastfds.fastfds_helper.modules.Algorithm_Group2_Modul;
+import de.metanome.algorithms.fastfds.fastfds_helper.modules.container.AgreeSet;
 import de.metanome.algorithms.fastfds.modules.container.DifferenceSet;
+
 import org.apache.lucene.util.OpenBitSet;
 
 import java.util.LinkedList;

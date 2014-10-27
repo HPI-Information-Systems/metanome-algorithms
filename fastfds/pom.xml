@@ -20,6 +20,7 @@
     </properties>
 
     <modules>
+        <module>fastfds_helper</module>
         <module>fastfds_algorithm</module>
     </modules>
 </project>

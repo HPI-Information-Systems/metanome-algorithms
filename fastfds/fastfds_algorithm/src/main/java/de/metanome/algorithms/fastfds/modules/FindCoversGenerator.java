@@ -13,8 +13,8 @@ import org.apache.lucene.util.OpenBitSet;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
-import de.metanome.algorithms.depminer.depminer_helper.modules.Algorithm_Group2_Modul;
-import de.metanome.algorithms.depminer.depminer_helper.modules.container.FunctionalDependencyGroup2;
+import de.metanome.algorithms.fastfds.fastfds_helper.modules.Algorithm_Group2_Modul;
+import de.metanome.algorithms.fastfds.fastfds_helper.modules.container.FunctionalDependencyGroup2;
 import de.metanome.algorithms.fastfds.modules.container.DifferenceSet;
 
 public class FindCoversGenerator extends Algorithm_Group2_Modul {

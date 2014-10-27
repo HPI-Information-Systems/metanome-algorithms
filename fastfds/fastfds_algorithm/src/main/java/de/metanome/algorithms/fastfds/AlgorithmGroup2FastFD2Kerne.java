@@ -3,7 +3,7 @@ package de.metanome.algorithms.fastfds;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
-import de.metanome.algorithms.depminer.depminer_helper.AlgorithmMetaGroup2;
+import de.metanome.algorithms.fastfds.fastfds_helper.AlgorithmMetaGroup2;
 
 public class AlgorithmGroup2FastFD2Kerne extends AlgorithmMetaGroup2 {
 

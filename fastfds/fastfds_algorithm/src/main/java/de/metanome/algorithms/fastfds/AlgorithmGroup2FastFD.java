@@ -5,7 +5,7 @@ import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementBoolean;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementRelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
-import de.metanome.algorithms.depminer.depminer_helper.AlgorithmMetaGroup2;
+import de.metanome.algorithms.fastfds.fastfds_helper.AlgorithmMetaGroup2;
 
 public class AlgorithmGroup2FastFD extends AlgorithmMetaGroup2 {
 

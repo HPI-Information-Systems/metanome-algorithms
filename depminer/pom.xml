@@ -20,7 +20,7 @@
     </properties>
 
     <modules>
+        <module>depminer_helper</module>
         <module>depminer_algorithm</module>
-        <module>helper</module>
     </modules>
 </project>

@@ -1,9 +1,9 @@
 package de.metanome.algorithms.fastfds.TestRunner;
 
-import de.metanome.algorithms.depminer.depminer_helper.testRunner.AlgorithExecuteThread;
-import de.metanome.algorithms.depminer.depminer_helper.testRunner.CSVTestCase;
-import de.metanome.algorithms.depminer.depminer_helper.testRunner.MemorySniffingThread;
 import de.metanome.algorithms.fastfds.AlgorithmGroup2FastFD;
+import de.metanome.algorithms.fastfds.fastfds_helper.testRunner.AlgorithExecuteThread;
+import de.metanome.algorithms.fastfds.fastfds_helper.testRunner.CSVTestCase;
+import de.metanome.algorithms.fastfds.fastfds_helper.testRunner.MemorySniffingThread;
 
 import java.io.IOException;
 
