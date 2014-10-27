@@ -6,7 +6,7 @@
     <artifactId>algorithms</artifactId>
     <packaging>pom</packaging>
     <name>algorithms</name>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>${metanome.version}</version>
     <description>The metanome algorithms collection</description>
 
     <properties>
@@ -47,13 +47,14 @@
 
     <modules>
         <module>utils</module>
-        <module>dao</module>
+        <module>dao</module> 
+        <module>fun</module>
         <module>depminer</module>
         <module>ducc</module>
         <module>fastfds</module>
         <module>fdep</module>
         <module>tane</module>
         <module>SPIDER</module>
-        <module>BINDER</module> 
+        <module>BINDER</module>
     </modules>
 </project>

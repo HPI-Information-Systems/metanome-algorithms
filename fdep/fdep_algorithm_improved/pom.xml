@@ -11,7 +11,7 @@
     <parent>
         <groupId>de.metanome.algorithms</groupId>
         <artifactId>algorithms</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>${metanome.version}</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>de.metanome.algorithms.tane</groupId>
             <artifactId>tane_algorithm_helper</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <version>${metanome.version}</version>
             <!-- <scope>test</scope>-->
         </dependency>
     </dependencies>
