@@ -1,5 +1,9 @@
 package de.metanome.algorithms.ducc;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import de.metanome.algorithm_helper.data_structures.PLIBuilder;
 import de.metanome.algorithm_helper.data_structures.PositionListIndex;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
@@ -11,12 +15,6 @@ import de.metanome.algorithm_integration.configuration.ConfigurationRequirementR
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.UniqueColumnCombinationResultReceiver;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
 
 public class Ducc implements UniqueColumnCombinationsAlgorithm, RelationalInputParameterAlgorithm {
     protected static final String INPUT_HANDLE = "csvIterator";
