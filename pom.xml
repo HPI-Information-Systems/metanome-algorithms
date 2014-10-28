@@ -48,6 +48,7 @@
     <modules>
         <module>utils</module>
         <module>dao</module> 
+        <module>fdmine</module>
         <module>fun</module>
         <module>depminer</module>
         <module>ducc</module>
