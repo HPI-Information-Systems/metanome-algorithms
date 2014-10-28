@@ -70,7 +70,7 @@
           <archive>
             <manifestEntries>
               <Algorithm-Bootstrap-Class>
-                de.metanome.algorithms.spider.SPIDERFile
+                de.metanome.algorithms.spider.SPIDERFile.SPIDERFile
               </Algorithm-Bootstrap-Class>
             </manifestEntries>
           </archive>

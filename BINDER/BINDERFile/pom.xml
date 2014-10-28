@@ -70,7 +70,7 @@
           <archive>
             <manifestEntries>
               <Algorithm-Bootstrap-Class>
-                de.metanome.algorithms.binder.BINDERFile
+                de.metanome.algorithms.binder.BINDERFile.BINDERFile
               </Algorithm-Bootstrap-Class>
             </manifestEntries>
           </archive>

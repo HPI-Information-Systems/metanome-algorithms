@@ -48,14 +48,6 @@
     <modules>
         <module>utils</module>
         <module>dao</module> 
-        <module>SPIDER</module>
         <module>BINDER</module>
-        <module>tane</module>
-        <module>fun</module>
-        <module>fdmine</module>
-        <module>depminer</module>
-        <module>fastfds</module>
-        <module>fdep</module>
-        <module>ducc</module>
     </modules>
 </project>
