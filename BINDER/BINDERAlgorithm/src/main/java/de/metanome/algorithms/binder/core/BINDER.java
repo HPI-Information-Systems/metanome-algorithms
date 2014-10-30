@@ -1280,9 +1280,17 @@ public class BINDER {
 						if ((refAttributeCombination.getTable() != this.column2table[ref]) || refAttributeCombination.contains(ref) || depAttributeCombination.contains(ref))
 							continue;
 
-						// If we reach here, we found a new n-ary IND candidate!
-						
 						AttributeCombination nPlusOneRef = new AttributeCombination(this.column2table[ref], refAttributeCombination.getAttributes(), ref);
+						
+						// Discard n-ary candidates that have non-matching types or CLOB or BLOB types; BINDER can handle this, but MIND cannot due to the use of SQL-join-checks
+						for (int i = 0; i < nPlusOneDep.getAttributes().length; i++) {
+							String depType = this.columnTypes.get(nPlusOneDep.getAttributes()[i]);
+							String refType = this.columnTypes.get(nPlusOneRef.getAttributes()[i]);
+							if (DatabaseUtils.isLargeObject(depType) || DatabaseUtils.isLargeObject(refType) || !DatabaseUtils.matchSameDataTypeClass(depType, refType))
+								continue;
+						}
+						
+						// If we reach here, we found a new n-ary IND candidate!
 						
 						if (!nPlusOneAryDep2ref.containsKey(nPlusOneDep))
 							nPlusOneAryDep2ref.put(nPlusOneDep, new LinkedList<AttributeCombination>());
@@ -1313,6 +1321,9 @@ public class BINDER {
 			int numTableAttributes = (this.tableColumnStartIndexes.length > tableIndex + 1) ? this.tableColumnStartIndexes[tableIndex + 1] - this.tableColumnStartIndexes[tableIndex] : this.numColumns - this.tableColumnStartIndexes[tableIndex];
 			int numTableAttributeCombinations = table2attributeCombinationNumbers.get(tableIndex).size();
 			int startTableColumnIndex = this.tableColumnStartIndexes[tableIndex];
+
+			if (numTableAttributeCombinations == 0)
+				continue;
 			
 			// Initialize buckets
 			Int2ObjectOpenHashMap<List<Set<String>>> buckets = new Int2ObjectOpenHashMap<List<Set<String>>>(numTableAttributeCombinations);

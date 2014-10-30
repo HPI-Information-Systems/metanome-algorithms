@@ -80,24 +80,26 @@ public class DatabaseUtils {
 	public static boolean isNumeric(String dataType) {
 		if (dataType == null)
 			return false;
-		if (dataType.contains("int") || 
-			dataType.contains("float") || 
-			dataType.contains("double") || 
-			dataType.contains("numeric") || 
-			dataType.contains("decimal") || 
-			dataType.contains("real") || 
-			dataType.contains("precision") || 
-			dataType.contains("serial") || 
-			dataType.contains("bit"))
+		String type = dataType.toLowerCase();
+		if (type.contains("int") || 
+			type.contains("float") || 
+			type.contains("double") || 
+			type.contains("numeric") || 
+			type.contains("decimal") || 
+			type.contains("real") || 
+			type.contains("precision") || 
+			type.contains("serial") || 
+			type.contains("bit"))
 			return true;
 		return false;
 	}
 	
 	public static boolean isString(String dataType) {
-		if (dataType == null)
+		if (dataType == null || DatabaseUtils.isLargeObject(dataType))
 			return false;
-		if (dataType.contains("char") || 
-			dataType.contains("text"))
+		String type = dataType.toLowerCase();
+		if (type.contains("char") || 
+			type.contains("text"))
 			return true;
 		return false;
 	}
@@ -105,9 +107,21 @@ public class DatabaseUtils {
 	public static boolean isTemporal(String dataType) {
 		if (dataType == null)
 			return false;
-		if (dataType.contains("date") || 
-			dataType.contains("time") || 
-			dataType.contains("year"))
+		String type = dataType.toLowerCase();
+		if (type.contains("date") || 
+			type.contains("time") || 
+			type.contains("year"))
+			return true;
+		return false;
+	}
+	
+	public static boolean isLargeObject(String dataType) {
+		if (dataType == null)
+			return false;
+		String type = dataType.toLowerCase();
+		if (type.contains("object") ||
+			type.contains("clob") ||
+			type.contains("blob"))
 			return true;
 		return false;
 	}

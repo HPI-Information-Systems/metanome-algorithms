@@ -125,13 +125,13 @@ public abstract class DataAccessObject {
 		}
 		
 		String nullAttributes = CollectionUtils.concat(exceptAttributeNames, "exceptTable.", " IS NULL ", "AND ");
-		String notNullAttributes = CollectionUtils.concat(fromAttributeNames, "fromTable.", " IS NOT NULL ", "AND ");
+		String notNullAttributes = CollectionUtils.concat(fromAttributeNames, "fromTable.", " IS NOT NULL ", "OR ");
 		
 		return "SELECT DISTINCT " + selectAttributes + " " +
 			   "FROM " + fromTableName + " fromTable LEFT OUTER JOIN " + exceptTableName + " exceptTable " +
 			   "ON " + joinAttributes.toString() +
 			   "WHERE " + nullAttributes +
-			   "AND " + notNullAttributes +
+			   "AND ( " + notNullAttributes + ") " +
 			   this.limitSuffix(limit);
 	}
 	
