@@ -1215,23 +1215,32 @@ public class BINDER {
 					String refTableName = this.tableNames[ref.getTable()];
 					String[] refAttributeNames = ref.getAttributes(this.columnNames);
 					
-					ResultSet resultSet = this.databaseConnectionGenerator.generateResultSetFromSql(this.dao.buildSelectColumnCombinationNotInColumnCombinationQuery(depTableName, depAttributeNames, refTableName, refAttributeNames, 2));
+					String query = this.dao.buildSelectColumnCombinationNotInColumnCombinationQuery(depTableName, depAttributeNames, refTableName, refAttributeNames, 2);
 					
+					ResultSet resultSet = null;
 					try {
+						resultSet = this.databaseConnectionGenerator.generateResultSetFromSql(query);
+						
 						// Check if there is a non-NULL value in the dep attribute combination
 						if (resultSet.next())
 							if ((resultSet.getString(1) != null) || resultSet.next())
 								refIterator.remove();
 					}
+					catch (InputGenerationException e) {
+						e.getCause().printStackTrace();
+						throw new InputGenerationException(e.getMessage() + "\nThe failed query was:\n" + query, e);
+					}
 					catch (SQLException e) {
 						e.printStackTrace();
-						throw new InputGenerationException(e.getMessage());
+						throw new InputGenerationException(e.getMessage() + "\nThe failed query was:\n" + query, e);
 					}
 					finally {
 						try {
-							Statement statement = resultSet.getStatement();
-							DatabaseUtils.close(resultSet);
-							DatabaseUtils.close(statement);
+							if (resultSet != null) {
+								Statement statement = resultSet.getStatement();
+								DatabaseUtils.close(resultSet);
+								DatabaseUtils.close(statement);
+							}
 						}
 						catch (SQLException e) {
 						}
@@ -1253,23 +1262,23 @@ public class BINDER {
 		Map<AttributeCombination, List<AttributeCombination>> nPlusOneAryDep2ref = new HashMap<AttributeCombination, List<AttributeCombination>>();
 		
 		for (AttributeCombination depAttributeCombination : naryDep2ref.keySet()) {
-			newDepLoop : for (int dep : this.dep2ref.keySet()) {
-				// Do not use empty attributes
-				if (this.columnSizes.getLong(dep) == 0)
+			if (!this.validAttributeCombinationForNaryCandidates(depAttributeCombination))
+				continue;
+			
+			for (int dep : this.dep2ref.keySet()) {
+				if (!this.validAttributeForNaryCandidates(dep))
 					continue;
 				
-				// Do not use attributes from different tables
-				if (depAttributeCombination.getTable() != this.column2table[dep])
+				if (!this.isCombineable(depAttributeCombination, dep))
 					continue;
-				
-				// Do not use smaller attributes
-				for (int attribute : depAttributeCombination.getAttributes())
-					if (attribute >= dep)
-						continue newDepLoop;
 				
 				AttributeCombination nPlusOneDep = new AttributeCombination(this.column2table[dep], depAttributeCombination.getAttributes(), dep);
 				
 				for (AttributeCombination refAttributeCombination : naryDep2ref.get(depAttributeCombination)) {
+					if (!this.validAttributeCombinationForNaryCandidates(refAttributeCombination))
+						continue;
+					
+					// The chosen extension of the dependent attribute group must not be included in the referenced attribute group
 					if (refAttributeCombination.contains(dep))
 						continue;
 					
@@ -1277,20 +1286,14 @@ public class BINDER {
 					while (refIterator.hasNext()) {
 						int ref = refIterator.next();
 						
-						if ((refAttributeCombination.getTable() != this.column2table[ref]) || refAttributeCombination.contains(ref) || depAttributeCombination.contains(ref))
+						if (!this.validAttributeForNaryCandidates(ref))
 							continue;
-
-						AttributeCombination nPlusOneRef = new AttributeCombination(this.column2table[ref], refAttributeCombination.getAttributes(), ref);
 						
-						// Discard n-ary candidates that have non-matching types or CLOB or BLOB types; BINDER can handle this, but MIND cannot due to the use of SQL-join-checks
-						for (int i = 0; i < nPlusOneDep.getAttributes().length; i++) {
-							String depType = this.columnTypes.get(nPlusOneDep.getAttributes()[i]);
-							String refType = this.columnTypes.get(nPlusOneRef.getAttributes()[i]);
-							if (DatabaseUtils.isLargeObject(depType) || DatabaseUtils.isLargeObject(refType) || !DatabaseUtils.matchSameDataTypeClass(depType, refType))
-								continue;
-						}
+						if (!this.isCombineable(depAttributeCombination, refAttributeCombination, ref))
+							continue;
 						
 						// If we reach here, we found a new n-ary IND candidate!
+						AttributeCombination nPlusOneRef = new AttributeCombination(this.column2table[ref], refAttributeCombination.getAttributes(), ref);
 						
 						if (!nPlusOneAryDep2ref.containsKey(nPlusOneDep))
 							nPlusOneAryDep2ref.put(nPlusOneDep, new LinkedList<AttributeCombination>());
@@ -1301,6 +1304,52 @@ public class BINDER {
 			}
 		}
 		return nPlusOneAryDep2ref;
+	}
+	
+	protected boolean validAttributeForNaryCandidates(int attribute) {
+		// Do not use empty attributes
+		if (this.columnSizes.getLong(attribute) == 0)
+			return false;
+		
+		// Do not use CLOB or BLOB types; BINDER can handle this, but MIND cannot due to the use of SQL-join-checks
+		if (DatabaseUtils.isLargeObject(this.columnTypes.get(attribute)))
+			return false;
+		
+		return true;
+	}
+	
+	protected boolean validAttributeCombinationForNaryCandidates(AttributeCombination attributeCombination) {
+		// Attribute combinations of size > 1 are always valid for further extensions; their attributes have been checked before
+		if (attributeCombination.getAttributes().length > 1)
+			return true;
+		
+		int depInCombination = attributeCombination.getAttributes()[0];
+		return this.validAttributeForNaryCandidates(depInCombination);
+	}
+	
+	protected boolean isCombineable(AttributeCombination depAttributeCombination, int dep) {
+		// Do not combine attributes from different tables
+		if (depAttributeCombination.getTable() != this.column2table[dep])
+			return false;
+		
+		// Do not use already contained or smaller attributes
+		for (int combinationAttribute : depAttributeCombination.getAttributes())
+			if (combinationAttribute >= dep)
+				return false;
+		
+		return true;
+	}
+	
+	protected boolean isCombineable(AttributeCombination depAttributeCombination, AttributeCombination refAttributeCombination, int ref) {
+		// Do not combine attributes from different tables
+		if (refAttributeCombination.getTable() != this.column2table[ref])
+			return false;
+		
+		// Do not use already contained attributes
+		if (refAttributeCombination.contains(ref) || depAttributeCombination.contains(ref))
+			return false;
+		
+		return true;
 	}
 
 	protected void naryBucketize(List<AttributeCombination> attributeCombinations, int naryOffset, int[] narySpillCounts) throws InputGenerationException, InputIterationException, IOException {
