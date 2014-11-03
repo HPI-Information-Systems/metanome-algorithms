@@ -66,7 +66,7 @@ public class FDminimizerShadowedFDFixture {
 //		table.add(ImmutableList.of("KL", "OR", "Tuesday", "09:00", "12:00", "I12", "30", "5"));	
 
         // TODO remove debugging
-        doAnswer(new Answer() {
+        doAnswer(new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) {
                 Object[] args = invocation.getArguments();
                 System.out.println(args[0]);
@@ -82,7 +82,7 @@ public class FDminimizerShadowedFDFixture {
 //			}
 //		}).when(inclusionDependencyResultReceiver).receiveResult(isA(InclusionDependency.class));
 
-        doAnswer(new Answer() {
+        doAnswer(new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) {
                 Object[] args = invocation.getArguments();
                 System.out.println(args[0]);

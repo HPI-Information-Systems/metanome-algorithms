@@ -36,7 +36,7 @@ public class DuccTestFixtureWithHoles {
 
         this.rowPosition = 0;
 
-        doAnswer(new Answer() {
+        doAnswer(new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) {
                 Object[] args = invocation.getArguments();
                 System.out.println(args[0]);

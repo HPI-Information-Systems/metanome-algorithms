@@ -49,7 +49,7 @@ public class AbaloneFixtureFixedUCC {
     protected InclusionDependencyResultReceiver inclusionDependencyResultReceiver = mock(InclusionDependencyResultReceiver.class);
 
     public AbaloneFixtureFixedUCC() throws CouldNotReceiveResultException {
-        doAnswer(new Answer() {
+        doAnswer(new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) {
                 Object[] args = invocation.getArguments();
                 System.out.println(args[0]);
