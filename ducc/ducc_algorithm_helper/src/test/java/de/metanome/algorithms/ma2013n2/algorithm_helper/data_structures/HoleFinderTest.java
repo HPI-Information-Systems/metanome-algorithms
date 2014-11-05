@@ -1,6 +1,7 @@
 package de.metanome.algorithms.ma2013n2.algorithm_helper.data_structures;
 
 import de.metanome.algorithm_helper.data_structures.ColumnCombinationBitset;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,93 +9,96 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class HoleFinderTest {
-    @Before
-    public void setUp() throws Exception {
-    }
 
-    @After
-    public void tearDown() throws Exception {
-    }
+  @Before
+  public void setUp() throws Exception {
+  }
 
-    @Test
-    public void testUpdateFirst() {
-        HoleFinder finder = new HoleFinder(5);
+  @After
+  public void tearDown() throws Exception {
+  }
 
-        ColumnCombinationBitset mNUCC = new ColumnCombinationBitset(1, 3, 4);
-        finder.update(mNUCC);
+  @Test
+  public void testUpdateFirst() {
+    HoleFinder finder = new HoleFinder(5);
 
-        ColumnCombinationBitset oneColumn0 = new ColumnCombinationBitset(0);
-        ColumnCombinationBitset oneColumn2 = new ColumnCombinationBitset(2);
+    ColumnCombinationBitset mNUCC = new ColumnCombinationBitset(1, 3, 4);
+    finder.update(mNUCC);
 
-        assertEquals(2, finder.complementarySet.size());
-        assertTrue(finder.complementarySet.contains(oneColumn0));
-        assertTrue(finder.complementarySet.contains(oneColumn2));
-    }
+    ColumnCombinationBitset oneColumn0 = new ColumnCombinationBitset(0);
+    ColumnCombinationBitset oneColumn2 = new ColumnCombinationBitset(2);
 
-    @Test
-    public void testUpdateAllOther() {
-        HoleFinder finder = new HoleFinder(5);
+    assertEquals(2, finder.complementarySet.size());
+    assertTrue(finder.complementarySet.contains(oneColumn0));
+    assertTrue(finder.complementarySet.contains(oneColumn2));
+  }
 
-        ColumnCombinationBitset firstCombi = new ColumnCombinationBitset(1, 3, 4);
-        finder.update(firstCombi);
+  @Test
+  public void testUpdateAllOther() {
+    HoleFinder finder = new HoleFinder(5);
 
-        ColumnCombinationBitset nextCombi = new ColumnCombinationBitset(2, 3, 4);
-        finder.update(nextCombi);
+    ColumnCombinationBitset firstCombi = new ColumnCombinationBitset(1, 3, 4);
+    finder.update(firstCombi);
 
-        ColumnCombinationBitset column10000 = new ColumnCombinationBitset(0);
-        ColumnCombinationBitset column01100 = new ColumnCombinationBitset(1, 2);
-        ColumnCombinationBitset column10100 = new ColumnCombinationBitset(0, 2);
+    ColumnCombinationBitset nextCombi = new ColumnCombinationBitset(2, 3, 4);
+    finder.update(nextCombi);
 
-        assertEquals(2, finder.complementarySet.size());
-        assertTrue(finder.complementarySet.contains(column10000));
-        assertTrue(finder.complementarySet.contains(column01100));
-        assertFalse(finder.complementarySet.contains(column10100));
-    }
+    ColumnCombinationBitset column10000 = new ColumnCombinationBitset(0);
+    ColumnCombinationBitset column01100 = new ColumnCombinationBitset(1, 2);
+    ColumnCombinationBitset column10100 = new ColumnCombinationBitset(0, 2);
 
-    @Test
-    public void testRemoveSets() {
-        HoleFinder finder = new HoleFinder(5);
+    assertEquals(2, finder.complementarySet.size());
+    assertTrue(finder.complementarySet.contains(column10000));
+    assertTrue(finder.complementarySet.contains(column01100));
+    assertFalse(finder.complementarySet.contains(column10100));
+  }
 
-        ColumnCombinationBitset firstCombi = new ColumnCombinationBitset(1, 3, 4);
-        finder.update(firstCombi);
+  @Test
+  public void testRemoveSets() {
+    HoleFinder finder = new HoleFinder(5);
 
-        ColumnCombinationBitset nextCombi = new ColumnCombinationBitset(2, 3, 4);
-        finder.update(nextCombi);
+    ColumnCombinationBitset firstCombi = new ColumnCombinationBitset(1, 3, 4);
+    finder.update(firstCombi);
 
-        ColumnCombinationBitset column10000 = new ColumnCombinationBitset(0);
-        ColumnCombinationBitset column01100 = new ColumnCombinationBitset(1, 2);
+    ColumnCombinationBitset nextCombi = new ColumnCombinationBitset(2, 3, 4);
+    finder.update(nextCombi);
 
-        assertEquals(2, finder.complementarySet.size());
-        assertTrue(finder.complementarySet.contains(column10000));
-        assertTrue(finder.complementarySet.contains(column01100));
+    ColumnCombinationBitset column10000 = new ColumnCombinationBitset(0);
+    ColumnCombinationBitset column01100 = new ColumnCombinationBitset(1, 2);
 
-        ArrayList<ColumnCombinationBitset> combinations = new ArrayList<>();
-        combinations.add(column01100);
+    assertEquals(2, finder.complementarySet.size());
+    assertTrue(finder.complementarySet.contains(column10000));
+    assertTrue(finder.complementarySet.contains(column01100));
 
-        finder.removeMinimalPositivesFromComplementarySet(combinations);
+    ArrayList<ColumnCombinationBitset> combinations = new ArrayList<>();
+    combinations.add(column01100);
 
-        assertEquals(1, finder.complementarySet.size());
-        assertTrue(finder.complementarySet.contains(column10000));
-        assertFalse(finder.complementarySet.contains(column01100));
-    }
+    finder.removeMinimalPositivesFromComplementarySet(combinations);
 
-    @Test
-    public void testGet() {
-        HoleFinder finder = new HoleFinder(5);
+    assertEquals(1, finder.complementarySet.size());
+    assertTrue(finder.complementarySet.contains(column10000));
+    assertFalse(finder.complementarySet.contains(column01100));
+  }
 
-        ColumnCombinationBitset firstCombi = new ColumnCombinationBitset(1, 3, 4);
-        finder.update(firstCombi);
+  @Test
+  public void testGet() {
+    HoleFinder finder = new HoleFinder(5);
 
-        List<ColumnCombinationBitset> result = finder.getHoles();
+    ColumnCombinationBitset firstCombi = new ColumnCombinationBitset(1, 3, 4);
+    finder.update(firstCombi);
 
-        ColumnCombinationBitset oneColumn0 = new ColumnCombinationBitset(0);
-        ColumnCombinationBitset oneColumn2 = new ColumnCombinationBitset(2);
+    List<ColumnCombinationBitset> result = finder.getHoles();
 
-        assertEquals(2, result.size());
-        assertTrue(result.contains(oneColumn0));
-        assertTrue(result.contains(oneColumn2));
-    }
+    ColumnCombinationBitset oneColumn0 = new ColumnCombinationBitset(0);
+    ColumnCombinationBitset oneColumn2 = new ColumnCombinationBitset(2);
+
+    assertEquals(2, result.size());
+    assertTrue(result.contains(oneColumn0));
+    assertTrue(result.contains(oneColumn2));
+  }
 }
