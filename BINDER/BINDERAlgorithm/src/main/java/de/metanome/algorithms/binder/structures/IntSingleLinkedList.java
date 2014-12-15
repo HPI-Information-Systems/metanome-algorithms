@@ -1,7 +1,6 @@
 package de.metanome.algorithms.binder.structures;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 
 import java.util.BitSet;
 import java.util.Collection;
@@ -10,6 +9,9 @@ public class IntSingleLinkedList {
 
 	private Element first = null;
 	private Element last = null;
+	
+	private Collection<Integer> seed = null;
+	private int except = -1;
 	
 	public class Element {
 		
@@ -60,30 +62,50 @@ public class IntSingleLinkedList {
 	}
 
 	public IntSingleLinkedList() {
+		this(null, -1);
 	}
 	
 	public IntSingleLinkedList(Collection<Integer> seed) {
-		for (Integer value : seed)
-			this.add(value);
+		this(seed, -1);
 	}
 
 	public IntSingleLinkedList(Collection<Integer> seed, int except) {
-		for (int value : seed)
-			if (value != except)
-				this.add(value);
+		this.seed = seed;
+		this.except = except;
+	}
+	
+	private void initialize() {
+		if (this.seed != null) {
+			for (int value : seed)
+				if (value != except)
+					this.selfAdd(value);
+			this.seed = null;
+		}
+	}
+	
+	private void selfAdd(int value) {
+		Element element = new Element(value);
+		if (this.last == null)
+			this.first = element;
+		else
+			this.last.next = element;
+		this.last = element;
 	}
 
-	public IntSingleLinkedList(Collection<Integer> seed, int except, BitSet excepts) {
-		for (int value : seed)
-			if ((value != except) && (!excepts.get(value)))
-				this.add(value);
+	public void add(int value) {
+		this.initialize();
+		this.selfAdd(value);
 	}
-
+	
 	public boolean isEmpty() {
+		this.initialize();
+		
 		return this.first == null;
 	}
 
 	public boolean contains(int value) {
+		this.initialize();
+		
 		Element element = this.first;
 		while (element != null) {
 			if (element.value == value)
@@ -93,36 +115,19 @@ public class IntSingleLinkedList {
 		return false;
 	}
 
-	public void add(Integer value) {
-		this.add(value.intValue());
-	}
-
-	public void add(int value) {
-		Element element = new Element(value);
-		if (this.last == null)
-			this.first = element;
-		else
-			this.last.next = element;
-		this.last = element;
-	}
-	
 	public void setOwnValuesIn(BitSet bitSet) {
+		this.initialize();
+		
 		Element element = this.first;
 		while (element != null) {
 			bitSet.set(element.value);
 			element = element.next;
 		}
 	}
-
-	public void addOwnValuesTo(IntList list) {
-		Element element = this.first;
-		while (element != null) {
-			list.add(element.value);
-			element = element.next;
-		}
-	}
 	
 	public void retainAll(IntArrayList otherList) {
+		this.initialize();
+		
 		Element previous = null;
 		Element current = this.first;
 		while (current != null) {
@@ -155,6 +160,8 @@ public class IntSingleLinkedList {
 	}
 	
 	public ElementIterator elementIterator() {
+		this.initialize();
+		
 		return new ElementIterator();
 	}
 }

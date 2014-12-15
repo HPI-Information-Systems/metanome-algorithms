@@ -44,9 +44,9 @@ import de.metanome.algorithms.binder.io.SqlInputIterator;
 import de.metanome.algorithms.binder.structures.Attribute;
 import de.metanome.algorithms.binder.structures.AttributeCombination;
 import de.metanome.algorithms.binder.structures.IntSingleLinkedList;
-import de.metanome.algorithms.binder.structures.IntSingleLinkedList.ElementIterator;
 import de.metanome.algorithms.binder.structures.Level;
 import de.metanome.algorithms.binder.structures.PruningStatistics;
+import de.metanome.algorithms.binder.structures.IntSingleLinkedList.ElementIterator;
 import de.uni_potsdam.hpi.dao.DataAccessObject;
 import de.uni_potsdam.hpi.utils.CollectionUtils;
 import de.uni_potsdam.hpi.utils.DatabaseUtils;
@@ -338,6 +338,8 @@ public class BINDER {
 				while (inputIterator.next()) {
 					for (int columnNumber = 0; columnNumber < numTableColumns; columnNumber++) {
 						String value = inputIterator.getValue(columnNumber);
+						
+						//value = new StringBuilder(value).reverse().toString(); // This is an optimization if urls with long, common prefixes are used to later improve the comparison values
 						
 						if (value == null)
 							continue;
@@ -1370,7 +1372,7 @@ public class BINDER {
 			int numTableAttributes = (this.tableColumnStartIndexes.length > tableIndex + 1) ? this.tableColumnStartIndexes[tableIndex + 1] - this.tableColumnStartIndexes[tableIndex] : this.numColumns - this.tableColumnStartIndexes[tableIndex];
 			int numTableAttributeCombinations = table2attributeCombinationNumbers.get(tableIndex).size();
 			int startTableColumnIndex = this.tableColumnStartIndexes[tableIndex];
-
+			
 			if (numTableAttributeCombinations == 0)
 				continue;
 			
