@@ -57,5 +57,6 @@
         <module>fastfds</module>
         <module>fdep</module>
         <module>ducc</module>
+        <module>dfd</module>
     </modules>
 </project>
