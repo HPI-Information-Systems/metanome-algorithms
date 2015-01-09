@@ -2,15 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>algorithms</artifactId>
-        <groupId>de.metanome.algorithms</groupId>
-        <version>0.0.2-SNAPSHOT</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>de.metanome.algorithms.dfd</groupId>
     <artifactId>dfd</artifactId>
     <packaging>pom</packaging>
+
+    <name>dfd</name>
 
     <modules>
         <module>dfdAlgorithm</module>
@@ -20,6 +18,13 @@
         <metanome.version>0.0.2-SNAPSHOT</metanome.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <parent>
+        <groupId>de.metanome.algorithms</groupId>
+        <artifactId>algorithms</artifactId>
+        <version>${metanome.version}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
     <repositories>
         <repository>
@@ -79,5 +84,14 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.metanome</groupId>
+            <artifactId>algorithm_integration</artifactId>
+            <version>${metanome.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 </project>
