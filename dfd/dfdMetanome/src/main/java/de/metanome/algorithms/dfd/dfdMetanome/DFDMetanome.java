@@ -1,4 +1,4 @@
-package de.metanome.algorithms.dfd;
+package de.metanome.algorithms.dfd.dfdMetanome;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
