@@ -15,7 +15,6 @@ import de.metanome.algorithm_integration.results.FunctionalDependency;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import fdiscovery.approach.runner.DFDMiner;
 import fdiscovery.columns.ColumnCollection;
@@ -23,19 +22,19 @@ import fdiscovery.general.FunctionalDependencies;
 import fdiscovery.preprocessing.SVFileProcessor;
 
 public class DFDMetanome implements FunctionalDependencyAlgorithm,
-                                   FileInputParameterAlgorithm {
+                                    FileInputParameterAlgorithm {
 
   private FunctionalDependencyResultReceiver resultReceiver;
   private FileInputGenerator[] fileInputGenerators;
   String identifier;
 
-  public enum Identifier {INPUT_GENERATOR}
+  public enum Identifier {input}
 
   @Override
   public void setFileInputConfigurationValue(String identifier,
                                              FileInputGenerator... fileInputGenerators)
       throws AlgorithmConfigurationException {
-    if (DFDMetanome.Identifier.INPUT_GENERATOR.name().equals(identifier)) {
+    if (DFDMetanome.Identifier.input.name().equals(identifier)) {
       this.fileInputGenerators = fileInputGenerators;
       this.identifier = identifier;
     }
@@ -52,7 +51,7 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
   @Override
   public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
     ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>();
-    configs.add(new ConfigurationRequirementFileInput(DFDMetanome.Identifier.INPUT_GENERATOR.name()));
+    configs.add(new ConfigurationRequirementFileInput(DFDMetanome.Identifier.input.name()));
     return configs;
   }
 
@@ -64,6 +63,7 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
       try {
         inputFileProcessor = new SVFileProcessor(source);
         inputFileProcessor.init();
+        inputFileProcessor.createColumnFiles();
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -72,14 +72,18 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
       FunctionalDependencies fds = dfdMiner.getDependencies();
       for (ColumnCollection determining : fds.keySet()) {
         for (Integer dependentColumn : fds.get(determining).getSetBits()) {
-          List<ColumnIdentifier> determiningColumns = new ArrayList<ColumnIdentifier>();
+          ColumnIdentifier[]
+              determiningColumns =
+              new ColumnIdentifier[determining.getSetBits().length];
+          int i = 0;
           for (Integer determiningColumn : determining.getSetBits()) {
-            determiningColumns.add(
-                new ColumnIdentifier(this.identifier, "Column " + determiningColumn));
+            determiningColumns[i] =
+                new ColumnIdentifier(this.identifier, "Column " + determiningColumn);
+            i++;
           }
           FunctionalDependency fd =
               new FunctionalDependency(
-                  new ColumnCombination((ColumnIdentifier[]) determiningColumns.toArray()),
+                  new ColumnCombination(determiningColumns),
                   new ColumnIdentifier(this.identifier, "Column " + dependentColumn));
           this.resultReceiver.receiveResult(fd);
         }
