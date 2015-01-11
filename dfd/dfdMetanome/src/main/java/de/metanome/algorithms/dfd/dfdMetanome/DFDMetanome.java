@@ -26,12 +26,8 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
                                    FileInputParameterAlgorithm {
 
   private FunctionalDependencyResultReceiver resultReceiver;
-
-  private int numberColumns;
-
-  private int numberRows;
   private FileInputGenerator[] fileInputGenerators;
-  String indentifier;
+  String identifier;
 
   public enum Identifier {INPUT_GENERATOR}
 
@@ -41,7 +37,7 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
       throws AlgorithmConfigurationException {
     if (DFDMetanome.Identifier.INPUT_GENERATOR.name().equals(identifier)) {
       this.fileInputGenerators = fileInputGenerators;
-      this.indentifier = identifier;
+      this.identifier = identifier;
     }
 
   }
@@ -55,21 +51,19 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
 
   @Override
   public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-    ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>(1);
-    configs.add(new ConfigurationRequirementFileInput(DFDMetanome.Identifier.INPUT_GENERATOR.name(),
-                                                      ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
+    ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>();
+    configs.add(new ConfigurationRequirementFileInput(DFDMetanome.Identifier.INPUT_GENERATOR.name()));
     return configs;
   }
 
   @Override
   public void execute() throws AlgorithmExecutionException {
     for (FileInputGenerator fileInput : fileInputGenerators) {
-
-      String filePath = fileInput.getInputFile().getAbsolutePath();
-      File source = new File(filePath);
+      File source = fileInput.getInputFile();
       SVFileProcessor inputFileProcessor = null;
       try {
         inputFileProcessor = new SVFileProcessor(source);
+        inputFileProcessor.init();
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -81,17 +75,17 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
           List<ColumnIdentifier> determiningColumns = new ArrayList<ColumnIdentifier>();
           for (Integer determiningColumn : determining.getSetBits()) {
             determiningColumns.add(
-                new ColumnIdentifier(this.indentifier, "Column " + determiningColumn));
+                new ColumnIdentifier(this.identifier, "Column " + determiningColumn));
           }
           FunctionalDependency fd =
               new FunctionalDependency(
                   new ColumnCombination((ColumnIdentifier[]) determiningColumns.toArray()),
-                  new ColumnIdentifier(this.indentifier, "Column " + dependentColumn));
+                  new ColumnIdentifier(this.identifier, "Column " + dependentColumn));
           this.resultReceiver.receiveResult(fd);
         }
       }
 
     }
-
   }
+
 }

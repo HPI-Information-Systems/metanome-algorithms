@@ -48,7 +48,7 @@ public class DFDMiner extends Miner implements Runnable {
 	private NonDependencies nonDependencies;
 	private MemoryManagedJoinedPartitions joinedPartitions;
 
-	public static void main2(String[] args) {
+	public static void main(String[] args) {
 		createColumDirectory();
 
 		File source = new File(DFDMiner.input);
@@ -57,7 +57,7 @@ public class DFDMiner extends Miner implements Runnable {
 			long timeStart = System.currentTimeMillis();
 
 			inputFileProcessor = new SVFileProcessor(source);
-			inputFileProcessor.init('\t');
+			inputFileProcessor.init();
 			System.out.println("Delimiter:\t" + inputFileProcessor.getDelimiter());
 			System.out.println("Columns:\t" + inputFileProcessor.getNumberOfColumns());
 			System.out.println("Rows:\t" + inputFileProcessor.getNumberOfRows());
@@ -77,7 +77,7 @@ public class DFDMiner extends Miner implements Runnable {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main2(String[] args) {
 		CLIParserMiner parser = new CLIParserMiner();
 		CommandLine cli = parser.parse(args);
 		String inputFilename = new String();

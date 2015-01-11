@@ -4,7 +4,7 @@ import java.io.File;
 
 public class Miner {
 
-	public static final String input = "data/pdb/t015.tsv";
+	public static final String input = "data/fd_reduced_15.csv";
 	
 	public static final String COLUMN_FILE_PATH = "columns" + File.separator;
 	public static final String RESULT_FILE_PATH = "results" + File.separator;
