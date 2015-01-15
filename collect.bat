@@ -25,3 +25,5 @@ copy fdep\fdep_algorithm_improved\target\*.jar _COLLECTION_
 
 copy ducc\ducc_for_metanome\target\*.jar _COLLECTION_
 
+copy dfd\dfdMetanome\target\*.jar _COLLECTION_
+

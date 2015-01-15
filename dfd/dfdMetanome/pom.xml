@@ -2,22 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.metanome.algorithms.dfd</groupId>
+    <artifactId>dfdMetanome</artifactId>
+    <packaging>jar</packaging>
+
+    <name>dfdMetanome</name>
+
     <parent>
         <groupId>de.metanome.algorithms</groupId>
         <artifactId>algorithms</artifactId>
         <version>${metanome.version}</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>dfdMetanome</artifactId>
-
-    <repositories>
-        <repository>
-            <id>snapshots-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>
