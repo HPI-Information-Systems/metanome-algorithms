@@ -21,7 +21,7 @@ copy depminer\depminer_algorithm\target\*.jar _COLLECTION_
 copy fastfds\fastfds_algorithm\target\*.jar _COLLECTION_
 
 copy fdep\fdep_algorithm\target\*.jar _COLLECTION_
-copy fdep\fdep_algorithm_improved\target\*.jar _COLLECTION_
+::copy fdep\fdep_algorithm_improved\target\*.jar _COLLECTION_
 
 copy ducc\ducc_for_metanome\target\*.jar _COLLECTION_
 
