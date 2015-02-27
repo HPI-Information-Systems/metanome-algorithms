@@ -84,7 +84,7 @@ public class AbaloneFixtureFixedUCC {
     public RelationalInputGenerator getInputGenerator() throws UnsupportedEncodingException, FileNotFoundException, AlgorithmConfigurationException {
     	String pathToInputFile = URLDecoder.decode(Thread.currentThread().getContextClassLoader().getResource(relationName).getPath(), "utf-8");
     	RelationalInputGenerator inputGenerator = new DefaultFileInputGenerator(new ConfigurationSettingFileInput(
-        		pathToInputFile, true, ',', '"', '\\', false, true, 0, false, true));
+        		pathToInputFile, true, ',', '"', '\\', false, true, 0, false, true, ""));
         return inputGenerator;
     }
 

@@ -68,7 +68,7 @@ public class BridgesFixture {
     public RelationalInputGenerator getInputGenerator() throws InputGenerationException, InputIterationException, UnsupportedEncodingException, FileNotFoundException, AlgorithmConfigurationException {
     	String pathToInputFile = URLDecoder.decode(Thread.currentThread().getContextClassLoader().getResource(relationName).getPath(), "utf-8");
     	RelationalInputGenerator inputGenerator = new DefaultFileInputGenerator(new ConfigurationSettingFileInput(
-        		pathToInputFile, true, ',', '"', '\\', false, true, 0, false, true));
+        		pathToInputFile, true, ',', '"', '\\', false, true, 0, false, true, ""));
         return inputGenerator;
     }
 
