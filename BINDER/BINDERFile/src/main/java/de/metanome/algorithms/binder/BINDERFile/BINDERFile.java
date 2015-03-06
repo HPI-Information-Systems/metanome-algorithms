@@ -1,5 +1,6 @@
 package de.metanome.algorithms.binder.BINDERFile;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
@@ -16,6 +17,7 @@ import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithms.binder.core.BINDER;
 import de.uni_potsdam.hpi.utils.CollectionUtils;
+import de.uni_potsdam.hpi.utils.FileUtils;
 
 public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, FileInputParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
 
@@ -56,8 +58,11 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 	public void setStringConfigurationValue(String identifier, String... values) throws AlgorithmConfigurationException {
 		if (BINDERFile.Identifier.INPUT_ROW_LIMIT.name().equals(identifier))
 			this.inputRowLimit = Integer.parseInt(values[0]);
-		else if (BINDERFile.Identifier.TEMP_FOLDER_PATH.name().equals(identifier))
-			this.tempFolderPath = values[0];
+		else if (BINDERFile.Identifier.TEMP_FOLDER_PATH.name().equals(identifier)) {
+			if ("".equals(values[0]) || " ".equals(values[0]) || "/".equals(values[0]) || "\\".equals(values[0]) || File.separator.equals(values[0]) || FileUtils.isRoot(new File(values[0])))
+				throw new AlgorithmConfigurationException(BINDERFile.Identifier.TEMP_FOLDER_PATH + " must not be \"" + values[0] + "\"");
+			this.tempFolderPath = values[0] + "BINDER_temp" + File.separator;
+		}
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}

@@ -1,5 +1,6 @@
 package de.metanome.algorithms.spider.SPIDERDatabase;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
@@ -19,6 +20,7 @@ import de.uni_potsdam.hpi.dao.DB2DataAccessObject;
 import de.uni_potsdam.hpi.dao.MySQLDataAccessObject;
 import de.uni_potsdam.hpi.dao.PostgreSQLDataAccessObject;
 import de.uni_potsdam.hpi.utils.CollectionUtils;
+import de.uni_potsdam.hpi.utils.FileUtils;
 
 public class SPIDERDatabase extends SPIDER implements InclusionDependencyAlgorithm, DatabaseConnectionParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
 
@@ -74,8 +76,11 @@ public class SPIDERDatabase extends SPIDER implements InclusionDependencyAlgorit
 		}
 		else if (SPIDERDatabase.Identifier.TABLE_NAMES.name().equals(identifier))
 			this.tableNames = values;
-		else if (SPIDERDatabase.Identifier.TEMP_FOLDER_PATH.name().equals(identifier))
-			this.tempFolderPath = values[0];
+		else if (SPIDERDatabase.Identifier.TEMP_FOLDER_PATH.name().equals(identifier)) {
+			if ("".equals(values[0]) || " ".equals(values[0]) || "/".equals(values[0]) || "\\".equals(values[0]) || File.separator.equals(values[0]) || FileUtils.isRoot(new File(values[0])))
+				throw new AlgorithmConfigurationException(SPIDERDatabase.Identifier.TEMP_FOLDER_PATH + " must not be \"" + values[0] + "\"");
+			this.tempFolderPath = values[0] + "SPIDER_temp" + File.separator;
+		}
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}

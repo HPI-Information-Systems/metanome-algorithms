@@ -42,7 +42,18 @@ public class FileUtils {
 		}
 	}
 
+	public static boolean isRoot(File directory) {
+		File rootSlash = new File("/");
+		File rootBackslash = new File("\\");
+		if (directory.getAbsolutePath().equals(rootSlash.getAbsolutePath()) || directory.getAbsolutePath().equals(rootBackslash.getAbsolutePath()))
+			return true;		
+		return false;
+	}
+	
 	public static boolean deleteDirectory(File directory) {
+		if (isRoot(directory))
+			return false;
+		
 		if (directory.exists()) {
 			File[] files = directory.listFiles();
 			if (null != files) {
