@@ -91,9 +91,9 @@ public class TestFileInputGenerator implements FileInputGenerator {
     } catch (final FileNotFoundException e) {
       throw new AlgorithmConfigurationException("File could not be found.", e);
     }
-    this.separator = setting.getSeparatorChar();
-    this.quotechar = setting.getQuoteChar();
-    this.escape = setting.getEscapeChar();
+    this.separator = setting.getSeparatorChar().toCharArray()[0];
+    this.quotechar = setting.getQuoteChar().toCharArray()[0];
+    this.escape = setting.getEscapeChar().toCharArray()[0];
     this.skipLines = setting.getSkipLines();
     this.strictQuotes = setting.isStrictQuotes();
     this.ignoreLeadingWhiteSpace = setting.isIgnoreLeadingWhiteSpace();

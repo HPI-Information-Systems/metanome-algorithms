@@ -58,5 +58,6 @@
         <module>fdep</module>
         <module>ducc</module>
         <module>dfd</module>
+        <module>ORDER</module>
     </modules>
 </project>
