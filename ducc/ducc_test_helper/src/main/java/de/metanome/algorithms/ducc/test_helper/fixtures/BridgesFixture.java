@@ -12,7 +12,7 @@ import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyRes
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithm_integration.result_receiver.UniqueColumnCombinationResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
-import de.metanome.backend.input.csv.DefaultFileInputGenerator;
+import de.metanome.backend.input.file.DefaultFileInputGenerator;
 
 import java.io.File;
 import java.io.FileNotFoundException;

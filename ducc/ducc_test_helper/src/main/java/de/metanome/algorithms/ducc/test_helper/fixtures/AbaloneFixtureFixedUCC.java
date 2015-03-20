@@ -16,7 +16,7 @@ import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResu
 import de.metanome.algorithm_integration.result_receiver.UniqueColumnCombinationResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
 import de.metanome.algorithm_integration.results.UniqueColumnCombination;
-import de.metanome.backend.input.csv.DefaultFileInputGenerator;
+import de.metanome.backend.input.file.DefaultFileInputGenerator;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
