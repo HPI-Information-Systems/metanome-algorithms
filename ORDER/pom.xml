@@ -4,7 +4,7 @@
 	<groupId>de.metanome.algorithms.order</groupId>
 	<artifactId>ORDER</artifactId>
 	<packaging>jar</packaging>
-	
+
 	<name>ORDER</name>
 	
 	<properties>
