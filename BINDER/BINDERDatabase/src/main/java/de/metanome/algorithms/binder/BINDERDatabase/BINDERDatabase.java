@@ -87,7 +87,7 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 	}
 	
 	@Override
-	public void setBooleanConfigurationValue(String identifier, boolean... values) throws AlgorithmConfigurationException {
+	public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
 		if (BINDERDatabase.Identifier.CLEAN_TEMP.name().equals(identifier))
 			this.cleanTemp = values[0];
 		else if (BINDERDatabase.Identifier.DETECT_NARY.name().equals(identifier))

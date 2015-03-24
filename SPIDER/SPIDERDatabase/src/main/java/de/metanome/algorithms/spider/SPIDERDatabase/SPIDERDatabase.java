@@ -86,7 +86,7 @@ public class SPIDERDatabase extends SPIDER implements InclusionDependencyAlgorit
 	}
 	
 	@Override
-	public void setBooleanConfigurationValue(String identifier, boolean... values) throws AlgorithmConfigurationException {
+	public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
 		if (SPIDERDatabase.Identifier.CLEAN_TEMP.name().equals(identifier))
 			this.cleanTemp = values[0];
 		else

@@ -39,7 +39,7 @@ public abstract class AlgorithmMetaGroup2 implements FunctionalDependencyAlgorit
     }
 
     @Override
-    public void setBooleanConfigurationValue(String identifier, boolean... values) {
+    public void setBooleanConfigurationValue(String identifier, Boolean... values) {
 
         this.configurationRequirements.put(identifier, values[0]);
 

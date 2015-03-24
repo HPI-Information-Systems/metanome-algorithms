@@ -79,7 +79,7 @@ public class Ducc implements UniqueColumnCombinationsAlgorithm, RelationalInputP
   }
 
   @Override
-  public void setBooleanConfigurationValue(String identifier, boolean... values)
+  public void setBooleanConfigurationValue(String identifier, Boolean... values)
       throws AlgorithmConfigurationException {
     if (identifier.equals(NULL_EQUALS_NULL)) {
       this.nullEqualsNull = values[0];

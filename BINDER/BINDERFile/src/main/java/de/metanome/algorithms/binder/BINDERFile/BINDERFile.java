@@ -68,7 +68,7 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 	}
 	
 	@Override
-	public void setBooleanConfigurationValue(String identifier, boolean... values) throws AlgorithmConfigurationException {
+	public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
 		if (BINDERFile.Identifier.CLEAN_TEMP.name().equals(identifier))
 			this.cleanTemp = values[0];
 		else if (BINDERFile.Identifier.DETECT_NARY.name().equals(identifier))
