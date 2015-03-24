@@ -88,7 +88,7 @@ StringParameterAlgorithm {
     try {
       this.initialize();
     } catch (final InputGenerationException i) {
-      throw new AlgorithmConfigurationException("Could not initialize ORDER.", i);
+      throw new AlgorithmConfigurationException("Could not initialize ORDER: " + i.getMessage(), i);
     }
   }
 
@@ -164,18 +164,9 @@ StringParameterAlgorithm {
       throw new InputGenerationException("Error while loading data.", e);
     }
 
-    if (this.dataByColumns == null || this.dataByColumns.isEmpty()
-        || this.dataByColumns.get(0).size() < 10) {
-      throw new InputGenerationException("Did not find any data ...");
+    if (this.dataByColumns == null || this.dataByColumns.isEmpty()) {
+      throw new InputGenerationException("Did not find any data in " + this.tableName + ".");
     }
-
-    for (int i = 0; i < this.columnIndices.length; i++) {
-      if (this.dataByColumns.get(i) == null || this.dataByColumns.get(i).isEmpty()) {
-        throw new InputGenerationException("Did not find enough data ...");
-      }
-    }
-
-
 
   }
 
