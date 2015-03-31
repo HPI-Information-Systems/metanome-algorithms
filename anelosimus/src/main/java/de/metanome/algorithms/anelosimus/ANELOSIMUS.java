@@ -497,7 +497,7 @@ public class ANELOSIMUS
     }
 
     @Override
-    public void setBooleanConfigurationValue(String identifier, boolean... values)
+    public void setBooleanConfigurationValue(String identifier, Boolean... values)
             throws AlgorithmConfigurationException {
         if (ANELOSIMUS.Identifier.VERIFY.name().equals(identifier)) {
             verify = values[0];
@@ -523,7 +523,7 @@ public class ANELOSIMUS
     }
 
     @Override
-    public void setIntegerConfigurationValue(String identifier, int... values)
+    public void setIntegerConfigurationValue(String identifier, Integer... values)
             throws AlgorithmConfigurationException {
         if (ANELOSIMUS.Identifier.M.name().equals(identifier)) {
             m = values[0];
@@ -543,25 +543,6 @@ public class ANELOSIMUS
             throw new AlgorithmConfigurationException("Unknown configuration: " + identifier + " -> " + values);
         }
     }
-
-    /*
-     * public Set<String> generateValueSetForColumn(int col) throws InputGenerationException, InputIterationException,
-     * Exception { Set<String> colValueSet; final InputIterator colIterator = new FileInputIterator(
-     * this.relationalInputGenerators[getTableIndexFor(col)].generateNewCopy(), -1); final int localRefColumnIndex =
-     * getColumnIndexInTableFor(col); colValueSet = new HashSet<>(); while (colIterator.next()) { final String value =
-     * colIterator.getValue(localRefColumnIndex); if (value == null) { continue; } if (nullValues.contains(value)) {
-     * continue; } colValueSet.add(value); } colIterator.close(); return colValueSet; }
-     */
-
-    /*
-     * private int getColumnIndexInTableFor(int column) { final int tableStartColumnIndex =
-     * tableColumnStartIndexes[getTableIndexFor(column)]; return column - tableStartColumnIndex; } private int
-     * getTableIndexFor(int column) { for (int i = 1; i < tableColumnStartIndexes.length; i++) { if
-     * (tableColumnStartIndexes[i] > column) { return i - 1; } } return tableNames.length - 1; } private int
-     * getNumberOfColumnsForTable(int tableIndex) { return tableColumnStartIndexes.length > (tableIndex + 1) ?
-     * tableColumnStartIndexes[tableIndex + 1] - tableColumnStartIndexes[tableIndex] : numColumns -
-     * tableColumnStartIndexes[tableIndex]; }
-     */
 
     public String getTableNameFor(int column, int[] tableColumnStartIndexes) {
         for (int i = 1; i < tableColumnStartIndexes.length; i++) {

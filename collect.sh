@@ -32,3 +32,5 @@ cp ducc/ducc_for_metanome/target/*.jar _COLLECTION_
 cp dfd/dfdMetanome/target/*.jar _COLLECTION_
 
 cp ORDER/target/*.jar _COLLECTION_
+
+cp anelosimus/target/*.jar _COLLECTION_
