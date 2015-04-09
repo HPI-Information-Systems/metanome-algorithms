@@ -31,3 +31,5 @@ copy dfd\dfdMetanome\target\*.jar _COLLECTION_
 
 copy ORDER\target\*.jar _COLLECTION_
 
+copy anelosimus\target\*.jar _COLLECTION_
+
