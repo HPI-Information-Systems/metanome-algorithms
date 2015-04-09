@@ -30,6 +30,3 @@ copy ducc\ducc_for_metanome\target\*.jar _COLLECTION_
 copy dfd\dfdMetanome\target\*.jar _COLLECTION_
 
 copy ORDER\target\*.jar _COLLECTION_
-
-copy anelosimus\target\*.jar _COLLECTION_
-
