@@ -11,7 +11,7 @@ package de.metanome.algorithms.anelosimus.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +25,7 @@ import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.results.Result;
 import de.metanome.algorithms.anelosimus.ANELOSIMUS;
 import de.metanome.algorithms.anelosimus.driver.AnelosimusDriver;
-import de.metanome.backend.result_receiver.ResultsCache;
+import de.metanome.backend.result_receiver.ResultCache;
 
 public class AnelosimusTest {
 
@@ -90,23 +90,26 @@ public class AnelosimusTest {
                 new String[][] { { "", "" }, { "", "" }, { "", "" } });
         relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
 
-        ResultsCache resultReceiver = new ResultsCache();
-
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps, relationalInputGenerators);
+            
+            assertEquals(2, resultReceiver.fetchNewResults().size());
         } catch (AlgorithmConfigurationException e) {
             logger.error("{}", e);
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             logger.error("{}", e);
             e.printStackTrace();
-        }
+        } catch (FileNotFoundException e) {
+            logger.error("{}", e);
+			e.printStackTrace();
+		}
 
-        assertEquals(2, resultReceiver.getNewResults().size());
     }
 
     @Test
@@ -119,23 +122,25 @@ public class AnelosimusTest {
 
         filterNullCols = true;
 
-        ResultsCache resultReceiver = new ResultsCache();
-
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps, relationalInputGenerators);
+
+            assertEquals(2, resultReceiver.fetchNewResults().size());
         } catch (AlgorithmConfigurationException e) {
             logger.error("{}", e);
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             logger.error("{}", e);
             e.printStackTrace();
-        }
-
-        assertEquals(2, resultReceiver.getNewResults().size());
+        } catch (FileNotFoundException e) {
+            logger.error("{}", e);
+			e.printStackTrace();
+		}
     }
 
     @Test
@@ -152,24 +157,25 @@ public class AnelosimusTest {
 
         nullValues = new String[] { "—", "-", "–", "N/A", "?", " ", "--" };
 
-        ResultsCache resultReceiver = new ResultsCache();
-
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps, relationalInputGenerators);
+
+            assertEquals(1, resultReceiver.fetchNewResults().size());
         } catch (AlgorithmConfigurationException e) {
             logger.error("{}", e);
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             logger.error("{}", e);
             e.printStackTrace();
-        }
-
-        assertEquals(1, resultReceiver.getNewResults().size());
-
+        } catch (FileNotFoundException e) {
+            logger.error("{}", e);
+			e.printStackTrace();
+		}
     }
 
     @Test
@@ -182,22 +188,25 @@ public class AnelosimusTest {
 
         refCoverageMinPercentage = 50;
 
-        ResultsCache resultReceiver = new ResultsCache();
-
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps, relationalInputGenerators);
+
+            assertEquals(2, resultReceiver.fetchNewResults().size());
         } catch (AlgorithmConfigurationException e) {
             logger.error("{}", e);
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             logger.error("{}", e);
             e.printStackTrace();
-        }
-        assertEquals(2, resultReceiver.getNewResults().size());
+        } catch (FileNotFoundException e) {
+            logger.error("{}", e);
+			e.printStackTrace();
+		}
     }
 
     @Test
@@ -210,23 +219,25 @@ public class AnelosimusTest {
 
         filterNonUniqueRefs = true;
 
-        ResultsCache resultReceiver = new ResultsCache();
-
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps, relationalInputGenerators);
+
+            assertEquals(1, resultReceiver.fetchNewResults().size());
         } catch (AlgorithmConfigurationException e) {
             logger.error("{}", e);
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             logger.error("{}", e);
             e.printStackTrace();
-        }
-
-        assertEquals(1, resultReceiver.getNewResults().size());
+        } catch (FileNotFoundException e) {
+            logger.error("{}", e);
+			e.printStackTrace();
+		}
     }
 
     @Test
@@ -240,23 +251,25 @@ public class AnelosimusTest {
 
         filterNumericAndShortCols = true;
 
-        ResultsCache resultReceiver = new ResultsCache();
-
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps, relationalInputGenerators);
+
+            assertEquals(1, resultReceiver.fetchNewResults().size());
         } catch (AlgorithmConfigurationException e) {
             logger.error("{}", e);
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             logger.error("{}", e);
             e.printStackTrace();
-        }
-
-        assertEquals(1, resultReceiver.getNewResults().size());
+        } catch (FileNotFoundException e) {
+            logger.error("{}", e);
+			e.printStackTrace();
+		}
     }
 
     @Test
@@ -272,22 +285,25 @@ public class AnelosimusTest {
         strategyRef2Deps = true;
         refCoverageMinPercentage = 50;
 
-        ResultsCache resultReceiver = new ResultsCache();
-
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps, relationalInputGenerators);
+
+            assertEquals(1, resultReceiver.fetchNewResults().size());
         } catch (AlgorithmConfigurationException e) {
             logger.error("{}", e);
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             logger.error("{}", e);
             e.printStackTrace();
-        }
-        assertEquals(1, resultReceiver.getNewResults().size());
+        } catch (FileNotFoundException e) {
+            logger.error("{}", e);
+			e.printStackTrace();
+		}
     }
 
     @Test
@@ -300,23 +316,25 @@ public class AnelosimusTest {
 
         strategyRef2Deps = true;
 
-        ResultsCache resultReceiver = new ResultsCache();
-
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps, relationalInputGenerators);
+
+            assertEquals(3, resultReceiver.fetchNewResults().size());
         } catch (AlgorithmConfigurationException e) {
             logger.error("{}", e);
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             logger.error("{}", e);
             e.printStackTrace();
-        }
-
-        assertEquals(3, resultReceiver.getNewResults().size());
+        } catch (FileNotFoundException e) {
+            logger.error("{}", e);
+			e.printStackTrace();
+		}
     }
 
     @Test
@@ -330,26 +348,28 @@ public class AnelosimusTest {
         strategyRef2Deps = true;
         filterDependentRefs = true;
 
-        ResultsCache resultReceiver = new ResultsCache();
-
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps, relationalInputGenerators);
+
+            // assertEquals(3, resultReceiver.getNewResults().size());
+            for (Result res : resultReceiver.fetchNewResults()) {
+                logger.info(res.toString());
+            }
         } catch (AlgorithmConfigurationException e) {
             logger.error("{}", e);
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             logger.error("{}", e);
             e.printStackTrace();
-        }
-
-        // assertEquals(3, resultReceiver.getNewResults().size());
-        for (Result res : resultReceiver.getNewResults()) {
-            logger.info(res.toString());
-        }
+        } catch (FileNotFoundException e) {
+            logger.error("{}", e);
+			e.printStackTrace();
+		}
     }
 
 }

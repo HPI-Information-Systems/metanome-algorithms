@@ -497,7 +497,7 @@ public class ANELOSIMUS
     }
 
     @Override
-    public void setBooleanConfigurationValue(String identifier, boolean... values)
+    public void setBooleanConfigurationValue(String identifier, Boolean... values)
             throws AlgorithmConfigurationException {
         if (ANELOSIMUS.Identifier.VERIFY.name().equals(identifier)) {
             verify = values[0];
@@ -521,9 +521,9 @@ public class ANELOSIMUS
             throw new AlgorithmConfigurationException("Unknown configuration: " + identifier + " -> " + values);
         }
     }
-
+    
     @Override
-    public void setIntegerConfigurationValue(String identifier, int... values) throws AlgorithmConfigurationException {
+    public void setIntegerConfigurationValue(String identifier, Integer... values) throws AlgorithmConfigurationException {
         if (ANELOSIMUS.Identifier.M.name().equals(identifier)) {
             m = values[0];
         } else if (ANELOSIMUS.Identifier.INPUT_ROW_LIMIT.name().equals(identifier)) {

@@ -48,8 +48,9 @@
     <modules>
         <module>utils</module>
         <module>dao</module> 
-        <module>BINDER</module>
         <module>SPIDER</module>
+        <module>BINDER</module>
+        <module>ANELOSIMUS</module>
         <module>tane</module>
         <module>fun</module>
         <module>fdmine</module>

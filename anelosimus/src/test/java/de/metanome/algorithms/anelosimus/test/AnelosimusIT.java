@@ -10,6 +10,7 @@
 package de.metanome.algorithms.anelosimus.test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +23,7 @@ import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithms.anelosimus.ANELOSIMUS;
 import de.metanome.algorithms.anelosimus.driver.AnelosimusDriver;
-import de.metanome.backend.result_receiver.ResultsCache;
+import de.metanome.backend.result_receiver.ResultCache;
 
 public class AnelosimusIT {
 
@@ -114,11 +115,10 @@ public class AnelosimusIT {
         isFastVector = false;
         condenseMatrix = true;
         output = false;
-
-        ResultsCache resultReceiver = new ResultsCache();
-
+        
         try {
-            AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
+        	ResultCache resultReceiver = new ResultCache("test");
+        	AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
@@ -130,7 +130,9 @@ public class AnelosimusIT {
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             e.printStackTrace();
-        }
+        } catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
     }
 
     @Test
@@ -169,9 +171,8 @@ public class AnelosimusIT {
         condenseMatrix = true;
         output = false;
 
-        ResultsCache resultReceiver = new ResultsCache();
-
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -184,7 +185,9 @@ public class AnelosimusIT {
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             e.printStackTrace();
-        }
+        } catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
     }
 
     @Test
@@ -221,10 +224,9 @@ public class AnelosimusIT {
         filterDependentRefs = true;
         isFastVector = false;
         condenseMatrix = true;
-
-        ResultsCache resultReceiver = new ResultsCache();
-
+        
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -237,7 +239,9 @@ public class AnelosimusIT {
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             e.printStackTrace();
-        }
+        } catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 
     }
 
@@ -259,10 +263,9 @@ public class AnelosimusIT {
 
         m = 10;
         k = 1;
-
-        ResultsCache resultReceiver = new ResultsCache();
-
+        
         try {
+        	ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -275,7 +278,9 @@ public class AnelosimusIT {
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
             e.printStackTrace();
-        }
+        } catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 
     }
 }

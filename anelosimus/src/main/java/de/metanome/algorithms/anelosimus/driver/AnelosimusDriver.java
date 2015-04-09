@@ -17,7 +17,7 @@ import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithms.anelosimus.ANELOSIMUS;
-import de.metanome.backend.input.csv.DefaultFileInputGenerator;
+import de.metanome.backend.input.file.DefaultFileInputGenerator;
 
 public class AnelosimusDriver {
     {
@@ -99,7 +99,7 @@ public class AnelosimusDriver {
                 fileInputGenerators[i] = new DefaultFileInputGenerator(new ConfigurationSettingFileInput(
                         inputFolderPath + databaseName + File.separator + tableNames[i] + inputFileEnding, true,
                         seperator,
-                        quote, escape, true, true, 0, hasHeader, true));
+                        quote, escape, true, true, 0, hasHeader, true, ""));
             }
             return fileInputGenerators;
         } catch (AlgorithmExecutionException e) {

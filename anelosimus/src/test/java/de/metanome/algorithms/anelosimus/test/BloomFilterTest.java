@@ -44,7 +44,7 @@ public class BloomFilterTest {
         BloomFilter<String> filter1 = new BloomFilter<>(1000000, 3, bitVectorFactory);
         for (int i = 0; i < 100000; i++) {
             String s = RandomStringUtils.randomAlphabetic(i % 25 + 1);
-            System.out.println(s);
+            //System.out.println(s);
             filter1.add(s);
         }
         // TODO check normal distribution
