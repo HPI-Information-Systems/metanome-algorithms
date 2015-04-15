@@ -48,10 +48,9 @@ import de.metanome.algorithms.anelosimus.helper.PrintHelper;
 import de.metanome.algorithms.anelosimus.io.FileInputIterator;
 import de.metanome.algorithms.anelosimus.io.InputIterator;
 
-public class ANELOSIMUS
-        implements InclusionDependencyAlgorithm, StringParameterAlgorithm, IntegerParameterAlgorithm,
-        BooleanParameterAlgorithm, RelationalInputParameterAlgorithm {
-    private static final double P_DIVISOR = 1000000000.0;
+public class ANELOSIMUS implements InclusionDependencyAlgorithm, StringParameterAlgorithm, IntegerParameterAlgorithm, BooleanParameterAlgorithm, RelationalInputParameterAlgorithm {
+    
+	private static final double P_DIVISOR = 1000000000.0;
     Logger logger = LoggerFactory.getLogger(ANELOSIMUS.class);
     String timePattern = "MM/dd/yy HH:mm:ss";
 
