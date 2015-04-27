@@ -60,7 +60,7 @@ public class ANELOSIMUS implements InclusionDependencyAlgorithm, StringParameter
 
     public enum Identifier {
         TABLE_NAMES,
-        INPUT_GENERATORS,
+        RELATIONAL_INPUT,
         INPUT_ROW_LIMIT,
         M,
         K,
@@ -430,29 +430,138 @@ public class ANELOSIMUS implements InclusionDependencyAlgorithm, StringParameter
     @Override
     public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
         final ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>();
-        configs.add(new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.INPUT_ROW_LIMIT.name()));
-        configs.add(new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.M.name()));
-        configs.add(new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.K.name()));
-        configs.add(new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.P.name()));
-        configs.add(new ConfigurationRequirementString(ANELOSIMUS.Identifier.N_EST_STRATEGY.name()));
-        configs.add(new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.PASSES.name()));
-        configs.add(new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.DOP.name()));
-        configs.add(new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.FILTER_NUMERIC_AND_SHORT_COLS.name()));
-        configs.add(new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.FILTER_DEPENDENT_REFS.name()));
-        configs.add(new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.FILTER_NON_UNIQUE_REFS.name()));
-        configs.add(new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.FILTER_NULL_COLS.name()));
-        configs.add(new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.CONDENSE_MATRIX.name()));
-        configs.add(new ConfigurationRequirementRelationalInput(ANELOSIMUS.Identifier.INPUT_GENERATORS.name(),
-                ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
-        configs.add(new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name()));
-
-        configs.add(new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.STRATEGY_REF2DEPS.name()));
-        configs.add(new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.FASTVECTOR.name()));
-        configs.add(new ConfigurationRequirementString(ANELOSIMUS.Identifier.TABLE_NAMES.name(),
-                ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
-        configs.add(new ConfigurationRequirementString(ANELOSIMUS.Identifier.NULL_VALUE_LIST.name()));
-        configs.add(new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.VERIFY.name()));
-        configs.add(new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.OUTPUT.name()));
+        configs.add(new ConfigurationRequirementRelationalInput(ANELOSIMUS.Identifier.RELATIONAL_INPUT.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
+        
+        // TODO: This is useless, because we can get the input names from their input generators: this.relationalInputGenerators[0].generateNewCopy().relationName()
+        configs.add(new ConfigurationRequirementString(ANELOSIMUS.Identifier.TABLE_NAMES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
+        
+        ConfigurationRequirementInteger m = new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.M.name());
+        Integer[] defaultM = new Integer[1];
+        defaultM[0] = -1;
+        m.setDefaultValues(defaultM);
+		m.setRequired(true);
+        configs.add(m);
+        
+        ConfigurationRequirementInteger k = new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.K.name());
+        Integer[] defaultK = new Integer[1];
+        defaultK[0] = -1;
+        k.setDefaultValues(defaultK);
+		k.setRequired(true);
+        configs.add(k);
+        
+        ConfigurationRequirementInteger p = new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.P.name());
+        Integer[] defaultP = new Integer[1];
+        defaultP[0] = -1;
+        p.setDefaultValues(defaultP);
+		p.setRequired(true);
+        configs.add(p);
+        
+        ConfigurationRequirementInteger passes = new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.PASSES.name());
+        Integer[] defaultPasses = new Integer[1];
+        defaultPasses[0] = -1;
+        passes.setDefaultValues(defaultPasses);
+        passes.setRequired(true);
+        configs.add(passes);
+        
+        ConfigurationRequirementInteger dop = new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.DOP.name());
+        Integer[] defaultDop = new Integer[1];
+        defaultDop[0] = -1;
+        dop.setDefaultValues(defaultDop);
+		dop.setRequired(true);
+        configs.add(dop);
+        
+        ConfigurationRequirementString nEstStrategy = new ConfigurationRequirementString(ANELOSIMUS.Identifier.N_EST_STRATEGY.name());
+        String[] defaultNEstStrategy = new String[1];
+        defaultNEstStrategy[0] = "???????";
+        nEstStrategy.setDefaultValues(defaultNEstStrategy);
+		nEstStrategy.setRequired(true);
+        configs.add(nEstStrategy);
+        
+        ConfigurationRequirementBoolean filterNumericAndShortCols = new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.FILTER_NUMERIC_AND_SHORT_COLS.name());
+        Boolean[] defaultFilterNumericAndShortCols = new Boolean[1];
+        defaultFilterNumericAndShortCols[0] = true;
+        filterNumericAndShortCols.setDefaultValues(defaultFilterNumericAndShortCols);
+        filterNumericAndShortCols.setRequired(false);
+        configs.add(filterNumericAndShortCols);
+        
+        ConfigurationRequirementBoolean filterDependentRefs = new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.FILTER_DEPENDENT_REFS.name());
+        Boolean[] defaultFilterDependentRefs = new Boolean[1];
+        defaultFilterDependentRefs[0] = true;
+        filterDependentRefs.setDefaultValues(defaultFilterDependentRefs);
+        filterDependentRefs.setRequired(false);
+        configs.add(filterDependentRefs);
+        
+        ConfigurationRequirementBoolean filterNonUniqueRefs = new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.FILTER_NON_UNIQUE_REFS.name());
+        Boolean[] defaultFilterNonUniqueRefs = new Boolean[1];
+        defaultFilterNonUniqueRefs[0] = true;
+        filterNonUniqueRefs.setDefaultValues(defaultFilterNonUniqueRefs);
+        filterNonUniqueRefs.setRequired(false);
+        configs.add(filterNonUniqueRefs);
+        
+        ConfigurationRequirementBoolean filterNullCols = new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.FILTER_NULL_COLS.name());
+        Boolean[] defaultFilterNullCols = new Boolean[1];
+        defaultFilterNullCols[0] = true;
+        filterNullCols.setDefaultValues(defaultFilterNullCols);
+        filterNullCols.setRequired(false);
+        configs.add(filterNullCols);
+        
+        ConfigurationRequirementBoolean condenseMatrix = new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.CONDENSE_MATRIX.name());
+        Boolean[] defaultCondenseMatrix = new Boolean[1];
+        defaultCondenseMatrix[0] = true;
+        condenseMatrix.setDefaultValues(defaultCondenseMatrix);
+        condenseMatrix.setRequired(false);
+        configs.add(condenseMatrix);
+        
+        ConfigurationRequirementInteger refCoverageMinPercentage = new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name());
+        Integer[] defaultRefCoverageMinPercentage = new Integer[1];
+        defaultRefCoverageMinPercentage[0] = -1;
+        refCoverageMinPercentage.setDefaultValues(defaultRefCoverageMinPercentage);
+        refCoverageMinPercentage.setRequired(true);
+        configs.add(refCoverageMinPercentage);
+        
+        ConfigurationRequirementBoolean strategyRef2Deps = new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.STRATEGY_REF2DEPS.name());
+        Boolean[] defaultStrategyRef2Deps = new Boolean[1];
+        defaultStrategyRef2Deps[0] = true;
+        strategyRef2Deps.setDefaultValues(defaultStrategyRef2Deps);
+        strategyRef2Deps.setRequired(false);
+        configs.add(strategyRef2Deps);
+        
+        ConfigurationRequirementBoolean fastvector = new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.FASTVECTOR.name());
+        Boolean[] defaultFastvector = new Boolean[1];
+        defaultFastvector[0] = true;
+        fastvector.setDefaultValues(defaultFastvector);
+        fastvector.setRequired(false);
+        configs.add(fastvector);
+        
+        // TODO: if this is a list of values that should be interpreted as NULL, then we could skip this parameter as well, because the NULL value is defined by Metanome per input source
+        ConfigurationRequirementString nullValueList = new ConfigurationRequirementString(ANELOSIMUS.Identifier.NULL_VALUE_LIST.name());
+        String[] defaultNullValueList = new String[1];
+        defaultNullValueList[0] = "???????";
+        nullValueList.setDefaultValues(defaultNullValueList);
+        nullValueList.setRequired(true);
+        configs.add(nullValueList);
+        
+        ConfigurationRequirementBoolean verify = new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.VERIFY.name());
+        Boolean[] defaultVerify = new Boolean[1];
+        defaultVerify[0] = true;
+        verify.setDefaultValues(defaultVerify);
+        verify.setRequired(false);
+        configs.add(verify);
+        
+        // TODO: a better identifier could be "GENERATE_OUTPUT", but we can also remove this parameter, because Metanome is now able to simply count results and not store/remember them
+        ConfigurationRequirementBoolean output = new ConfigurationRequirementBoolean(ANELOSIMUS.Identifier.OUTPUT.name());
+        Boolean[] defaultOutput = new Boolean[1];
+        defaultOutput[0] = true;
+        output.setDefaultValues(defaultOutput);
+        output.setRequired(false);
+        configs.add(output);
+        
+        ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(ANELOSIMUS.Identifier.INPUT_ROW_LIMIT.name());
+        Integer[] defaultInputRowLimit = new Integer[1];
+        defaultInputRowLimit[0] = -1;
+        inputRowLimit.setDefaultValues(defaultInputRowLimit);
+        inputRowLimit.setRequired(true);
+        configs.add(inputRowLimit);
 
         return configs;
     }
@@ -488,7 +597,7 @@ public class ANELOSIMUS implements InclusionDependencyAlgorithm, StringParameter
     public void setRelationalInputConfigurationValue(String identifier,
             RelationalInputGenerator... values)
             throws AlgorithmConfigurationException {
-        if (ANELOSIMUS.Identifier.INPUT_GENERATORS.name().equals(identifier)) {
+        if (ANELOSIMUS.Identifier.RELATIONAL_INPUT.name().equals(identifier)) {
             this.relationalInputGenerators = values;
         } else {
             throw new AlgorithmConfigurationException("Unknown configuration: " + identifier + " -> " + values);
@@ -523,7 +632,9 @@ public class ANELOSIMUS implements InclusionDependencyAlgorithm, StringParameter
     
     @Override
     public void setIntegerConfigurationValue(String identifier, Integer... values) throws AlgorithmConfigurationException {
-        if (ANELOSIMUS.Identifier.M.name().equals(identifier)) {
+    	if (values.length <= 0)
+ 			return;
+    	if (ANELOSIMUS.Identifier.M.name().equals(identifier)) {
             m = values[0];
         } else if (ANELOSIMUS.Identifier.INPUT_ROW_LIMIT.name().equals(identifier)) {
             inputRowLimit = values[0];

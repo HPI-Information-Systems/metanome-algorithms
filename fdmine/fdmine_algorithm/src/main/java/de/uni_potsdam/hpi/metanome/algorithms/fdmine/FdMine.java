@@ -29,7 +29,7 @@ import de.metanome.algorithm_integration.results.FunctionalDependency;
 
 public class FdMine implements FunctionalDependencyAlgorithm, RelationalInputParameterAlgorithm {
 
-    protected static final String INPUT_FILE_TAG = "input file";
+    protected static final String INPUT_FILE_TAG = "Relational Input";
 
     protected RelationalInputGenerator inputGenerator;
     protected FunctionalDependencyResultReceiver resultReceiver;

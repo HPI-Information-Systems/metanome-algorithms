@@ -20,10 +20,8 @@ import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.ColumnPermutation;
 import de.metanome.algorithm_integration.algorithm_types.OrderDependencyAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.RelationalInputParameterAlgorithm;
-import de.metanome.algorithm_integration.algorithm_types.StringParameterAlgorithm;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementRelationalInput;
-import de.metanome.algorithm_integration.configuration.ConfigurationRequirementString;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
@@ -44,8 +42,7 @@ import de.metanome.algorithms.order.types.Datatype;
 import de.metanome.algorithms.order.types.TypeInferrer;
 import de.uni_potsdam.hpi.utils.CollectionUtils;
 
-public class ORDER implements OrderDependencyAlgorithm, RelationalInputParameterAlgorithm,
-StringParameterAlgorithm {
+public class ORDER implements OrderDependencyAlgorithm, RelationalInputParameterAlgorithm {
 
   protected RelationalInputGenerator inputGenerator;
   protected RelationalInput input;
@@ -71,15 +68,13 @@ StringParameterAlgorithm {
   Logger logger = LoggerFactory.getLogger(ORDER.class);
 
   public enum ConfigIdentifier {
-    RELATIONAL_INPUT_GENERATOR, TABLE_NAME
+    RELATIONAL_INPUT
   }
 
   @Override
   public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
     final ArrayList<ConfigurationRequirement> config = new ArrayList<ConfigurationRequirement>(3);
-    config.add(new ConfigurationRequirementRelationalInput(
-        ORDER.ConfigIdentifier.RELATIONAL_INPUT_GENERATOR.name()));
-    config.add(new ConfigurationRequirementString(ORDER.ConfigIdentifier.TABLE_NAME.name()));
+    config.add(new ConfigurationRequirementRelationalInput(ORDER.ConfigIdentifier.RELATIONAL_INPUT.name()));
     return config;
   }
 
@@ -111,6 +106,8 @@ StringParameterAlgorithm {
     this.statistics = new Statistics("ORDER");
 
     this.input = this.inputGenerator.generateNewCopy();
+    
+    this.tableName = this.input.relationName();
 
     this.columnNames = this.input.columnNames();
 
@@ -256,27 +253,14 @@ StringParameterAlgorithm {
   }
 
   @Override
-  public void setStringConfigurationValue(final String identifier, final String... values)
-      throws AlgorithmConfigurationException {
-
-    if (identifier.equals(ORDER.ConfigIdentifier.TABLE_NAME.name())) {
-      this.tableName = values[0];
-    } else {
-      throw new AlgorithmConfigurationException("Unknown configuration identifier: " + identifier
-          + "->" + CollectionUtils.concat(values, ","));
-    }
-  }
-
-  @Override
   public void setRelationalInputConfigurationValue(final String identifier,
       final RelationalInputGenerator... values) throws AlgorithmConfigurationException {
-    if (identifier.equals(ORDER.ConfigIdentifier.RELATIONAL_INPUT_GENERATOR.name())) {
+    if (identifier.equals(ORDER.ConfigIdentifier.RELATIONAL_INPUT.name())) {
       this.inputGenerator = values[0];
     } else {
       throw new AlgorithmConfigurationException("Unknown configuration identifier: " + identifier
           + "->" + CollectionUtils.concat(values, ","));
     }
-
   }
 
 }

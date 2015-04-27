@@ -118,7 +118,7 @@ public class AnelosimusDriver {
             final RelationalInputGenerator[] fileInputGenerators) throws AlgorithmConfigurationException,
             AlgorithmExecutionException {
         ANELOSIMUS anelosimus = new ANELOSIMUS();
-        anelosimus.setRelationalInputConfigurationValue(ANELOSIMUS.Identifier.INPUT_GENERATORS.name(),
+        anelosimus.setRelationalInputConfigurationValue(ANELOSIMUS.Identifier.RELATIONAL_INPUT.name(),
                 fileInputGenerators);
 
         anelosimus.setResultReceiver(resultReceiver);

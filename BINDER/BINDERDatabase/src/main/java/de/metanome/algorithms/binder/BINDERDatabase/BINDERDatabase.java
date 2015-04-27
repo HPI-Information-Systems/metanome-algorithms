@@ -8,10 +8,12 @@ import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.algorithm_types.BooleanParameterAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.DatabaseConnectionParameterAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.InclusionDependencyAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.IntegerParameterAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.StringParameterAlgorithm;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementBoolean;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementDatabaseConnection;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirementInteger;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementString;
 import de.metanome.algorithm_integration.input.DatabaseConnectionGenerator;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
@@ -22,33 +24,67 @@ import de.uni_potsdam.hpi.dao.PostgreSQLDataAccessObject;
 import de.uni_potsdam.hpi.utils.CollectionUtils;
 import de.uni_potsdam.hpi.utils.FileUtils;
 
-public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorithm, DatabaseConnectionParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
+public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorithm, DatabaseConnectionParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
 
 	public enum Database {
 		MYSQL, DB2, POSTGRESQL
 	}
 	
 	public enum Identifier {
-		INPUT_GENERATOR, INPUT_ROW_LIMIT, DATABASE_NAME, DATABASE_TYPE, TABLE_NAMES, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY
+		INPUT_DATABASE, INPUT_ROW_LIMIT, DATABASE_NAME, DATABASE_TYPE, INPUT_TABLES, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY
 	};
 	
 	@Override
 	public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
 		ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>(8);
-		configs.add(new ConfigurationRequirementDatabaseConnection(BINDERDatabase.Identifier.INPUT_GENERATOR.name()));
-		configs.add(new ConfigurationRequirementString(BINDERDatabase.Identifier.INPUT_ROW_LIMIT.name()));
-		configs.add(new ConfigurationRequirementString(BINDERDatabase.Identifier.DATABASE_NAME.name()));
-		configs.add(new ConfigurationRequirementString(BINDERDatabase.Identifier.DATABASE_TYPE.name()));
-		configs.add(new ConfigurationRequirementString(BINDERDatabase.Identifier.TABLE_NAMES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
-		configs.add(new ConfigurationRequirementString(BINDERDatabase.Identifier.TEMP_FOLDER_PATH.name()));
-		configs.add(new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.CLEAN_TEMP.name()));
-		configs.add(new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.DETECT_NARY.name()));
+		configs.add(new ConfigurationRequirementDatabaseConnection(BINDERDatabase.Identifier.INPUT_DATABASE.name()));
+		
+		ConfigurationRequirementString databaseName = new ConfigurationRequirementString(BINDERDatabase.Identifier.DATABASE_NAME.name());
+		databaseName.setRequired(true);
+		configs.add(databaseName); // TODO: take this from the input source
+		
+		ConfigurationRequirementString databaseType = new ConfigurationRequirementString(BINDERDatabase.Identifier.DATABASE_TYPE.name());
+		String[] defaultDatabaseType = new String[1];
+		defaultDatabaseType[0] = "MYSQL";
+		databaseType.setDefaultValues(defaultDatabaseType);
+		databaseType.setRequired(true);
+		configs.add(databaseType); // TODO: take this from the input source
+		
+		ConfigurationRequirementString tableNames = new ConfigurationRequirementString(BINDERDatabase.Identifier.INPUT_TABLES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES);
+		tableNames.setRequired(true);
+		configs.add(tableNames);
+		
+		ConfigurationRequirementString tempFolder = new ConfigurationRequirementString(BINDERDatabase.Identifier.TEMP_FOLDER_PATH.name());
+		String[] defaultTempFolder = new String[1];
+		defaultTempFolder[0] = "BINDER_temp";
+		tempFolder.setDefaultValues(defaultTempFolder);
+		tempFolder.setRequired(true);
+		configs.add(tempFolder);
+
+		ConfigurationRequirementInteger inputRowlimit = new ConfigurationRequirementInteger(BINDERDatabase.Identifier.INPUT_ROW_LIMIT.name());
+		inputRowlimit.setRequired(false);
+		configs.add(inputRowlimit);
+		
+		ConfigurationRequirementBoolean cleanTemp = new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.CLEAN_TEMP.name());
+		Boolean[] defaultCleanTemp = new Boolean[1];
+		defaultCleanTemp[0] = true;
+		cleanTemp.setDefaultValues(defaultCleanTemp);
+		cleanTemp.setRequired(false);
+		configs.add(cleanTemp);
+		
+		ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.DETECT_NARY.name());
+		Boolean[] defaultDetectNary = new Boolean[1];
+		defaultDetectNary[0] = false;
+		detectNary.setDefaultValues(defaultDetectNary);
+		detectNary.setRequired(false);
+		configs.add(detectNary);
+
 		return configs;
 	}
 
 	@Override
 	public void setDatabaseConnectionGeneratorConfigurationValue(String identifier, DatabaseConnectionGenerator... values) throws AlgorithmConfigurationException {
-		if (BINDERDatabase.Identifier.INPUT_GENERATOR.name().equals(identifier))
+		if (BINDERDatabase.Identifier.INPUT_DATABASE.name().equals(identifier))
 			this.databaseConnectionGenerator = values[0];
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
@@ -60,10 +96,18 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 	}
 
 	@Override
+	public void setIntegerConfigurationValue(String identifier, Integer... values) throws AlgorithmConfigurationException {
+		if (BINDERDatabase.Identifier.INPUT_ROW_LIMIT.name().equals(identifier)) {
+			if (values.length > 0)
+				this.inputRowLimit = values[0].intValue();
+		}
+		else 
+			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
+	}
+
+	@Override
 	public void setStringConfigurationValue(String identifier, String... values) throws AlgorithmConfigurationException {
-		if (BINDERDatabase.Identifier.INPUT_ROW_LIMIT.name().equals(identifier))
-			this.inputRowLimit = Integer.parseInt(values[0]);
-		else if (BINDERDatabase.Identifier.DATABASE_NAME.name().equals(identifier))
+		if (BINDERDatabase.Identifier.DATABASE_NAME.name().equals(identifier))
 			this.databaseName = values[0];
 		else if (BINDERDatabase.Identifier.DATABASE_TYPE.name().equals(identifier)) {
 			if (BINDERDatabase.Database.MYSQL.name().equals(values[0]))
@@ -75,7 +119,7 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 			else
 				this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 		}
-		else if (BINDERDatabase.Identifier.TABLE_NAMES.name().equals(identifier))
+		else if (BINDERDatabase.Identifier.INPUT_TABLES.name().equals(identifier))
 			this.tableNames = values;
 		else if (BINDERDatabase.Identifier.TEMP_FOLDER_PATH.name().equals(identifier)) {
 			if ("".equals(values[0]) || " ".equals(values[0]) || "/".equals(values[0]) || "\\".equals(values[0]) || File.separator.equals(values[0]) || FileUtils.isRoot(new File(values[0])))

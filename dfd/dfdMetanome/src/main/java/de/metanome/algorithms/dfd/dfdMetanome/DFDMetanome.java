@@ -28,13 +28,13 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
   private FileInputGenerator[] fileInputGenerators;
   String identifier;
 
-  public enum Identifier {input}
+  public enum Identifier {INPUT_FILE}
 
   @Override
   public void setFileInputConfigurationValue(String identifier,
                                              FileInputGenerator... fileInputGenerators)
       throws AlgorithmConfigurationException {
-    if (DFDMetanome.Identifier.input.name().equals(identifier)) {
+    if (DFDMetanome.Identifier.INPUT_FILE.name().equals(identifier)) {
       this.fileInputGenerators = fileInputGenerators;
       this.identifier = identifier;
     }
@@ -51,7 +51,7 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
   @Override
   public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
     ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>();
-    configs.add(new ConfigurationRequirementFileInput(DFDMetanome.Identifier.input.name()));
+    configs.add(new ConfigurationRequirementFileInput(DFDMetanome.Identifier.INPUT_FILE.name()));
     return configs;
   }
 

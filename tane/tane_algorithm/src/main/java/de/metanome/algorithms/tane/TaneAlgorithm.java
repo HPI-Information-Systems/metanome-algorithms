@@ -35,13 +35,12 @@ import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyRes
 import de.metanome.algorithm_integration.results.FunctionalDependency;
 
 public class TaneAlgorithm implements FunctionalDependencyAlgorithm,
-//		SqlInputParameterAlgorithm,
         RelationalInputParameterAlgorithm,
         StringParameterAlgorithm {
 
     public static final String INPUT_SQL_CONNECTION = "DatabaseConnection";
     public static final String INPUT_TABLE_NAME = "Table_Name";
-    public static final String INPUT_TAG = "Relational_Input";
+    public static final String INPUT_TAG = "Relational Input";
 
     private DatabaseConnectionGenerator databaseConnectionGenerator;
     private RelationalInputGenerator relationalInputGenerator;

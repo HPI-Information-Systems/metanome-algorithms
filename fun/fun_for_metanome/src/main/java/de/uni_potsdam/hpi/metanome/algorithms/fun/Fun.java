@@ -18,7 +18,7 @@ import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyRes
 
 public class Fun implements FunctionalDependencyAlgorithm, RelationalInputParameterAlgorithm {
 
-    protected static final String INPUT_FILE_TAG = "input file";
+    protected static final String INPUT_FILE_TAG = "Relational Input";
 
     protected RelationalInputGenerator inputGenerator;
     protected FunctionalDependencyResultReceiver resultReceiver;

@@ -11,8 +11,8 @@ public class AlgorithmGroup2FastFD extends AlgorithmMetaGroup2 {
 
     @Override
     protected void buildSpecs() {
-        configSpecs.add(new ConfigurationRequirementBoolean(AlgorithmMetaGroup2.USE_OPTIMIZATIONS_TAG));
         configSpecs.add(new ConfigurationRequirementRelationalInput(AlgorithmMetaGroup2.INPUT_TAG));
+        configSpecs.add(new ConfigurationRequirementBoolean(AlgorithmMetaGroup2.USE_OPTIMIZATIONS_TAG));
     }
 
     @Override

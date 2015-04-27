@@ -28,13 +28,12 @@ import de.metanome.algorithms.tane.algorithm_helper.FDTree;
 import de.metanome.algorithms.tane.algorithm_helper.FDTreeElement;
 
 public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
-//			SqlInputParameterAlgorithm,
         RelationalInputParameterAlgorithm,
         StringParameterAlgorithm {
 
     public static final String INPUT_SQL_CONNECTION = "DatabaseConnection";
     public static final String INPUT_TABLE_NAME = "Table_Name";
-    public static final String INPUT_TAG = "Relational_Input";
+    public static final String INPUT_TAG = "Relational Input";
 
 
     private DatabaseConnectionGenerator databaseConnectionGenerator;

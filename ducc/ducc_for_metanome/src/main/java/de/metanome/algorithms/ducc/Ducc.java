@@ -21,8 +21,8 @@ import java.util.Random;
 public class Ducc implements UniqueColumnCombinationsAlgorithm, RelationalInputParameterAlgorithm,
                              BooleanParameterAlgorithm {
 
-  protected static final String INPUT_HANDLE = "csvIterator";
-  protected static final String NULL_EQUALS_NULL = "null==null?";
+  protected static final String INPUT_HANDLE = "Relational Input";
+  protected static final String NULL_EQUALS_NULL = "NULL = NULL";
   protected boolean nullEqualsNull = true;
   protected Random random;
   protected RelationalInputGenerator inputGenerator;
@@ -35,21 +35,21 @@ public class Ducc implements UniqueColumnCombinationsAlgorithm, RelationalInputP
   @Override
   public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
     ArrayList<ConfigurationRequirement> spec = new ArrayList<>();
-    ConfigurationRequirementRelationalInput
-        csvFile =
-        new ConfigurationRequirementRelationalInput(INPUT_HANDLE);
-    spec.add(csvFile);
+    ConfigurationRequirementRelationalInput input = new ConfigurationRequirementRelationalInput(INPUT_HANDLE);
+    spec.add(input);
 
-    ConfigurationRequirementBoolean
-        nullEqualsNull =
-        new ConfigurationRequirementBoolean((NULL_EQUALS_NULL));
+    ConfigurationRequirementBoolean nullEqualsNull = new ConfigurationRequirementBoolean(NULL_EQUALS_NULL);
+    Boolean[] defaultNullEqualsNull = new Boolean[1];
+    defaultNullEqualsNull[0] = true;
+	nullEqualsNull.setDefaultValues(defaultNullEqualsNull);
+    nullEqualsNull.setRequired(false);
     spec.add(nullEqualsNull);
+    
     return spec;
   }
 
   @Override
-  public void setRelationalInputConfigurationValue(String identifier,
-                                                   RelationalInputGenerator... values)
+  public void setRelationalInputConfigurationValue(String identifier, RelationalInputGenerator... values)
       throws AlgorithmConfigurationException {
     if (identifier.equals(INPUT_HANDLE)) {
       inputGenerator = values[0];

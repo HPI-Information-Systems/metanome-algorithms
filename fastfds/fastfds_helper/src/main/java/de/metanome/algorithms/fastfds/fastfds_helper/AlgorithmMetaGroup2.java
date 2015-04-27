@@ -17,8 +17,8 @@ import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyRes
 public abstract class AlgorithmMetaGroup2 implements FunctionalDependencyAlgorithm, RelationalInputParameterAlgorithm,
         BooleanParameterAlgorithm, StringParameterAlgorithm {
 
-    public static String INPUT_TAG = "inputFile";
-    public static String USE_OPTIMIZATIONS_TAG = "optimizations";
+    public static String INPUT_TAG = "Relational Input";
+    public static String USE_OPTIMIZATIONS_TAG = "Use Optimizations";
 
     protected FunctionalDependencyResultReceiver fdrr;
     protected Map<String, Object> configurationRequirements = new HashMap<String, Object>();
