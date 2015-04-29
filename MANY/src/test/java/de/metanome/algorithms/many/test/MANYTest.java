@@ -143,41 +143,6 @@ public class MANYTest {
     }
 
     @Test
-    public void testFilterNullColsWithSpecialNullValues() {
-        // conf
-        RelationalInputGenerator[] relationalInputGenerators = new RelationalInputGenerator[1];
-        RelationalInputMock table1 = new RelationalInputMock("table1",
-                new String[] { "foo", "bar", "1", "2" },
-                new String[][] { { "—", "-", "1", "1" }, { "-", "—", "1", "1" },
-                        { "", "", "1", "2" } });
-        relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
-
-        filterNullCols = true;
-
-        nullValues = new String[] { "—", "-", "–", "N/A", "?", " ", "--" };
-
-        try {
-            ResultCache resultReceiver = new ResultCache("test");
-            AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
-                    k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
-                    filterNullCols,
-                    filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
-                    strategyRef2Deps, relationalInputGenerators);
-
-            assertEquals(1, resultReceiver.fetchNewResults().size());
-        } catch (AlgorithmConfigurationException e) {
-            logger.error("{}", e);
-            e.printStackTrace();
-        } catch (AlgorithmExecutionException e) {
-            logger.error("{}", e);
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            logger.error("{}", e);
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void testRefCoverageMinPercentage() {
         // conf
         RelationalInputGenerator[] relationalInputGenerators = new RelationalInputGenerator[1];
