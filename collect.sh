@@ -12,7 +12,7 @@ cp SPIDER/SPIDERDatabase/target/*.jar _COLLECTION_
 cp BINDER/BINDERFile/target/*.jar _COLLECTION_
 cp BINDER/BINDERDatabase/target/*.jar _COLLECTION_
 
-cp anelosimus/target/*.jar _COLLECTION_
+cp MANY/target/*.jar _COLLECTION_
 
 cp tane/tane_algorithm/target/*.jar _COLLECTION_
 #cp tane/tane_tree_dir_algorithm/target/*.jar _COLLECTION_

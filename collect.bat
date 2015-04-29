@@ -8,7 +8,7 @@ copy SPIDER\SPIDERDatabase\target\*.jar _COLLECTION_
 copy BINDER\BINDERFile\target\*.jar _COLLECTION_
 copy BINDER\BINDERDatabase\target\*.jar _COLLECTION_
 
-copy anelosimus\target\*.jar _COLLECTION_
+copy MANY\target\*.jar _COLLECTION_
 
 copy tane\tane_algorithm\target\*.jar _COLLECTION_
 ::copy tane\tane_tree_dir_algorithm\target\*.jar _COLLECTION_
