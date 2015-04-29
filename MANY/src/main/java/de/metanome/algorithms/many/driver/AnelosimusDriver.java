@@ -124,14 +124,9 @@ public class AnelosimusDriver {
 
         anelosimus.setIntegerConfigurationValue(MANY.Identifier.INPUT_ROW_LIMIT.name(), inputRowLimit);
 
-        anelosimus.setStringConfigurationValue(MANY.Identifier.TABLE_NAMES.name(), tableNames);
-        anelosimus.setStringConfigurationValue(MANY.Identifier.NULL_VALUE_LIST.name(), nullValues);
-        anelosimus.setStringConfigurationValue(MANY.Identifier.N_EST_STRATEGY.name(), n_est_strategy);
         anelosimus
-                .setIntegerConfigurationValue(MANY.Identifier.P.name(), p);
-        anelosimus
-                .setIntegerConfigurationValue(MANY.Identifier.K.name(), k);
-        anelosimus.setIntegerConfigurationValue(MANY.Identifier.M.name(), m);
+                .setIntegerConfigurationValue(MANY.Identifier.HASH_FUNCTION_COUNT.name(), k);
+        anelosimus.setIntegerConfigurationValue(MANY.Identifier.BIT_VECTOR_SIZE.name(), m);
         anelosimus.setIntegerConfigurationValue(MANY.Identifier.DOP.name(), dop);
         anelosimus.setIntegerConfigurationValue(MANY.Identifier.PASSES.name(), passes);
         anelosimus.setBooleanConfigurationValue(MANY.Identifier.VERIFY.name(), verify);
@@ -164,32 +159,4 @@ public class AnelosimusDriver {
         logger.debug("end: {}", DateFormatUtils.formatUTC(System.currentTimeMillis(), "MM/dd/yy HH:mm:ss"));
         logger.info("took: {} seconds", (System.currentTimeMillis() - start) / 1000f);
     }
-
-    /*
-     * public static void runAnelosimus(InclusionDependencyResultReceiver resultReceiver, RelationalInputGenerator[]
-     * fileInputGenerators, String n_est_strategy, int p, int m, int k, int passes, String[] nullValues, int dop, int
-     * refCoverageMinPercentage, boolean verify, boolean filterNonUniqueRefs, boolean filterNullCols, boolean
-     * filterNumericAndShortCols, boolean filterDependentRefs, boolean useFastVector, boolean condenseMatrix, boolean
-     * strategyRef2Deps) { String[] tableNames = new String[fileInputGenerators.length]; try { int i = 0; for
-     * (RelationalInputGenerator gen : fileInputGenerators) { tableNames[i] = gen.generateNewCopy().relationName(); i++;
-     * } run(resultReceiver, tableNames, n_est_strategy, p, m, k, passes, nullValues, dop, refCoverageMinPercentage,
-     * verify, filterNonUniqueRefs, filterNullCols, filterNumericAndShortCols, filterDependentRefs, useFastVector,
-     * condenseMatrix, strategyRef2Deps, fileInputGenerators); } catch (AlgorithmExecutionException e) {
-     * logger.error("{}", e); e.printStackTrace(); } }
-     */
-    /*
-     * public static void runAnelosimus(InclusionDependencyResultReceiver resultReceiver, String databaseName, String
-     * inputFileEnding, String inputFolderPath, boolean hasHeader, char seperator, char quote, char escape, String[]
-     * tableNames, String n_est_strategy, int p, int m, int k, int passes, String[] nullValues, int dop, int
-     * refCoverageMinPercentage, boolean verify, boolean filterNonUniqueRefs, boolean filterNullCols, boolean
-     * filterNumericAndShortCols, boolean filterDependentRefs, boolean useFastVector, boolean condenseMatrix, boolean
-     * strategyRef2Deps) { final RelationalInputGenerator[] fileInputGenerators = new
-     * FileInputGenerator[tableNames.length]; try { for (int i = 0; i < tableNames.length; i++) { fileInputGenerators[i]
-     * = new DefaultFileInputGenerator(new ConfigurationSettingFileInput( inputFolderPath + databaseName +
-     * File.separator + tableNames[i] + inputFileEnding, true, seperator, quote, escape, true, true, 0, hasHeader,
-     * true)); } run(resultReceiver, tableNames, n_est_strategy, p, m, k, passes, nullValues, dop,
-     * refCoverageMinPercentage, verify, filterNonUniqueRefs, filterNullCols, filterNumericAndShortCols,
-     * filterDependentRefs, useFastVector, condenseMatrix, strategyRef2Deps, fileInputGenerators); } catch
-     * (AlgorithmExecutionException e) { logger.error("{}", e); e.printStackTrace(); } }
-     */
 }

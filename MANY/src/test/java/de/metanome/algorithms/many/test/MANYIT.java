@@ -56,7 +56,6 @@ public class MANYIT {
     public void setUp() throws Exception {
 
         inputRowLimit = -1;
-        nEstStrategy = MANY.N_EST_STRATEGIES.AVERAGE.name();
         p = 0;
         m = 8;
         k = 1;
@@ -115,10 +114,10 @@ public class MANYIT {
         isFastVector = false;
         condenseMatrix = true;
         output = false;
-        
+
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
-        	AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
+            ResultCache resultReceiver = new ResultCache("test");
+            AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
@@ -131,8 +130,8 @@ public class MANYIT {
         } catch (AlgorithmExecutionException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -172,7 +171,7 @@ public class MANYIT {
         output = false;
 
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -186,8 +185,8 @@ public class MANYIT {
         } catch (AlgorithmExecutionException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -224,9 +223,9 @@ public class MANYIT {
         filterDependentRefs = true;
         isFastVector = false;
         condenseMatrix = true;
-        
+
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -240,8 +239,8 @@ public class MANYIT {
         } catch (AlgorithmExecutionException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
 
     }
 
@@ -263,9 +262,9 @@ public class MANYIT {
 
         m = 10;
         k = 1;
-        
+
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -279,8 +278,8 @@ public class MANYIT {
         } catch (AlgorithmExecutionException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
 
     }
 }

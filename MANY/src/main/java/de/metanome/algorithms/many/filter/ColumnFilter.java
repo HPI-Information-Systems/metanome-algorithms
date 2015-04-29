@@ -6,7 +6,7 @@ public class ColumnFilter {
 
     public static final ColumnFilter INSTANCE = new ColumnFilter();
 
-    public boolean filterColumn(Set<String> column, Set<String> nullValues) {
+    public boolean filterColumn(Set<String> column) {
 
         // ii
         if (column.size() < 3) {

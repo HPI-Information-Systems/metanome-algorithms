@@ -58,7 +58,6 @@ public class MANYTest {
     public void setUp() throws Exception {
 
         inputRowLimit = -1;
-        nEstStrategy = MANY.N_EST_STRATEGIES.AVERAGE.name();
         p = 0;
         m = 8;
         k = 1;
@@ -91,13 +90,13 @@ public class MANYTest {
         relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
 
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps, relationalInputGenerators);
-            
+
             assertEquals(2, resultReceiver.fetchNewResults().size());
         } catch (AlgorithmConfigurationException e) {
             logger.error("{}", e);
@@ -107,8 +106,8 @@ public class MANYTest {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             logger.error("{}", e);
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
 
     }
 
@@ -123,7 +122,7 @@ public class MANYTest {
         filterNullCols = true;
 
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -139,8 +138,8 @@ public class MANYTest {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             logger.error("{}", e);
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -158,7 +157,7 @@ public class MANYTest {
         nullValues = new String[] { "—", "-", "–", "N/A", "?", " ", "--" };
 
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -174,8 +173,8 @@ public class MANYTest {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             logger.error("{}", e);
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -189,7 +188,7 @@ public class MANYTest {
         refCoverageMinPercentage = 50;
 
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -205,8 +204,8 @@ public class MANYTest {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             logger.error("{}", e);
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -220,7 +219,7 @@ public class MANYTest {
         filterNonUniqueRefs = true;
 
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -236,8 +235,8 @@ public class MANYTest {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             logger.error("{}", e);
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -252,7 +251,7 @@ public class MANYTest {
         filterNumericAndShortCols = true;
 
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -268,8 +267,8 @@ public class MANYTest {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             logger.error("{}", e);
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -286,7 +285,7 @@ public class MANYTest {
         refCoverageMinPercentage = 50;
 
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -302,8 +301,8 @@ public class MANYTest {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             logger.error("{}", e);
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -317,7 +316,7 @@ public class MANYTest {
         strategyRef2Deps = true;
 
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -333,8 +332,8 @@ public class MANYTest {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             logger.error("{}", e);
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -349,7 +348,7 @@ public class MANYTest {
         filterDependentRefs = true;
 
         try {
-        	ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test");
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -368,8 +367,8 @@ public class MANYTest {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             logger.error("{}", e);
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
 }

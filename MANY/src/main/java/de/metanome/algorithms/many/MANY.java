@@ -48,24 +48,17 @@ import de.metanome.algorithms.many.helper.PrintHelper;
 import de.metanome.algorithms.many.io.FileInputIterator;
 import de.metanome.algorithms.many.io.InputIterator;
 
-public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgorithm, IntegerParameterAlgorithm, BooleanParameterAlgorithm, RelationalInputParameterAlgorithm {
-    
-	private static final double P_DIVISOR = 1000000000.0;
+public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgorithm,
+        BooleanParameterAlgorithm, RelationalInputParameterAlgorithm {
+
     Logger logger = LoggerFactory.getLogger(MANY.class);
     String timePattern = "MM/dd/yy HH:mm:ss";
 
-    public enum N_EST_STRATEGIES {
-        AVERAGE, AVERAGE_HALF_DOUBLED
-    }
-
     public enum Identifier {
-        TABLE_NAMES,
         RELATIONAL_INPUT,
         INPUT_ROW_LIMIT,
-        M,
-        K,
-        P,
-        N_EST_STRATEGY,
+        BIT_VECTOR_SIZE,
+        HASH_FUNCTION_COUNT,
         STRATEGY_REF2DEPS,
         PASSES,
         DOP,
@@ -84,16 +77,12 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
     public RelationalInputGenerator[] relationalInputGenerators;
     private int inputRowLimit;
     int[] tableColumnStartIndexes;
-    String[] tableNames;
     List<String> columnNames;
     final List<List<String>> columnValueLists = new ArrayList<List<String>>();
     final Map<Integer, Set<String>> verificationCache = Collections
             .synchronizedMap(new HashMap<Integer, Set<String>>());
     int[] condensedMatrixMapping;
 
-    N_EST_STRATEGIES strategy;
-    int n_est;
-    double p;
     int m;
     int k;
     int passes;
@@ -106,7 +95,6 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
     boolean filterNonUniqueRefs;
     boolean filterNullCols;
     InclusionDependencyResultReceiver resultReceiver;
-    Set<String> nullValues;
     boolean isStrategyRef2Deps;
     boolean isFastVector;
     boolean condenseMatrix;
@@ -134,7 +122,7 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
             logger.debug("init start: {}", DateFormatUtils.formatUTC(System.currentTimeMillis(), timePattern));
             initialize();
 
-            logger.debug("number of tables: {}", tableNames.length);
+            logger.debug("number of tables: {}", this.relationalInputGenerators.length);
             logger.debug("bloom filtering start: {}",
                     DateFormatUtils.formatUTC(System.currentTimeMillis(), timePattern));
             bitVectorFactory = new BitVectorFactory(isFastVector);
@@ -146,10 +134,6 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
             refCandidates = bitVectorFactory.createBitVector(numColumns).flip();
             // dependentRefs = new SynchronizedBitVector(bitVectorFactory.createBitVector(numColumns).flip());
             depCandidates = bitVectorFactory.createBitVector(numColumns).flip();
-            if (p != 0) {
-                logger.debug("Bloom filter length for n_est{}: {}({})", this.n_est, BloomFilter.getM(p, n_est),
-                        BloomFilter.getK(p, n_est));
-            }
 
             // iterate over columns
             for (int globalColumnIndex = 0; globalColumnIndex < columnValueLists.size(); globalColumnIndex++) {
@@ -166,7 +150,7 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
                 }
 
                 if (filterNumericAndShortCols) {
-                    if (!ColumnFilter.INSTANCE.filterColumn(columnSet, nullValues)) {
+                    if (!ColumnFilter.INSTANCE.filterColumn(columnSet)) {
                         this.unfilteredColumns.set(globalColumnIndex);
                     } else {
                         skip = true;
@@ -180,13 +164,7 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
                 List<BloomFilter<String>> bloomFilterList = new ArrayList<>();
                 Validate.isTrue(passes <= 255);
                 for (int j = 0; j < passes; j++) {
-                    // take computed parameters
-                    if (p != 0) {
-                        bloomFilterList.add(new BloomFilter<String>(p, n_est, bitVectorFactory, (byte) j));
-                        // take explicit params
-                    } else {
-                        bloomFilterList.add(new BloomFilter<String>(m, k, bitVectorFactory, (byte) j));
-                    }
+                    bloomFilterList.add(new BloomFilter<String>(m, k, bitVectorFactory, (byte) j));
 
                 }
 
@@ -351,18 +329,16 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
     }
 
     private void initialize() throws InputGenerationException, SQLException, InputIterationException {
-        long overallRows = 0;
-
         // Ensure the presence of an input generator
         if (this.relationalInputGenerators == null) {
             throw new InputGenerationException("No input generator specified!");
         }
 
         // Query meta data for input tables
-        tableColumnStartIndexes = new int[tableNames.length];
+        tableColumnStartIndexes = new int[this.relationalInputGenerators.length];
         columnNames = new ArrayList<String>();
 
-        for (int tableIndex = 0; tableIndex < tableNames.length; tableIndex++) {
+        for (int tableIndex = 0; tableIndex < this.relationalInputGenerators.length; tableIndex++) {
             this.tableColumnStartIndexes[tableIndex] = this.columnNames.size();
 
             RelationalInput input = this.relationalInputGenerators[tableIndex].generateNewCopy();
@@ -384,18 +360,11 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
             while (inputIterator.next()) {
                 for (int columnNumber = 0; columnNumber < numTableColumns; columnNumber++) {
                     String value = inputIterator.getValue(columnNumber);
-                    // canonalize null values
-                    if (nullValues != null) {
-                        if (nullValues.contains(value)) {
-                            value = null;
-                        }
-                    }
 
                     tableColumns.get(columnNumber).add(value);
                 }
                 rows++;
             }
-            overallRows += rows;
             columnValueLists.addAll(tableColumns);
 
             try {
@@ -410,13 +379,6 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
 
         numColumns = this.columnNames.size();
         logger.debug("Number of columns: {}", numColumns);
-
-        if (this.strategy.equals(N_EST_STRATEGIES.AVERAGE)) {
-            this.n_est = (int) (overallRows / tableNames.length);
-        } else if (this.strategy.equals(N_EST_STRATEGIES.AVERAGE_HALF_DOUBLED)) {
-            this.n_est = (int) (overallRows / 2 / tableNames.length) * 2;
-        }
-        logger.debug("n estimation: {}", this.n_est);
     }
 
     private void storeColumnIdentifier(RelationalInput input) throws InputIterationException,
@@ -430,133 +392,111 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
     @Override
     public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
         final ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>();
-        configs.add(new ConfigurationRequirementRelationalInput(MANY.Identifier.RELATIONAL_INPUT.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
-        
-        // TODO: This is useless, because we can get the input names from their input generators: this.relationalInputGenerators[0].generateNewCopy().relationName()
-        configs.add(new ConfigurationRequirementString(MANY.Identifier.TABLE_NAMES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
-        
-        ConfigurationRequirementInteger m = new ConfigurationRequirementInteger(MANY.Identifier.M.name());
+        configs.add(new ConfigurationRequirementRelationalInput(MANY.Identifier.RELATIONAL_INPUT.name(),
+                ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
+
+        ConfigurationRequirementInteger m = new ConfigurationRequirementInteger(MANY.Identifier.BIT_VECTOR_SIZE.name());
         Integer[] defaultM = new Integer[1];
         defaultM[0] = -1;
         m.setDefaultValues(defaultM);
-		m.setRequired(true);
+        m.setRequired(true);
         configs.add(m);
-        
-        ConfigurationRequirementInteger k = new ConfigurationRequirementInteger(MANY.Identifier.K.name());
+
+        ConfigurationRequirementInteger k = new ConfigurationRequirementInteger(
+                MANY.Identifier.HASH_FUNCTION_COUNT.name());
         Integer[] defaultK = new Integer[1];
         defaultK[0] = -1;
         k.setDefaultValues(defaultK);
-		k.setRequired(true);
+        k.setRequired(true);
         configs.add(k);
-        
-        ConfigurationRequirementInteger p = new ConfigurationRequirementInteger(MANY.Identifier.P.name());
-        Integer[] defaultP = new Integer[1];
-        defaultP[0] = -1;
-        p.setDefaultValues(defaultP);
-		p.setRequired(true);
-        configs.add(p);
-        
+
         ConfigurationRequirementInteger passes = new ConfigurationRequirementInteger(MANY.Identifier.PASSES.name());
         Integer[] defaultPasses = new Integer[1];
         defaultPasses[0] = -1;
         passes.setDefaultValues(defaultPasses);
         passes.setRequired(true);
         configs.add(passes);
-        
+
         ConfigurationRequirementInteger dop = new ConfigurationRequirementInteger(MANY.Identifier.DOP.name());
         Integer[] defaultDop = new Integer[1];
         defaultDop[0] = -1;
         dop.setDefaultValues(defaultDop);
-		dop.setRequired(true);
+        dop.setRequired(true);
         configs.add(dop);
-        
-        ConfigurationRequirementString nEstStrategy = new ConfigurationRequirementString(MANY.Identifier.N_EST_STRATEGY.name());
-        String[] defaultNEstStrategy = new String[1];
-        defaultNEstStrategy[0] = "???????";
-        nEstStrategy.setDefaultValues(defaultNEstStrategy);
-		nEstStrategy.setRequired(true);
-        configs.add(nEstStrategy);
-        
-        ConfigurationRequirementBoolean filterNumericAndShortCols = new ConfigurationRequirementBoolean(MANY.Identifier.FILTER_NUMERIC_AND_SHORT_COLS.name());
+
+        ConfigurationRequirementBoolean filterNumericAndShortCols = new ConfigurationRequirementBoolean(
+                MANY.Identifier.FILTER_NUMERIC_AND_SHORT_COLS.name());
         Boolean[] defaultFilterNumericAndShortCols = new Boolean[1];
         defaultFilterNumericAndShortCols[0] = true;
         filterNumericAndShortCols.setDefaultValues(defaultFilterNumericAndShortCols);
         filterNumericAndShortCols.setRequired(false);
         configs.add(filterNumericAndShortCols);
-        
-        ConfigurationRequirementBoolean filterDependentRefs = new ConfigurationRequirementBoolean(MANY.Identifier.FILTER_DEPENDENT_REFS.name());
+
+        ConfigurationRequirementBoolean filterDependentRefs = new ConfigurationRequirementBoolean(
+                MANY.Identifier.FILTER_DEPENDENT_REFS.name());
         Boolean[] defaultFilterDependentRefs = new Boolean[1];
         defaultFilterDependentRefs[0] = true;
         filterDependentRefs.setDefaultValues(defaultFilterDependentRefs);
         filterDependentRefs.setRequired(false);
         configs.add(filterDependentRefs);
-        
-        ConfigurationRequirementBoolean filterNonUniqueRefs = new ConfigurationRequirementBoolean(MANY.Identifier.FILTER_NON_UNIQUE_REFS.name());
+
+        ConfigurationRequirementBoolean filterNonUniqueRefs = new ConfigurationRequirementBoolean(
+                MANY.Identifier.FILTER_NON_UNIQUE_REFS.name());
         Boolean[] defaultFilterNonUniqueRefs = new Boolean[1];
         defaultFilterNonUniqueRefs[0] = true;
         filterNonUniqueRefs.setDefaultValues(defaultFilterNonUniqueRefs);
         filterNonUniqueRefs.setRequired(false);
         configs.add(filterNonUniqueRefs);
-        
-        ConfigurationRequirementBoolean filterNullCols = new ConfigurationRequirementBoolean(MANY.Identifier.FILTER_NULL_COLS.name());
+
+        ConfigurationRequirementBoolean filterNullCols = new ConfigurationRequirementBoolean(
+                MANY.Identifier.FILTER_NULL_COLS.name());
         Boolean[] defaultFilterNullCols = new Boolean[1];
         defaultFilterNullCols[0] = true;
         filterNullCols.setDefaultValues(defaultFilterNullCols);
         filterNullCols.setRequired(false);
         configs.add(filterNullCols);
-        
-        ConfigurationRequirementBoolean condenseMatrix = new ConfigurationRequirementBoolean(MANY.Identifier.CONDENSE_MATRIX.name());
+
+        ConfigurationRequirementBoolean condenseMatrix = new ConfigurationRequirementBoolean(
+                MANY.Identifier.CONDENSE_MATRIX.name());
         Boolean[] defaultCondenseMatrix = new Boolean[1];
         defaultCondenseMatrix[0] = true;
         condenseMatrix.setDefaultValues(defaultCondenseMatrix);
         condenseMatrix.setRequired(false);
         configs.add(condenseMatrix);
-        
-        ConfigurationRequirementInteger refCoverageMinPercentage = new ConfigurationRequirementInteger(MANY.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name());
+
+        ConfigurationRequirementInteger refCoverageMinPercentage = new ConfigurationRequirementInteger(
+                MANY.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name());
         Integer[] defaultRefCoverageMinPercentage = new Integer[1];
         defaultRefCoverageMinPercentage[0] = -1;
         refCoverageMinPercentage.setDefaultValues(defaultRefCoverageMinPercentage);
         refCoverageMinPercentage.setRequired(true);
         configs.add(refCoverageMinPercentage);
-        
-        ConfigurationRequirementBoolean strategyRef2Deps = new ConfigurationRequirementBoolean(MANY.Identifier.STRATEGY_REF2DEPS.name());
+
+        ConfigurationRequirementBoolean strategyRef2Deps = new ConfigurationRequirementBoolean(
+                MANY.Identifier.STRATEGY_REF2DEPS.name());
         Boolean[] defaultStrategyRef2Deps = new Boolean[1];
         defaultStrategyRef2Deps[0] = true;
         strategyRef2Deps.setDefaultValues(defaultStrategyRef2Deps);
         strategyRef2Deps.setRequired(false);
         configs.add(strategyRef2Deps);
-        
-        ConfigurationRequirementBoolean fastvector = new ConfigurationRequirementBoolean(MANY.Identifier.FASTVECTOR.name());
+
+        ConfigurationRequirementBoolean fastvector = new ConfigurationRequirementBoolean(
+                MANY.Identifier.FASTVECTOR.name());
         Boolean[] defaultFastvector = new Boolean[1];
         defaultFastvector[0] = true;
         fastvector.setDefaultValues(defaultFastvector);
         fastvector.setRequired(false);
         configs.add(fastvector);
-        
-        // TODO: if this is a list of values that should be interpreted as NULL, then we could skip this parameter as well, because the NULL value is defined by Metanome per input source
-        ConfigurationRequirementString nullValueList = new ConfigurationRequirementString(MANY.Identifier.NULL_VALUE_LIST.name());
-        String[] defaultNullValueList = new String[1];
-        defaultNullValueList[0] = "???????";
-        nullValueList.setDefaultValues(defaultNullValueList);
-        nullValueList.setRequired(true);
-        configs.add(nullValueList);
-        
+
         ConfigurationRequirementBoolean verify = new ConfigurationRequirementBoolean(MANY.Identifier.VERIFY.name());
         Boolean[] defaultVerify = new Boolean[1];
         defaultVerify[0] = true;
         verify.setDefaultValues(defaultVerify);
         verify.setRequired(false);
         configs.add(verify);
-        
-        // TODO: a better identifier could be "GENERATE_OUTPUT", but we can also remove this parameter, because Metanome is now able to simply count results and not store/remember them
-        ConfigurationRequirementBoolean output = new ConfigurationRequirementBoolean(MANY.Identifier.OUTPUT.name());
-        Boolean[] defaultOutput = new Boolean[1];
-        defaultOutput[0] = true;
-        output.setDefaultValues(defaultOutput);
-        output.setRequired(false);
-        configs.add(output);
-        
-        ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(MANY.Identifier.INPUT_ROW_LIMIT.name());
+
+        ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(
+                MANY.Identifier.INPUT_ROW_LIMIT.name());
         Integer[] defaultInputRowLimit = new Integer[1];
         defaultInputRowLimit[0] = -1;
         inputRowLimit.setDefaultValues(defaultInputRowLimit);
@@ -569,28 +509,6 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
     @Override
     public void setResultReceiver(InclusionDependencyResultReceiver resultReceiver) {
         this.resultReceiver = resultReceiver;
-    }
-
-    @Override
-    public void setStringConfigurationValue(String identifier, String... values)
-            throws AlgorithmConfigurationException {
-        if (MANY.Identifier.TABLE_NAMES.name().equals(identifier)) {
-            tableNames = values;
-        } else if (MANY.Identifier.NULL_VALUE_LIST.name().equals(identifier)) {
-            nullValues = new HashSet<String>(Arrays.asList(values));
-        } else if (MANY.Identifier.N_EST_STRATEGY.name().equals(identifier)) {
-            try {
-                if (values[0] != null)
-                    strategy = N_EST_STRATEGIES.valueOf(values[0]);
-                else
-                    strategy = N_EST_STRATEGIES.AVERAGE;
-            } catch (IllegalArgumentException e) {
-                throw new AlgorithmConfigurationException("Unknown configuration: " + identifier + " -> " + values);
-            }
-        }
-        else {
-            throw new AlgorithmConfigurationException("Unknown configuration: " + identifier + " -> " + values);
-        }
     }
 
     @Override
@@ -629,19 +547,18 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
             throw new AlgorithmConfigurationException("Unknown configuration: " + identifier + " -> " + values);
         }
     }
-    
+
     @Override
-    public void setIntegerConfigurationValue(String identifier, Integer... values) throws AlgorithmConfigurationException {
-    	if (values.length <= 0)
- 			return;
-    	if (MANY.Identifier.M.name().equals(identifier)) {
+    public void setIntegerConfigurationValue(String identifier, Integer... values)
+            throws AlgorithmConfigurationException {
+        if (values.length <= 0)
+            return;
+        if (MANY.Identifier.BIT_VECTOR_SIZE.name().equals(identifier)) {
             m = values[0];
         } else if (MANY.Identifier.INPUT_ROW_LIMIT.name().equals(identifier)) {
             inputRowLimit = values[0];
-        } else if (MANY.Identifier.K.name().equals(identifier)) {
+        } else if (MANY.Identifier.HASH_FUNCTION_COUNT.name().equals(identifier)) {
             k = values[0];
-        } else if (MANY.Identifier.P.name().equals(identifier)) {
-            p = values[0] / P_DIVISOR;
         } else if (MANY.Identifier.PASSES.name().equals(identifier)) {
             passes = values[0];
         } else if (MANY.Identifier.DOP.name().equals(identifier)) {
@@ -653,13 +570,14 @@ public class MANY implements InclusionDependencyAlgorithm, StringParameterAlgori
         }
     }
 
-    public String getTableNameFor(int column, int[] tableColumnStartIndexes) {
+    public String getTableNameFor(int column, int[] tableColumnStartIndexes) throws InputGenerationException {
         for (int i = 1; i < tableColumnStartIndexes.length; i++) {
             if (tableColumnStartIndexes[i] > column) {
-                return tableNames[i - 1];
+                return this.relationalInputGenerators[i - 1].generateNewCopy().relationName();
             }
         }
-        return tableNames[tableNames.length - 1];
+        return this.relationalInputGenerators[this.relationalInputGenerators.length - 1].generateNewCopy()
+                .relationName();
     }
 
     public Set<String> getValueSetFor(int col) throws Exception {
