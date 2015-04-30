@@ -429,7 +429,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         Boolean[] defaultFilterNumericAndShortCols = new Boolean[1];
         defaultFilterNumericAndShortCols[0] = true;
         filterNumericAndShortCols.setDefaultValues(defaultFilterNumericAndShortCols);
-        filterNumericAndShortCols.setRequired(false);
+        filterNumericAndShortCols.setRequired(true);
         configs.add(filterNumericAndShortCols);
 
         ConfigurationRequirementBoolean filterDependentRefs = new ConfigurationRequirementBoolean(
@@ -437,7 +437,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         Boolean[] defaultFilterDependentRefs = new Boolean[1];
         defaultFilterDependentRefs[0] = true;
         filterDependentRefs.setDefaultValues(defaultFilterDependentRefs);
-        filterDependentRefs.setRequired(false);
+        filterDependentRefs.setRequired(true);
         configs.add(filterDependentRefs);
 
         ConfigurationRequirementBoolean filterNonUniqueRefs = new ConfigurationRequirementBoolean(
@@ -445,7 +445,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         Boolean[] defaultFilterNonUniqueRefs = new Boolean[1];
         defaultFilterNonUniqueRefs[0] = true;
         filterNonUniqueRefs.setDefaultValues(defaultFilterNonUniqueRefs);
-        filterNonUniqueRefs.setRequired(false);
+        filterNonUniqueRefs.setRequired(true);
         configs.add(filterNonUniqueRefs);
 
         ConfigurationRequirementBoolean filterNullCols = new ConfigurationRequirementBoolean(
@@ -453,7 +453,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         Boolean[] defaultFilterNullCols = new Boolean[1];
         defaultFilterNullCols[0] = true;
         filterNullCols.setDefaultValues(defaultFilterNullCols);
-        filterNullCols.setRequired(false);
+        filterNullCols.setRequired(true);
         configs.add(filterNullCols);
 
         ConfigurationRequirementBoolean condenseMatrix = new ConfigurationRequirementBoolean(
@@ -461,7 +461,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         Boolean[] defaultCondenseMatrix = new Boolean[1];
         defaultCondenseMatrix[0] = true;
         condenseMatrix.setDefaultValues(defaultCondenseMatrix);
-        condenseMatrix.setRequired(false);
+        condenseMatrix.setRequired(true);
         configs.add(condenseMatrix);
 
         ConfigurationRequirementInteger refCoverageMinPercentage = new ConfigurationRequirementInteger(
@@ -477,7 +477,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         Boolean[] defaultStrategyRef2Deps = new Boolean[1];
         defaultStrategyRef2Deps[0] = true;
         strategyRef2Deps.setDefaultValues(defaultStrategyRef2Deps);
-        strategyRef2Deps.setRequired(false);
+        strategyRef2Deps.setRequired(true);
         configs.add(strategyRef2Deps);
 
         ConfigurationRequirementBoolean fastvector = new ConfigurationRequirementBoolean(
@@ -485,14 +485,14 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         Boolean[] defaultFastvector = new Boolean[1];
         defaultFastvector[0] = true;
         fastvector.setDefaultValues(defaultFastvector);
-        fastvector.setRequired(false);
+        fastvector.setRequired(true);
         configs.add(fastvector);
 
         ConfigurationRequirementBoolean verify = new ConfigurationRequirementBoolean(MANY.Identifier.VERIFY.name());
         Boolean[] defaultVerify = new Boolean[1];
         defaultVerify[0] = true;
         verify.setDefaultValues(defaultVerify);
-        verify.setRequired(false);
+        verify.setRequired(true);
         configs.add(verify);
 
         ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(

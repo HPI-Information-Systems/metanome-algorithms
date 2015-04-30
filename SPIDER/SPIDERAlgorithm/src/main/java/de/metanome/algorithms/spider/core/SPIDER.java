@@ -81,6 +81,7 @@ public class SPIDER {
 				"memoryCheckFrequency: " + this.memoryCheckFrequency + "\r\n\t" +
 				"maxMemoryUsagePercentage: " + this.maxMemoryUsagePercentage + "\r\n\t" +
 				"availableMemory: " + this.availableMemory + " byte (spilled when exeeding " + this.maxMemoryUsage + " byte)\r\n\t" +
+				"cleanTemp: " + this.cleanTemp + "\r\n\t" +
 				"numUnaryINDs: " + this.numUnaryINDs + "\r\n" +
 			"statisticTime: " + this.statisticTime + "\r\n" +
 			"loadTime: " + this.loadTime + "\r\n" +
@@ -120,6 +121,9 @@ public class SPIDER {
 			this.outputTime = System.currentTimeMillis();
 			this.output();
 			this.outputTime = System.currentTimeMillis() - this.outputTime;
+			
+			System.out.println(this.toString());
+			System.out.println();
 		}
 		catch (IOException e) {
 			e.printStackTrace();

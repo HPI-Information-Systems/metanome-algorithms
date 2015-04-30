@@ -51,7 +51,7 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 		Boolean[] defaultCleanTemp = new Boolean[1];
 		defaultCleanTemp[0] = true;
 		cleanTemp.setDefaultValues(defaultCleanTemp);
-		cleanTemp.setRequired(false);
+		cleanTemp.setRequired(true);
 		configs.add(cleanTemp);
 		
 		return configs;

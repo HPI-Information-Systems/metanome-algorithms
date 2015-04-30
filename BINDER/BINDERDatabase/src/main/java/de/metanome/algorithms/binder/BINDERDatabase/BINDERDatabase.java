@@ -69,14 +69,14 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 		Boolean[] defaultCleanTemp = new Boolean[1];
 		defaultCleanTemp[0] = true;
 		cleanTemp.setDefaultValues(defaultCleanTemp);
-		cleanTemp.setRequired(false);
+		cleanTemp.setRequired(true);
 		configs.add(cleanTemp);
 		
 		ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.DETECT_NARY.name());
 		Boolean[] defaultDetectNary = new Boolean[1];
 		defaultDetectNary[0] = false;
 		detectNary.setDefaultValues(defaultDetectNary);
-		detectNary.setRequired(false);
+		detectNary.setRequired(true);
 		configs.add(detectNary);
 
 		return configs;

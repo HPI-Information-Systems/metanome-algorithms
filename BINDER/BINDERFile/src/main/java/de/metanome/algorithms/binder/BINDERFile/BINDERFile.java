@@ -38,7 +38,7 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		tempFolder.setDefaultValues(defaultTempFolder);
 		tempFolder.setRequired(true);
 		configs.add(tempFolder);
-
+		
 		ConfigurationRequirementInteger inputRowlimit = new ConfigurationRequirementInteger(BINDERFile.Identifier.INPUT_ROW_LIMIT.name());
 		inputRowlimit.setRequired(false);
 		configs.add(inputRowlimit);
@@ -47,14 +47,14 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		Boolean[] defaultCleanTemp = new Boolean[1];
 		defaultCleanTemp[0] = true;
 		cleanTemp.setDefaultValues(defaultCleanTemp);
-		cleanTemp.setRequired(false);
+		cleanTemp.setRequired(true);
 		configs.add(cleanTemp);
 		
 		ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(BINDERFile.Identifier.DETECT_NARY.name());
 		Boolean[] defaultDetectNary = new Boolean[1];
 		defaultDetectNary[0] = false;
 		detectNary.setDefaultValues(defaultDetectNary);
-		detectNary.setRequired(false);
+		detectNary.setRequired(true);
 		configs.add(detectNary);
 		
 		return configs;

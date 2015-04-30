@@ -42,7 +42,7 @@ public class Ducc implements UniqueColumnCombinationsAlgorithm, RelationalInputP
     Boolean[] defaultNullEqualsNull = new Boolean[1];
     defaultNullEqualsNull[0] = true;
 	nullEqualsNull.setDefaultValues(defaultNullEqualsNull);
-    nullEqualsNull.setRequired(false);
+    nullEqualsNull.setRequired(true);
     spec.add(nullEqualsNull);
     
     return spec;

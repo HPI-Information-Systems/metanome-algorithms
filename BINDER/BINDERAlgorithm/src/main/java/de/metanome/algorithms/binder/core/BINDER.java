@@ -131,6 +131,8 @@ public class BINDER {
 				"memoryCheckFrequency: " + this.memoryCheckFrequency + "\r\n\t" +
 				"maxMemoryUsagePercentage: " + this.maxMemoryUsagePercentage + "\r\n\t" +
 				"availableMemory: " + this.availableMemory + " byte (spilled when exeeding " + this.maxMemoryUsage + " byte)\r\n\t" +
+				"cleanTemp: " + this.cleanTemp + "\r\n\t" +
+				"detectNary: " + this.detectNary + "\r\n\t" +
 				"numUnaryINDs: " + this.numUnaryINDs + "\r\n\t" +
 				"numNaryINDs: " + this.numNaryINDs + "\r\n\t" +
 			"\r\n" +
@@ -202,6 +204,9 @@ public class BINDER {
 			this.outputTime = System.currentTimeMillis();
 			this.output();
 			this.outputTime = System.currentTimeMillis() - this.outputTime;
+			
+			System.out.println(this.toString());
+			System.out.println();
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
