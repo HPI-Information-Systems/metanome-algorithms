@@ -49,10 +49,10 @@ public class FileUtils {
 			return true;		
 		return false;
 	}
-	
-	public static boolean deleteDirectory(File directory) {
+
+	public static void deleteDirectory(File directory) {
 		if (isRoot(directory))
-			return false;
+			return;
 		
 		if (directory.exists()) {
 			File[] files = directory.listFiles();
@@ -65,7 +65,24 @@ public class FileUtils {
 				}
 			}
 		}
-		return(directory.delete());
+		directory.delete();
+	}
+	
+	public static void cleanDirectory(File directory) {
+		if (isRoot(directory))
+			return;
+		
+		if (directory.exists()) {
+			File[] files = directory.listFiles();
+			if (null != files) {
+				for (int i = 0; i < files.length; i++) {
+					if (files[i].isDirectory())
+						deleteDirectory(files[i]);
+					else
+						files[i].delete();
+				}
+			}
+		}
 	}
 
 	public static void createFile(String filePath, boolean recreateIfExists) throws IOException {

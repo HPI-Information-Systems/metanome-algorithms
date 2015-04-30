@@ -93,7 +93,7 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		if (BINDERFile.Identifier.TEMP_FOLDER_PATH.name().equals(identifier)) {
 			if ("".equals(values[0]) || " ".equals(values[0]) || "/".equals(values[0]) || "\\".equals(values[0]) || File.separator.equals(values[0]) || FileUtils.isRoot(new File(values[0])))
 				throw new AlgorithmConfigurationException(BINDERFile.Identifier.TEMP_FOLDER_PATH + " must not be \"" + values[0] + "\"");
-			this.tempFolderPath = values[0] + "BINDER_temp" + File.separator;
+			this.tempFolderPath = values[0] + File.separator + "BINDER_temp" + File.separator;
 		}
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));

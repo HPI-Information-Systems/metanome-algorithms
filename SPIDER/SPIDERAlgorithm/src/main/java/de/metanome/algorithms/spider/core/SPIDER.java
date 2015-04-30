@@ -91,7 +91,7 @@ public class SPIDER {
 	
 	public void execute() throws AlgorithmExecutionException {
 		// Clean temp if there are files from previous runs that may pollute this run
-		FileUtils.deleteDirectory(new File(this.tempFolderPath));
+		FileUtils.cleanDirectory(new File(this.tempFolderPath));
 		
 		try {
 			//////////////////////////////
@@ -139,7 +139,7 @@ public class SPIDER {
 			
 			// Clean temp
 			if (this.cleanTemp)
-				FileUtils.deleteDirectory(new File(this.tempFolderPath));
+				FileUtils.cleanDirectory(new File(this.tempFolderPath));
 		}		
 	}
 	

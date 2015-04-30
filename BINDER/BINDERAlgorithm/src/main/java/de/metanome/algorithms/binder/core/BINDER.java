@@ -164,7 +164,7 @@ public class BINDER {
 		LoggingUtils.disableLogging();
 		
 		// Clean temp if there are files from previous runs that may pollute this run
-		FileUtils.deleteDirectory(new File(this.tempFolderPath));
+		FileUtils.cleanDirectory(new File(this.tempFolderPath));
 		
 		try {
 			////////////////////////////////////////////////////////
@@ -222,7 +222,7 @@ public class BINDER {
 			
 			// Clean temp
 			if (this.cleanTemp)
-				FileUtils.deleteDirectory(new File(this.tempFolderPath));
+				FileUtils.cleanDirectory(new File(this.tempFolderPath));
 		}
 	}
 	
@@ -1066,7 +1066,7 @@ public class BINDER {
 		// Clean temp
 		if (this.cleanTemp) {
 			File tempFoder = new File(this.tempFolderPath);
-			FileUtils.deleteDirectory(tempFoder);
+			FileUtils.cleanDirectory(tempFoder);
 		}
 		// N-ary column combinations are enumerated following the enumeration of the attributes
 		int naryOffset = this.numColumns;
@@ -1163,7 +1163,7 @@ public class BINDER {
 		// Clean temp
 		if (this.cleanTemp) {
 			File tempFoder = new File(this.tempFolderPath);
-			FileUtils.deleteDirectory(tempFoder);
+			FileUtils.cleanDirectory(tempFoder);
 		}
 		
 		// Build an index that assigns the columns to their tables, because we can only group those attributes that belong to the same table.
