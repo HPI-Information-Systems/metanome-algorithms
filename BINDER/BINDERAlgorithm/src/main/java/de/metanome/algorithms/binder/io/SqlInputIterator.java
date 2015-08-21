@@ -15,6 +15,7 @@ import de.uni_potsdam.hpi.utils.DatabaseUtils;
 public class SqlInputIterator implements InputIterator {
 	
 	private ResultSet resultSet = null;
+	private List<String> record = null;
 	
 	public SqlInputIterator(DatabaseConnectionGenerator inputGenerator, DataAccessObject dao, String tableName, int inputRowLimit) throws InputGenerationException {
 		this.resultSet = inputGenerator.generateResultSetFromSql(dao.buildSelectEverythingQuery(tableName, inputRowLimit));
@@ -23,7 +24,23 @@ public class SqlInputIterator implements InputIterator {
 	@Override
 	public boolean next() throws InputIterationException {
 		try {
-			return this.resultSet.next();
+			boolean hasNext = this.resultSet.next();
+			
+			if (hasNext) {
+				int numColumns = this.resultSet.getMetaData().getColumnCount();
+				this.record = new ArrayList<String>(numColumns);
+				
+				for (int columnIndex = 1; columnIndex <= numColumns; columnIndex++) {
+					String value = this.resultSet.getString(columnIndex);
+					
+					// Replace line breaks with the zero-character, because these line breaks would otherwise split values when later written to plane-text buckets
+					if (value != null)
+						value = value.replaceAll("\n", "\0");
+					this.record.add(value);
+				}
+			}
+			
+			return hasNext;
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
@@ -33,21 +50,12 @@ public class SqlInputIterator implements InputIterator {
 	
 	@Override
 	public String getValue(int columnIndex) throws InputIterationException {
-		try {
-			return this.resultSet.getString(columnIndex + 1);
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-			throw new InputIterationException(e.getMessage());
-		}
+		return this.record.get(columnIndex);
 	}
 
 	@Override
-	public List<String> getValues(int numColumns) throws InputIterationException {
-		List<String> values = new ArrayList<String>(numColumns);
-		for (int columnIndex = 0; columnIndex < numColumns; columnIndex++)
-			values.add(this.getValue(columnIndex));
-		return values;
+	public List<String> getValues() throws InputIterationException {
+		return this.record;
 	}
 	
 	@Override

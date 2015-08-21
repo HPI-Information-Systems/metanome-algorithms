@@ -1374,7 +1374,6 @@ public class BINDER {
 		
 		for (int tableIndex = 0; tableIndex < this.tableNames.length; tableIndex++) {
 			String tableName = this.tableNames[tableIndex];
-			int numTableAttributes = (this.tableColumnStartIndexes.length > tableIndex + 1) ? this.tableColumnStartIndexes[tableIndex + 1] - this.tableColumnStartIndexes[tableIndex] : this.numColumns - this.tableColumnStartIndexes[tableIndex];
 			int numTableAttributeCombinations = table2attributeCombinationNumbers.get(tableIndex).size();
 			int startTableColumnIndex = this.tableColumnStartIndexes[tableIndex];
 			
@@ -1405,7 +1404,7 @@ public class BINDER {
 					inputIterator = new FileInputIterator(this.fileInputGenerator[tableIndex], this.inputRowLimit);
 				
 				while (inputIterator.next()) {
-					List<String> values = inputIterator.getValues(numTableAttributes);
+					List<String> values = inputIterator.getValues();
 					
 					for (int attributeCombinationNumber : table2attributeCombinationNumbers.get(tableIndex)) {
 						AttributeCombination attributeCombination = attributeCombinations.get(attributeCombinationNumber);

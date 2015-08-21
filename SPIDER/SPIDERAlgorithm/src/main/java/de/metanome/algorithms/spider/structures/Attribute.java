@@ -55,6 +55,9 @@ public class Attribute implements Comparable<Attribute>, Closeable {
 				if (value == null)
 					continue;
 				
+				// Replace line breaks with the zero-character, because these line breaks would otherwise split values when later written to plane-text files
+				value = value.replaceAll("\n", "\0");
+				
 				if (!isFirstValues)
 					writer.newLine();
 				writer.write(value);

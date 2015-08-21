@@ -33,8 +33,11 @@ public class TPMMS {
 			while (relationalInput.hasNext()) {
 				String value = relationalInput.next().get(relativeAttributeIndex);
 				
-				if ((value == null) || (value.equals("")))
+				if (value == null)
 					continue;
+				
+				// Replace line breaks with the zero-character, because these line breaks would otherwise split values when later written to plane-text files
+				value = value.replaceAll("\n", "\0");
 				
 				values.add(value);
 				numValuesSinceLastMemoryCheck++;

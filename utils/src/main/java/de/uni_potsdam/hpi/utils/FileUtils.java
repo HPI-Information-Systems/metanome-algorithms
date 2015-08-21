@@ -107,10 +107,10 @@ public class FileUtils {
 		int line = (skipHeadline) ? 1 : 0;
 		return new CSVReader(new InputStreamReader(new FileInputStream(filePath), Charset.forName(FileUtils.CHARSET_NAME)), separator, '\"', line);
 	}
-	
-	public static CSVWriter buildCSVFileWriter(String filePath, char separator) throws IOException {
-		FileUtils.createFile(filePath, true);
-		return new CSVWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath)), Charset.forName(FileUtils.CHARSET_NAME)), separator, '\"', '\\');
+
+	public static CSVWriter buildCSVFileWriter(String filePath, char separator, boolean append) throws IOException {
+		FileUtils.createFile(filePath, !append);
+		return new CSVWriter(new OutputStreamWriter(new FileOutputStream(new File(filePath), append), Charset.forName(FileUtils.CHARSET_NAME)), separator, '\"', '\\');
 	}
 
 	public static BufferedReader buildFileReader(String filePath) throws FileNotFoundException {
