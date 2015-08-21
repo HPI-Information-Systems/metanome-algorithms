@@ -24,7 +24,7 @@ import de.uni_potsdam.hpi.utils.FileUtils;
 public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, FileInputParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
 
 	public enum Identifier {
-		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY
+		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL
 	};
 	
 	@Override
@@ -56,6 +56,12 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		detectNary.setDefaultValues(defaultDetectNary);
 		detectNary.setRequired(true);
 		configs.add(detectNary);
+
+		ConfigurationRequirementInteger maxNaryLevel = new ConfigurationRequirementInteger(Identifier.MAX_NARY_LEVEL.name());
+		Integer[] defaultMaxNaryLevel = { Integer.valueOf(1) };
+		maxNaryLevel.setDefaultValues(defaultMaxNaryLevel);
+		maxNaryLevel.setRequired(false);
+		configs.add(maxNaryLevel);
 		
 		return configs;
 	}
@@ -83,6 +89,11 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		if (BINDERFile.Identifier.INPUT_ROW_LIMIT.name().equals(identifier)) {
 			if (values.length > 0)
 				this.inputRowLimit = values[0].intValue();
+		}
+		else if (Identifier.MAX_NARY_LEVEL.name().equals(identifier)) {
+			if (values.length > 0) {
+				this.maxNaryLevel = values[0].intValue();
+			}
 		}
 		else 
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
