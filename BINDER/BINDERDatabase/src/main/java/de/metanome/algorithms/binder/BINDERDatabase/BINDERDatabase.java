@@ -31,7 +31,7 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 	}
 	
 	public enum Identifier {
-		INPUT_DATABASE, INPUT_ROW_LIMIT, DATABASE_NAME, DATABASE_TYPE, INPUT_TABLES, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY
+		INPUT_DATABASE, INPUT_ROW_LIMIT, DATABASE_NAME, DATABASE_TYPE, INPUT_TABLES, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL
 	};
 	
 	@Override
@@ -79,6 +79,12 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 		detectNary.setRequired(true);
 		configs.add(detectNary);
 
+		ConfigurationRequirementInteger maxNaryLevel = new ConfigurationRequirementInteger(BINDERDatabase.Identifier.MAX_NARY_LEVEL.name());
+		Integer[] defaultMaxNaryLevel = { Integer.valueOf(-1), Integer.valueOf(0) };
+		maxNaryLevel.setDefaultValues(defaultMaxNaryLevel);
+		maxNaryLevel.setRequired(false);
+		configs.add(maxNaryLevel);
+
 		return configs;
 	}
 
@@ -100,6 +106,11 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 		if (BINDERDatabase.Identifier.INPUT_ROW_LIMIT.name().equals(identifier)) {
 			if (values.length > 0)
 				this.inputRowLimit = values[0].intValue();
+		}
+		else if (BINDERDatabase.Identifier.MAX_NARY_LEVEL.name().equals(identifier)) {
+			if (values.length > 0) {
+				this.maxNaryLevel = values[0].intValue();
+			}
 		}
 		else 
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));

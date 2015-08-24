@@ -195,7 +195,7 @@ public class BINDER {
 			/////////////////////////////////////////////////////////
 			// Phase 3: N-ary IND detection (Find INDs of size > 1 //
 			/////////////////////////////////////////////////////////
-			if (this.detectNary && (this.maxNaryLevel > 1 || this.maxNaryLevel == -1))
+			if (this.detectNary && (this.maxNaryLevel > 1 || this.maxNaryLevel <= 0))
 				this.detectNaryViaBucketing();
 				//this.detectNaryViaSingleChecks();
 			
@@ -1110,7 +1110,7 @@ public class BINDER {
 		this.naryGenerationTime = new LongArrayList();
 		this.naryLoadTime = new LongArrayList();
 		this.naryCompareTime = new LongArrayList();
-		while (++naryLevel <= this.maxNaryLevel || this.maxNaryLevel == -1) {
+		while (++naryLevel <= this.maxNaryLevel || this.maxNaryLevel <= 0) {
 			// Generate (n+1)-ary IND candidates from the already identified unary and n-ary IND candidates
 			final long naryGenerationTimeCurrent = System.currentTimeMillis();
 			

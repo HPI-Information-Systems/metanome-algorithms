@@ -57,8 +57,8 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		detectNary.setRequired(true);
 		configs.add(detectNary);
 
-		ConfigurationRequirementInteger maxNaryLevel = new ConfigurationRequirementInteger(Identifier.MAX_NARY_LEVEL.name());
-		Integer[] defaultMaxNaryLevel = { Integer.valueOf(1) };
+		ConfigurationRequirementInteger maxNaryLevel = new ConfigurationRequirementInteger(BINDERFile.Identifier.MAX_NARY_LEVEL.name());
+		Integer[] defaultMaxNaryLevel = { Integer.valueOf(-1), Integer.valueOf(0) };
 		maxNaryLevel.setDefaultValues(defaultMaxNaryLevel);
 		maxNaryLevel.setRequired(false);
 		configs.add(maxNaryLevel);
@@ -90,7 +90,7 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 			if (values.length > 0)
 				this.inputRowLimit = values[0].intValue();
 		}
-		else if (Identifier.MAX_NARY_LEVEL.name().equals(identifier)) {
+		else if (BINDERFile.Identifier.MAX_NARY_LEVEL.name().equals(identifier)) {
 			if (values.length > 0) {
 				this.maxNaryLevel = values[0].intValue();
 			}
