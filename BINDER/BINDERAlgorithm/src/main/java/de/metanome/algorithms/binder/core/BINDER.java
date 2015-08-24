@@ -71,8 +71,8 @@ public class BINDER {
 	protected int numColumns;
 	protected int numBucketsPerColumn = 10; // TODO: Parameter!
 	protected int memoryCheckFrequency = 100; // TODO: Parameter!
-	protected float maxMemoryUsagePercentage = 0.8f; // TODO: Parameter!
-	protected int overheadPerValueForIndexes = 32; // Bytes that each value requires in the comparison phase for the indexes
+	protected float maxMemoryUsagePercentage = 0.6f; // TODO: Parameter!
+	protected int overheadPerValueForIndexes = 64; // Bytes that each value requires in the comparison phase for the indexes
 	protected long availableMemory;
 	protected long maxMemoryUsage;
 	
