@@ -67,7 +67,8 @@ public class BINDER {
 	protected String tempFolderPath = null; // TODO: Use Metanome temp file functionality here (interface TempFileAlgorithm)
 	protected boolean cleanTemp = true;
 	protected boolean detectNary = false;
-	
+	protected int maxNaryLevel = -1;
+
 	protected int numColumns;
 	protected int numBucketsPerColumn = 10; // TODO: Parameter!
 	protected int memoryCheckFrequency = 100; // TODO: Parameter!
@@ -194,7 +195,7 @@ public class BINDER {
 			/////////////////////////////////////////////////////////
 			// Phase 3: N-ary IND detection (Find INDs of size > 1 //
 			/////////////////////////////////////////////////////////
-			if (this.detectNary)
+			if (this.detectNary && (this.maxNaryLevel > 1 || this.maxNaryLevel == -1))
 				this.detectNaryViaBucketing();
 				//this.detectNaryViaSingleChecks();
 			
@@ -1101,15 +1102,17 @@ public class BINDER {
 			}
 			nPlusOneAryDep2ref.put(depAttributeCombination, refAttributeCombinations);
 		}
+
+		int naryLevel = 1;
 		
 		// Generate, bucketize and test the n-ary INDs level-wise
 		this.naryDep2ref = new HashMap<AttributeCombination, List<AttributeCombination>>();
 		this.naryGenerationTime = new LongArrayList();
 		this.naryLoadTime = new LongArrayList();
 		this.naryCompareTime = new LongArrayList();
-		while (true) {
+		while (++naryLevel <= this.maxNaryLevel || this.maxNaryLevel == -1) {
 			// Generate (n+1)-ary IND candidates from the already identified unary and n-ary IND candidates
-			long naryGenerationTimeCurrent = System.currentTimeMillis();
+			final long naryGenerationTimeCurrent = System.currentTimeMillis();
 			
 			nPlusOneAryDep2ref = this.generateNPlusOneAryCandidates(nPlusOneAryDep2ref);
 			if (nPlusOneAryDep2ref.isEmpty())
@@ -1153,6 +1156,7 @@ public class BINDER {
 			naryOffset = naryOffset + attributeCombinations.size();
 
 			this.naryCompareTime.add(System.currentTimeMillis() - naryCompareTimeCurrent);
+			System.out.println("Used " + (System.currentTimeMillis() - naryGenerationTimeCurrent) + " ms on level " + naryLevel);
 		}
 	}
 	
