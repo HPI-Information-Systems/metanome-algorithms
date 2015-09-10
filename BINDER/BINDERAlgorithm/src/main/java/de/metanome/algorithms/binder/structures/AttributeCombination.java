@@ -35,9 +35,12 @@ public class AttributeCombination implements Comparable<AttributeCombination> {
 			attributesByName[i] = names.get(this.attributes[i]);
 		return attributesByName;
 	}
-	
+
 	public boolean contains(int attribute) {
-		return Arrays.binarySearch(this.attributes, attribute) >= 0;
+		for (int a : this.attributes)
+			if (a == attribute)
+				return true;
+		return false;
 	}
 	
 	@Override

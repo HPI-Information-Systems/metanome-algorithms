@@ -15,7 +15,7 @@ public class MemoryManagedJoinedPartitions extends TLongObjectHashMap<HashMap<Co
 
 	private static final long serialVersionUID = -7385828030861564827L;
 	private static final int PARTITION_THRESHOLD = 10000;
-	private static final boolean USE_MEMORY_MANAGEMENT = true;
+	private static final boolean USE_MEMORY_MANAGEMENT = false;
 	
 	private int numberOfColumns;
 	private ColumnCollection key;
