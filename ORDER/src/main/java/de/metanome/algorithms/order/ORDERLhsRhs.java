@@ -587,7 +587,7 @@ public class ORDERLhsRhs extends ORDER {
       if (valid) {
         // order dependency is valid
         this.statistics.setNumFoundDependencies(this.statistics.getNumFoundDependencies() + 1);
-        this.signalFoundOrderDependency(lhs, rhs, ComparisonOperator.STRICTLY_SMALLER,
+        this.signalFoundOrderDependency(rhs, lhs, ComparisonOperator.SMALLER_EQUAL,
             OrderType.LEXICOGRAPHICAL);
 
         if (this.validDependencies.get(lhs) == null) {
