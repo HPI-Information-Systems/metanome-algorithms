@@ -34,3 +34,6 @@ cp ducc/ducc_for_metanome/target/*.jar _COLLECTION_
 cp dfd/dfdMetanome/target/*.jar _COLLECTION_
 
 cp ORDER/target/*.jar _COLLECTION_
+
+cp AIDFD/target/*.jar _COLLECTION_
+
