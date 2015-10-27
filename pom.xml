@@ -60,5 +60,6 @@
         <module>dfd</module>
         <module>AIDFD</module>
         <module>ORDER</module>
+        <module>FAIDA</module>
     </modules>
 </project>
