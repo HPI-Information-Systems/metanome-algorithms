@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntListIterator;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.io.BufferedReader;
@@ -27,6 +28,8 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import org.apache.lucene.util.OpenBitSet;
+
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.ColumnPermutation;
@@ -44,9 +47,9 @@ import de.metanome.algorithms.binder.io.SqlInputIterator;
 import de.metanome.algorithms.binder.structures.Attribute;
 import de.metanome.algorithms.binder.structures.AttributeCombination;
 import de.metanome.algorithms.binder.structures.IntSingleLinkedList;
+import de.metanome.algorithms.binder.structures.IntSingleLinkedList.ElementIterator;
 import de.metanome.algorithms.binder.structures.Level;
 import de.metanome.algorithms.binder.structures.PruningStatistics;
-import de.metanome.algorithms.binder.structures.IntSingleLinkedList.ElementIterator;
 import de.uni_potsdam.hpi.dao.DataAccessObject;
 import de.uni_potsdam.hpi.utils.CollectionUtils;
 import de.uni_potsdam.hpi.utils.DatabaseUtils;
@@ -67,6 +70,7 @@ public class BINDER {
 	protected String tempFolderPath = null; // TODO: Use Metanome temp file functionality here (interface TempFileAlgorithm)
 	protected boolean cleanTemp = true;
 	protected boolean detectNary = false;
+	protected boolean filterKeyForeignkeys = false;
 	protected int maxNaryLevel = -1;
 
 	protected int numColumns;
@@ -90,6 +94,8 @@ public class BINDER {
 	protected int[] column2table = null;
 	protected String valueSeparator = "#";
 	protected int numNaryINDs = 0;
+	
+	protected OpenBitSet nullValueColumns;
 	
 	protected long unaryStatisticTime = -1;
 	protected long unaryLoadTime = -1;
@@ -137,6 +143,8 @@ public class BINDER {
 				"numUnaryINDs: " + this.numUnaryINDs + "\r\n\t" +
 				"numNaryINDs: " + this.numNaryINDs + "\r\n\t" +
 			"\r\n" +
+			"nullValueColumns: " + this.toString(this.nullValueColumns) + 
+			"\r\n" +
 			((this.pruningStatistics != null) ? String.valueOf(this.pruningStatistics.getPrunedCombinations()) : "-") + " candidates pruned by statistical pruning\r\n\t" +
 			"\r\n" +
 			"columnSizes: " + ((this.columnSizes != null) ? CollectionUtils.concat(this.columnSizes, ", ") : "-") + "\r\n" +	
@@ -158,6 +166,14 @@ public class BINDER {
 			"naryLoadTime: " + this.naryLoadTime + "\r\n" +
 			"naryCompareTime: " + this.naryCompareTime + "\r\n" +
 			"outputTime: " + this.outputTime;
+	}
+	
+	protected String toString(OpenBitSet o) {
+		StringBuilder builder = new StringBuilder("[");
+		for (int i = 0; i < o.length(); i++)
+			builder.append((o.get(i) == true) ? 1 : 0);
+		builder.append("]");
+		return builder.toString();
 	}
 
 	public void execute() throws AlgorithmExecutionException {
@@ -262,7 +278,21 @@ public class BINDER {
 		for (int bucketNumber = 0; bucketNumber < this.numBucketsPerColumn; bucketNumber++)
 			this.refinements[bucketNumber] = 0;
 		
+		this.nullValueColumns = new OpenBitSet(this.columnNames.size());
+		
 		this.pruningStatistics = new PruningStatistics(this.numColumns, this.numBucketsPerColumn);
+		
+		// Build an index that assigns the columns to their tables, because the n-ary detection can only group those attributes that belong to the same table and the foreign key detection also only groups attributes from different tables.
+		this.column2table = new int[this.numColumns];
+		int table = 0;
+		for (int i = 0; i < this.tableColumnStartIndexes.length; i++) {
+			int currentStart = this.tableColumnStartIndexes[i];
+			int nextStart = ((i + 1) == this.tableColumnStartIndexes.length) ? this.numColumns : this.tableColumnStartIndexes[i + 1];
+			
+			for (int j = currentStart; j < nextStart; j++)
+				this.column2table[j] = table;
+			table++;
+		}
 	}
 	
 	protected void collectStatisticsFrom(DatabaseConnectionGenerator inputGenerator, int tableIndex) throws InputGenerationException {
@@ -347,8 +377,10 @@ public class BINDER {
 						
 						//value = new StringBuilder(value).reverse().toString(); // This is an optimization if urls with long, common prefixes are used to later improve the comparison values
 						
-						if (value == null)
+						if (value == null) {
+							this.nullValueColumns.set(startTableColumnIndex + columnNumber);
 							continue;
+						}
 						
 						// Bucketize
 						int bucketNumber = this.calculateBucketFor(value);
@@ -799,11 +831,32 @@ public class BINDER {
 			if (this.columnSizes.getLong(column) > 0)
 				nonEmptyColumns.add(column);
 		
-		for (int dep : columns)
-			if (this.columnSizes.getLong(dep) == 0)
-				dep2refFinal.put(dep, new IntSingleLinkedList(columns, dep));
-			else
-				dep2refToCheck.put(dep, new IntSingleLinkedList(nonEmptyColumns, dep));
+		if (this.filterKeyForeignkeys) {
+			for (int dep : columns) {
+				// Empty columns are no foreign keys
+				if (this.columnSizes.getLong(dep) == 0)
+					continue;
+				
+				// Referenced columns must not have null values and must come from different tables
+				IntArrayList seed = nonEmptyColumns.clone();
+				IntListIterator iterator = seed.iterator();
+				while (iterator.hasNext()) {
+					int ref = iterator.nextInt();
+					if ((this.column2table[dep] == this.column2table[ref]) || this.nullValueColumns.get(ref))
+						iterator.remove();
+				}
+				
+				dep2refToCheck.put(dep, new IntSingleLinkedList(seed, dep));
+			}
+		}
+		else {
+			for (int dep : columns) {
+				if (this.columnSizes.getLong(dep) == 0)
+					dep2refFinal.put(dep, new IntSingleLinkedList(columns, dep));
+				else
+					dep2refToCheck.put(dep, new IntSingleLinkedList(nonEmptyColumns, dep));
+			}
+		}
 	}
 	
 	protected void prune(Int2ObjectOpenHashMap<BitSet> attribute2Refs, BitSet attributeGroup) {
@@ -1072,18 +1125,6 @@ public class BINDER {
 		// N-ary column combinations are enumerated following the enumeration of the attributes
 		int naryOffset = this.numColumns;
 
-		// Build an index that assigns the columns to their tables, because we can only group those attributes that belong to the same table.
-		this.column2table = new int[this.numColumns];
-		int table = 0;
-		for (int i = 0; i < this.tableColumnStartIndexes.length; i++) {
-			int currentStart = this.tableColumnStartIndexes[i];
-			int nextStart = ((i + 1) == this.tableColumnStartIndexes.length) ? this.numColumns : this.tableColumnStartIndexes[i + 1];
-			
-			for (int j = currentStart; j < nextStart; j++)
-				this.column2table[j] = table;
-			table++;
-		}
-		
 		// Initialize counters
 		this.naryActiveAttributesPerBucketLevel = new IntArrayList();
 		this.narySpillCounts = new ArrayList<int[]>();
@@ -1168,18 +1209,6 @@ public class BINDER {
 		if (this.cleanTemp) {
 			File tempFoder = new File(this.tempFolderPath);
 			FileUtils.cleanDirectory(tempFoder);
-		}
-		
-		// Build an index that assigns the columns to their tables, because we can only group those attributes that belong to the same table.
-		this.column2table = new int[this.numColumns];
-		int table = 0;
-		for (int i = 0; i < this.tableColumnStartIndexes.length; i++) {
-			int currentStart = this.tableColumnStartIndexes[i];
-			int nextStart = ((i + 1) == this.tableColumnStartIndexes.length) ? this.numColumns : this.tableColumnStartIndexes[i + 1];
-			
-			for (int j = currentStart; j < nextStart; j++)
-				this.column2table[j] = table;
-			table++;
 		}
 		
 		// Initialize nPlusOneAryDep2ref with unary dep2ref

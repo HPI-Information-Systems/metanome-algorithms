@@ -24,7 +24,7 @@ import de.uni_potsdam.hpi.utils.FileUtils;
 public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, FileInputParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
 
 	public enum Identifier {
-		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL
+		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL, FILTER_KEY_FOREIGNKEYS
 	};
 	
 	@Override
@@ -62,6 +62,13 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		maxNaryLevel.setDefaultValues(defaultMaxNaryLevel);
 		maxNaryLevel.setRequired(false);
 		configs.add(maxNaryLevel);
+
+		ConfigurationRequirementBoolean filterKeyForeignkeys = new ConfigurationRequirementBoolean(BINDERFile.Identifier.FILTER_KEY_FOREIGNKEYS.name());
+		Boolean[] defaultFilterKeyForeignkeys = new Boolean[1];
+		defaultFilterKeyForeignkeys[0] = false;
+		filterKeyForeignkeys.setDefaultValues(defaultFilterKeyForeignkeys);
+		filterKeyForeignkeys.setRequired(true);
+		configs.add(filterKeyForeignkeys);
 		
 		return configs;
 	}
@@ -116,6 +123,8 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 			this.cleanTemp = values[0];
 		else if (BINDERFile.Identifier.DETECT_NARY.name().equals(identifier))
 			this.detectNary = values[0];
+		else if (BINDERFile.Identifier.FILTER_KEY_FOREIGNKEYS.name().equals(identifier))
+			this.filterKeyForeignkeys = values[0];
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}

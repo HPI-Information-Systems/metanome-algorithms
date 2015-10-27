@@ -31,7 +31,7 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 	}
 	
 	public enum Identifier {
-		INPUT_DATABASE, INPUT_ROW_LIMIT, DATABASE_NAME, DATABASE_TYPE, INPUT_TABLES, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL
+		INPUT_DATABASE, INPUT_ROW_LIMIT, DATABASE_NAME, DATABASE_TYPE, INPUT_TABLES, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL, FILTER_KEY_FOREIGNKEYS
 	};
 	
 	@Override
@@ -85,6 +85,13 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 		maxNaryLevel.setRequired(false);
 		configs.add(maxNaryLevel);
 
+		ConfigurationRequirementBoolean filterKeyForeignkeys = new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.FILTER_KEY_FOREIGNKEYS.name());
+		Boolean[] defaultFilterKeyForeignkeys = new Boolean[1];
+		defaultFilterKeyForeignkeys[0] = false;
+		filterKeyForeignkeys.setDefaultValues(defaultFilterKeyForeignkeys);
+		filterKeyForeignkeys.setRequired(true);
+		configs.add(filterKeyForeignkeys);
+		
 		return configs;
 	}
 
@@ -147,6 +154,8 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 			this.cleanTemp = values[0];
 		else if (BINDERDatabase.Identifier.DETECT_NARY.name().equals(identifier))
 			this.detectNary = values[0];
+		else if (BINDERDatabase.Identifier.FILTER_KEY_FOREIGNKEYS.name().equals(identifier))
+			this.filterKeyForeignkeys = values[0];
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}
