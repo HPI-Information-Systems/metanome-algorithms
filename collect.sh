@@ -37,3 +37,5 @@ cp ORDER/target/*.jar _COLLECTION_
 
 cp AIDFD/target/*.jar _COLLECTION_
 
+cp FAIDA/FAIDAAlgorithm/target/*.jar _COLLECTION_
+

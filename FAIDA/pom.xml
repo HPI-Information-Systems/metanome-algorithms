@@ -31,7 +31,6 @@
 	</build>
 	
 	<modules>
-        <module>MetanomeTestRunner</module>
         <module>FAIDAAlgorithm</module>
     </modules>
     
