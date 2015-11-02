@@ -89,7 +89,7 @@ public class FileUtils {
 		File file = new File(filePath);
 		File folder = file.getParentFile();
 		
-		if (!folder.exists()) {
+		if ((folder != null) && !folder.exists()) {
 			folder.mkdirs();
 			while (!folder.exists()) {}
 		}
