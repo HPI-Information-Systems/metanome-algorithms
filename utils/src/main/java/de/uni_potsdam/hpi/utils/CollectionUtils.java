@@ -2,6 +2,7 @@ package de.uni_potsdam.hpi.utils;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.util.Collection;
@@ -49,6 +50,9 @@ public class CollectionUtils {
 	
 	// Simply concatenate the elements of a collection
 	public static String concat(Iterable<String> strings, String separator) {
+		if (strings == null)
+			return "";
+		
 		StringBuilder buffer = new StringBuilder();
 		
 		for (String string : strings) {
@@ -64,6 +68,9 @@ public class CollectionUtils {
 	
 	// Simply concatenate the elements of an IntArrayList
 	public static String concat(IntArrayList integers, String separator) {
+		if (integers == null)
+			return "";
+		
 		StringBuilder buffer = new StringBuilder();
 		
 		for (int integer : integers) {
@@ -79,6 +86,9 @@ public class CollectionUtils {
 
 	// Simply concatenate the elements of an IntArrayList
 	public static String concat(LongArrayList longs, String separator) {
+		if (longs == null)
+			return "";
+		
 		StringBuilder buffer = new StringBuilder();
 		
 		for (long longValue : longs) {
@@ -94,6 +104,9 @@ public class CollectionUtils {
 	
 	// Simply concatenate the elements of an array
 	public static String concat(Object[] objects, String separator) {
+		if (objects == null)
+			return "";
+		
 		StringBuilder buffer = new StringBuilder();
 		
 		for (int i = 0; i < objects.length; i++) {
@@ -107,6 +120,9 @@ public class CollectionUtils {
 	
 	// Simply concatenate the elements of an array
 	public static String concat(int[] numbers, String separator) {
+		if (numbers == null)
+			return "";
+		
 		StringBuilder buffer = new StringBuilder();
 		
 		for (int i = 0; i < numbers.length; i++) {
@@ -120,6 +136,9 @@ public class CollectionUtils {
 
 	// Simply concatenate the elements of an array
 	public static String concat(boolean[] booleans, String separator) {
+		if (booleans == null)
+			return "";
+		
 		StringBuilder buffer = new StringBuilder();
 		
 		for (int i = 0; i < booleans.length; i++) {
@@ -133,6 +152,9 @@ public class CollectionUtils {
 	
 	// Concatenate the elements of the arrays and the whole list
 	public static String concat(List<int[]> numbersList, String innerSeparator, String outerSeparator) {
+		if (numbersList == null)
+			return "";
+		
 		StringBuilder buffer = new StringBuilder();
 		
 		Iterator<int[]> iterator = numbersList.iterator();
@@ -152,6 +174,9 @@ public class CollectionUtils {
 
 	// Concatenate the elements of an array extending each element by a given prefix and suffix
 	public static String concat(String[] strings, String prefix, String suffix, String separator) {
+		if (strings == null)
+			return "";
+		
 		StringBuilder buffer = new StringBuilder();
 		
 		for (int i = 0; i < strings.length; i++) {
@@ -178,6 +203,9 @@ public class CollectionUtils {
 
 	// Interleave and concatenate the two arrays
 	public static String concat(String[] stringsA, String[] stringsB, String separatorStrings, String separatorPairs) {
+		if ((stringsA == null) || (stringsB == null))
+			return "";
+		
 		StringBuilder buffer = new StringBuilder();
 		
 		int times = Math.max(stringsA.length, stringsB.length);
@@ -196,6 +224,18 @@ public class CollectionUtils {
 		}
 		
 		return buffer.toString();
+	}
+	
+	public static String concat(ObjectArrayList<int[][]> samples, String separator) {
+		if (samples == null)
+			return "";
+		
+		StringBuilder buffer = new StringBuilder();
+		
+		for (int[][] sample : samples)
+			buffer.append(sample.length + separator);
+		
+		return buffer.substring(0, buffer.length() - 1);
 	}
 	
 	// Removes all values that occur in both sets from both sets
