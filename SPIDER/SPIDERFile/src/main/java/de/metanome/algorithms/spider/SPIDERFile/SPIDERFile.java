@@ -64,7 +64,7 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 			
 			this.tableNames = new String[values.length];
 			for (int i = 0; i < values.length; i++)
-				this.tableNames[i] = values[i].getInputFile().getName().split("\\.")[0];
+				this.tableNames[i] = values[i].getInputFile().getName();
 		}
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
