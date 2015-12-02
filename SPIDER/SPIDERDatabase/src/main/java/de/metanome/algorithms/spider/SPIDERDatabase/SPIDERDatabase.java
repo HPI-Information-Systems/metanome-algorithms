@@ -35,8 +35,8 @@ public class SPIDERDatabase extends SPIDER implements InclusionDependencyAlgorit
 	};
 
 	@Override
-	public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-		ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>(7);
+	public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<ConfigurationRequirement<?>>(7);
 		configs.add(new ConfigurationRequirementDatabaseConnection(SPIDERDatabase.Identifier.INPUT_DATABASE.name()));
 		
 		ConfigurationRequirementString databaseName = new ConfigurationRequirementString(SPIDERDatabase.Identifier.DATABASE_NAME.name());

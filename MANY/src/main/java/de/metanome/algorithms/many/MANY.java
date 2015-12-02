@@ -4,37 +4,16 @@
 
 package de.metanome.algorithms.many;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.algorithm_types.BooleanParameterAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.InclusionDependencyAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.IntegerParameterAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.RelationalInputParameterAlgorithm;
-import de.metanome.algorithm_integration.algorithm_types.StringParameterAlgorithm;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementBoolean;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementInteger;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementRelationalInput;
-import de.metanome.algorithm_integration.configuration.ConfigurationRequirementString;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
@@ -47,6 +26,24 @@ import de.metanome.algorithms.many.filter.ColumnFilter;
 import de.metanome.algorithms.many.helper.PrintHelper;
 import de.metanome.algorithms.many.io.FileInputIterator;
 import de.metanome.algorithms.many.io.InputIterator;
+
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgorithm,
         BooleanParameterAlgorithm, RelationalInputParameterAlgorithm {
@@ -390,8 +387,8 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
     }
 
     @Override
-    public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-        final ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>();
+    public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+        final ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<>();
         configs.add(new ConfigurationRequirementRelationalInput(MANY.Identifier.RELATIONAL_INPUT.name(),
                 ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
 

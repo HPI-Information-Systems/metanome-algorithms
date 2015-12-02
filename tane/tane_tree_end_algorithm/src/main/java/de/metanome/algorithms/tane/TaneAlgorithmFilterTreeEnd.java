@@ -73,8 +73,8 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
     private LongBigArrayBigList tTable;
 
     @Override
-    public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-    	ArrayList<ConfigurationRequirement> requiredConfig = new ArrayList<>();
+    public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+    	ArrayList<ConfigurationRequirement<?>> requiredConfig = new ArrayList<>();
 //		requiredConfig.add(new ConfigurationSpecificationSQLIterator(INPUT_SQL_CONNECTION));
         requiredConfig.add(new ConfigurationRequirementRelationalInput(INPUT_TAG));
 //		requiredConfig.add(new ConfigurationSpecificationString(INPUT_TABLE_NAME));

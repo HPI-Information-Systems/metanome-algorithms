@@ -49,8 +49,8 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
 
 
   @Override
-  public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-    ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>();
+  public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+    ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<>();
     configs.add(new ConfigurationRequirementFileInput(DFDMetanome.Identifier.INPUT_FILE.name()));
     return configs;
   }

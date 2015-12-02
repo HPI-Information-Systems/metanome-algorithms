@@ -266,8 +266,8 @@ public class AIDFD implements FunctionalDependencyAlgorithm,
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-		ArrayList<ConfigurationRequirement> reqs = new ArrayList<ConfigurationRequirement>();
+	public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+		ArrayList<ConfigurationRequirement<?>> reqs = new ArrayList<ConfigurationRequirement<?>>();
 		reqs.add(new ConfigurationRequirementRelationalInput(INPUT_RELATION_FILE));
 		reqs.add(new ConfigurationRequirementBoolean(INPUT_USE_BLOOMFILTER));
 		reqs.add(new ConfigurationRequirementBoolean(INPUT_CHECK_CORRECTNESS));

@@ -18,7 +18,6 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -46,7 +45,7 @@ public class DuccTest {
         expectedSpecification2 =
         new ConfigurationRequirementBoolean(Ducc.NULL_EQUALS_NULL);
 
-    List<ConfigurationRequirement> spec = ducc.getConfigurationRequirements();
+    List<ConfigurationRequirement<?>> spec = ducc.getConfigurationRequirements();
     assertEquals(2, spec.size());
     assertEquals(expectedSpecification1.getIdentifier(), spec.get(0).getIdentifier());
     assertEquals(expectedSpecification2.getIdentifier(), spec.get(1).getIdentifier());

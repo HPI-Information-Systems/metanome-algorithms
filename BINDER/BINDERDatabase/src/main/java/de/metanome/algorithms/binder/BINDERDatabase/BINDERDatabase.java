@@ -35,8 +35,8 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 	};
 	
 	@Override
-	public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-		ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>(8);
+	public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<>(8);
 		configs.add(new ConfigurationRequirementDatabaseConnection(BINDERDatabase.Identifier.INPUT_DATABASE.name()));
 		
 		ConfigurationRequirementString databaseName = new ConfigurationRequirementString(BINDERDatabase.Identifier.DATABASE_NAME.name());

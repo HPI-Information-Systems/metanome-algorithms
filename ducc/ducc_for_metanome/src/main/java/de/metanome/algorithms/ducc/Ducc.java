@@ -33,8 +33,8 @@ public class Ducc implements UniqueColumnCombinationsAlgorithm, RelationalInputP
   }
 
   @Override
-  public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-    ArrayList<ConfigurationRequirement> spec = new ArrayList<>();
+  public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+    ArrayList<ConfigurationRequirement<?>> spec = new ArrayList<>();
     ConfigurationRequirementRelationalInput input = new ConfigurationRequirementRelationalInput(INPUT_HANDLE);
     spec.add(input);
 

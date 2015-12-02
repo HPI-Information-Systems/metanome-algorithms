@@ -32,8 +32,8 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 	};
 	
 	@Override
-	public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-		ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>(4);
+	public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<>(4);
 		configs.add(new ConfigurationRequirementFileInput(SPIDERFile.Identifier.INPUT_FILES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
 
 		ConfigurationRequirementString tempFolder = new ConfigurationRequirementString(SPIDERFile.Identifier.TEMP_FOLDER_PATH.name());

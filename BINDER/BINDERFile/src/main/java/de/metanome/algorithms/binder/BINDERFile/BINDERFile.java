@@ -28,8 +28,8 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 	};
 	
 	@Override
-	public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-		ArrayList<ConfigurationRequirement> configs = new ArrayList<ConfigurationRequirement>(5);
+	public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<>(5);
 		configs.add(new ConfigurationRequirementFileInput(BINDERFile.Identifier.INPUT_FILES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
 		
 		ConfigurationRequirementString tempFolder = new ConfigurationRequirementString(BINDERFile.Identifier.TEMP_FOLDER_PATH.name());

@@ -1,21 +1,5 @@
 package de.metanome.algorithms.tane;
 
-import it.unimi.dsi.fastutil.longs.LongBigArrayBigList;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectBigArrayBigList;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
-
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.ColumnCombination;
@@ -33,6 +17,22 @@ import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
+
+import it.unimi.dsi.fastutil.longs.LongBigArrayBigList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectBigArrayBigList;
+
+import org.apache.lucene.util.OpenBitSet;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaneAlgorithm implements FunctionalDependencyAlgorithm,
         RelationalInputParameterAlgorithm,
@@ -56,8 +56,8 @@ public class TaneAlgorithm implements FunctionalDependencyAlgorithm,
     private LongBigArrayBigList tTable;
 
     @Override
-    public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-        ArrayList<ConfigurationRequirement> requiredConfig = new ArrayList<ConfigurationRequirement>();
+    public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+        ArrayList<ConfigurationRequirement<?>> requiredConfig = new ArrayList<>();
 //		requiredConfig.add(new ConfigurationSpecificationSQLIterator(INPUT_SQL_CONNECTION));
         requiredConfig.add(new ConfigurationRequirementRelationalInput(INPUT_TAG));
 //		requiredConfig.add(new ConfigurationSpecificationString(INPUT_TABLE_NAME));

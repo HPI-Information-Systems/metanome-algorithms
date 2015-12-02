@@ -38,8 +38,8 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
     }
 
     @Override
-    public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-        ArrayList<ConfigurationRequirement> configs = new ArrayList<>();
+    public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+        ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<>();
 
         configs.add(new ConfigurationRequirementFileInput(Identifier.INPUT_FILES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
 

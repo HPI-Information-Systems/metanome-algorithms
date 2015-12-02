@@ -72,8 +72,8 @@ public class ORDER implements OrderDependencyAlgorithm, RelationalInputParameter
   }
 
   @Override
-  public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-    final ArrayList<ConfigurationRequirement> config = new ArrayList<ConfigurationRequirement>(3);
+  public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+    final ArrayList<ConfigurationRequirement<?>> config = new ArrayList<>(3);
     config.add(new ConfigurationRequirementRelationalInput(ORDER.ConfigIdentifier.RELATIONAL_INPUT.name()));
     return config;
   }

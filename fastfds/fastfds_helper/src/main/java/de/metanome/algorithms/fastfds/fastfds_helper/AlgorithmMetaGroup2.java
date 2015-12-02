@@ -22,10 +22,10 @@ public abstract class AlgorithmMetaGroup2 implements FunctionalDependencyAlgorit
 
     protected FunctionalDependencyResultReceiver fdrr;
     protected Map<String, Object> configurationRequirements = new HashMap<String, Object>();
-    protected ArrayList<ConfigurationRequirement> configSpecs = new ArrayList<ConfigurationRequirement>();
+    protected ArrayList<ConfigurationRequirement<?>> configSpecs = new ArrayList<>();
 
     @Override
-    public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
+    public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
 
         this.buildSpecs();
         return this.configSpecs;

@@ -57,8 +57,8 @@ public class FdepAlgorithmHashValues implements FunctionalDependencyAlgorithm,
     private FunctionalDependencyResultReceiver fdResultReceiver;
 
     @Override
-    public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-        ArrayList<ConfigurationRequirement> requiredConfig = new ArrayList<ConfigurationRequirement>();
+    public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+        ArrayList<ConfigurationRequirement<?>> requiredConfig = new ArrayList<>();
 //		requiredConfig.add(new ConfigurationSpecificationSQLIterator(
 //			INPUT_SQL_CONNECTION));
 //		requiredConfig.add(new ConfigurationSpecificationString(INPUT_TABLE_NAME));

@@ -43,8 +43,8 @@ public class FdMine implements FunctionalDependencyAlgorithm, RelationalInputPar
     Map<ColumnCombinationBitset, HashSet<ColumnCombinationBitset>> eqSet = new HashMap<>();
 
     @Override
-    public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-        ArrayList<ConfigurationRequirement> configurationSpecifications = new ArrayList<>();
+    public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+        ArrayList<ConfigurationRequirement<?>> configurationSpecifications = new ArrayList<>();
 
         configurationSpecifications.add(new ConfigurationRequirementRelationalInput(INPUT_FILE_TAG));
 

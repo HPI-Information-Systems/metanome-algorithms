@@ -26,8 +26,8 @@ public class Fun implements FunctionalDependencyAlgorithm, RelationalInputParame
 
 
     @Override
-    public ArrayList<ConfigurationRequirement> getConfigurationRequirements() {
-        ArrayList<ConfigurationRequirement> configurationSpecifications = new ArrayList<>();
+    public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+        ArrayList<ConfigurationRequirement<?>> configurationSpecifications = new ArrayList<>();
 
         configurationSpecifications.add(new ConfigurationRequirementRelationalInput(INPUT_FILE_TAG));
 
