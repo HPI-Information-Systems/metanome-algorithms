@@ -13,6 +13,7 @@ import java.util.Set;
 import de.metanome.algorithm_helper.data_structures.ColumnCombinationBitset;
 import de.metanome.algorithm_helper.data_structures.PLIBuilder;
 import de.metanome.algorithm_helper.data_structures.PositionListIndex;
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.ColumnCombination;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.algorithm_types.FunctionalDependencyAlgorithm;
@@ -52,7 +53,7 @@ public class FdMine implements FunctionalDependencyAlgorithm, RelationalInputPar
     }
 
     @Override
-    public void execute() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException {
+    public void execute() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
         RelationalInput input = inputGenerator.generateNewCopy();
 
         relationName = input.relationName();

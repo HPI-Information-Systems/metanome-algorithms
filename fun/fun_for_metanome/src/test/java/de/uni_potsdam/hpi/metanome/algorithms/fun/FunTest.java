@@ -66,7 +66,7 @@ public class FunTest {
 	}
 
 	@Test 
-	public void testExecute() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException {
+	public void testExecute() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
 		// Setup
 		AlgorithmTestFixture fixture = new AlgorithmTestFixture();
         algorithm.setRelationalInputConfigurationValue(Fun.INPUT_FILE_TAG, fixture.getInputGenerator());
@@ -79,7 +79,7 @@ public class FunTest {
 	}
 	
 	@Test 
-	public void testExecuteFDFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException {
+	public void testExecuteFDFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
 		// Setup
 		FDmineFixture fixture = new FDmineFixture();
         algorithm.setRelationalInputConfigurationValue(Fun.INPUT_FILE_TAG, fixture.getInputGenerator());
@@ -111,7 +111,7 @@ public class FunTest {
 	}
 	
 	@Test
-	public void testUCCMinimizeFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException {
+	public void testUCCMinimizeFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
 		// Setup
 		FDminimizerShadowedFDFixture fixture = new FDminimizerShadowedFDFixture();
         algorithm.setRelationalInputConfigurationValue(Fun.INPUT_FILE_TAG, fixture.getInputGenerator());
@@ -148,7 +148,7 @@ public class FunTest {
     }
     
     @Test
-	public void testShadowedFds() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException {
+	public void testShadowedFds() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
 		// Setup
     	System.out.println("Shadowed Fds");
     	ShadowedSuperSetFixture fixture = new ShadowedSuperSetFixture();

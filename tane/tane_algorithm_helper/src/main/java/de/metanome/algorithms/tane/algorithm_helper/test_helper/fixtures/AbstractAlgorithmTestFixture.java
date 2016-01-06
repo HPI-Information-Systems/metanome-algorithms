@@ -1,6 +1,8 @@
 package de.metanome.algorithms.tane.algorithm_helper.test_helper.fixtures;
 
 import com.google.common.collect.ImmutableList;
+
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
@@ -21,7 +23,7 @@ public abstract class AbstractAlgorithmTestFixture {
     protected List<ImmutableList<String>> table = new LinkedList<ImmutableList<String>>();
     protected FunctionalDependencyResultReceiver fdResultReceiver = mock(FunctionalDependencyResultReceiver.class);
 
-    public FileInputGenerator getInputGenerator() throws InputGenerationException, InputIterationException {
+    public FileInputGenerator getInputGenerator() throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
         FileInputGenerator inputGenerator = mock(FileInputGenerator.class);
         RelationalInput input = this.getRelationalInput();
         when(inputGenerator.generateNewCopy())

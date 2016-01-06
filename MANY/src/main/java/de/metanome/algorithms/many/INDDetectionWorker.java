@@ -7,6 +7,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.ColumnPermutation;
 import de.metanome.algorithm_integration.input.InputGenerationException;
@@ -66,7 +67,7 @@ public class INDDetectionWorker implements Runnable {
 
     }
 
-    private void outputIND(int ref, int dep) throws InputGenerationException {
+    private void outputIND(int ref, int dep) throws InputGenerationException, AlgorithmConfigurationException {
         if (this.parent.outputINDS) {
             final String depTableName = this.parent.getTableNameFor(dep, this.parent.tableColumnStartIndexes);
             final String depColumnName = this.parent.columnNames.get(dep);

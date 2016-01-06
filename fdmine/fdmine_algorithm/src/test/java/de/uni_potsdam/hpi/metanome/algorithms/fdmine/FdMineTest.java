@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementRelationalInput;
 import de.metanome.algorithm_integration.input.InputGenerationException;
@@ -72,7 +73,7 @@ public class FdMineTest {
     }
 
     @Test
-    public void testExecuteFDFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException {
+    public void testExecuteFDFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
         // Setup
         FDmineFixture fixture = new FDmineFixture();
         algorithm.setRelationalInputConfigurationValue(FdMine.INPUT_FILE_TAG, fixture.getInputGenerator());

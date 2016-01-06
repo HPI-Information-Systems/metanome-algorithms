@@ -8,6 +8,7 @@ import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Test;
 
 import de.metanome.algorithm_helper.data_structures.PLIBuilder;
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
@@ -60,9 +61,10 @@ public class FunAlgorithmTest {
 	 * @throws CouldNotReceiveResultException 
 	 * @throws InputIterationException 
 	 * @throws InputGenerationException 
+	 * @throws AlgorithmConfigurationException 
 	 */
 	@Test
-	public void testYieldsAllFDsAndUCCs() throws InputIterationException, CouldNotReceiveResultException, InputGenerationException {
+	public void testYieldsAllFDsAndUCCs() throws InputIterationException, CouldNotReceiveResultException, InputGenerationException, AlgorithmConfigurationException {
 		// Setup
 		AlgorithmTestFixture fixture = new AlgorithmTestFixture();
 		RelationalInput relationalInput = fixture.getInputGenerator().generateNewCopy();
@@ -86,9 +88,10 @@ public class FunAlgorithmTest {
 	 * @throws CouldNotReceiveResultException
 	 * @throws InputGenerationException
 	 * @throws InputIterationException
+	 * @throws AlgorithmConfigurationException 
 	 */
 	@Test
-	public void testFunFastCount() throws CouldNotReceiveResultException, InputGenerationException, InputIterationException {
+	public void testFunFastCount() throws CouldNotReceiveResultException, InputGenerationException, InputIterationException, AlgorithmConfigurationException {
 		// Setup
 		FunFastCountFixture fixture = new FunFastCountFixture();
 		RelationalInput relationalInput = fixture.getInputGenerator().generateNewCopy();

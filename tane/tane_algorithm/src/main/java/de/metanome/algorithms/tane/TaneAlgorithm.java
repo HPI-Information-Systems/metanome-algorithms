@@ -154,8 +154,9 @@ public class TaneAlgorithm implements FunctionalDependencyAlgorithm,
      * @return A ObjectArrayList with the HashMaps.
      * @throws InputGenerationException
      * @throws InputIterationException
+     * @throws AlgorithmConfigurationException 
      */
-    private ObjectArrayList<Object2ObjectOpenHashMap<Object, LongBigArrayBigList>> loadData() throws InputGenerationException, InputIterationException {
+    private ObjectArrayList<Object2ObjectOpenHashMap<Object, LongBigArrayBigList>> loadData() throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
         RelationalInput input = null;
         if (this.relationalInputGenerator != null) {
             input = this.relationalInputGenerator.generateNewCopy();

@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.lucene.util.OpenBitSet;
 
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.ColumnPermutation;
@@ -243,7 +244,7 @@ public class BINDER {
 		}
 	}
 	
-	protected void initialize() throws InputGenerationException, SQLException, InputIterationException {
+	protected void initialize() throws InputGenerationException, SQLException, InputIterationException, AlgorithmConfigurationException {
 		// Ensure the presence of an input generator
 		if ((this.databaseConnectionGenerator == null) && (this.fileInputGenerator == null))
 			throw new InputGenerationException("No input generator specified!");
@@ -295,7 +296,7 @@ public class BINDER {
 		}
 	}
 	
-	protected void collectStatisticsFrom(DatabaseConnectionGenerator inputGenerator, int tableIndex) throws InputGenerationException {
+	protected void collectStatisticsFrom(DatabaseConnectionGenerator inputGenerator, int tableIndex) throws InputGenerationException, AlgorithmConfigurationException {
 		ResultSet resultSet = null;
 		try {
 			// Query attribute names and types
@@ -317,7 +318,7 @@ public class BINDER {
 		}
 	}
 
-	protected void collectStatisticsFrom(FileInputGenerator inputGenerator) throws InputIterationException, InputGenerationException {
+	protected void collectStatisticsFrom(FileInputGenerator inputGenerator) throws InputIterationException, InputGenerationException, AlgorithmConfigurationException {
 		RelationalInput input = null;
 		try {
 			// Query attribute names and types
@@ -332,7 +333,7 @@ public class BINDER {
 		}
 	}
 	
-	protected void bucketize() throws InputGenerationException, InputIterationException, IOException {
+	protected void bucketize() throws InputGenerationException, InputIterationException, IOException, AlgorithmConfigurationException {
 		// Initialize the counters that count the empty buckets per bucket level to identify sparse buckets and promising bucket levels for comparison
 		int[] emptyBuckets = new int[this.numBucketsPerColumn];
 		for (int levelNumber = 0; levelNumber < this.numBucketsPerColumn; levelNumber++)
@@ -1116,7 +1117,7 @@ public class BINDER {
 		return subBucketNumbers;
 	}
 	
-	protected void detectNaryViaBucketing() throws InputGenerationException, InputIterationException, IOException {
+	protected void detectNaryViaBucketing() throws InputGenerationException, InputIterationException, IOException, AlgorithmConfigurationException {
 		// Clean temp
 		if (this.cleanTemp) {
 			File tempFoder = new File(this.tempFolderPath);
@@ -1201,7 +1202,7 @@ public class BINDER {
 		}
 	}
 	
-	protected void detectNaryViaSingleChecks() throws InputGenerationException {
+	protected void detectNaryViaSingleChecks() throws InputGenerationException, AlgorithmConfigurationException {
 		if (this.databaseConnectionGenerator == null)
 			throw new InputGenerationException("n-ary IND detection using De Marchi's MIND algorithm only possible on databases");
 		
@@ -1392,7 +1393,7 @@ public class BINDER {
 		return true;
 	}
 
-	protected void naryBucketize(List<AttributeCombination> attributeCombinations, int naryOffset, int[] narySpillCounts) throws InputGenerationException, InputIterationException, IOException {
+	protected void naryBucketize(List<AttributeCombination> attributeCombinations, int naryOffset, int[] narySpillCounts) throws InputGenerationException, InputIterationException, IOException, AlgorithmConfigurationException {
 		// Identify the relevant attribute combinations for the different tables
 		List<IntArrayList> table2attributeCombinationNumbers = new ArrayList<IntArrayList>(this.tableNames.length);
 		for (int tableNumber = 0; tableNumber < this.tableNames.length; tableNumber++)

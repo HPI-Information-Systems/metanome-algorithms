@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import de.metanome.algorithm_helper.data_structures.ColumnCombinationBitset;
 import de.metanome.algorithm_helper.data_structures.PLIBuilder;
 import de.metanome.algorithm_helper.data_structures.PositionListIndex;
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.ColumnCombination;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.input.InputGenerationException;
@@ -110,7 +111,7 @@ public class FDminimizerShadowedFDFixture {
   }
 
   public RelationalInputGenerator getInputGenerator()
-      throws InputGenerationException, InputIterationException {
+      throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
     RelationalInputGenerator inputGenerator = mock(RelationalInputGenerator.class);
     RelationalInput input = this.getRelationalInput();
     when(inputGenerator.generateNewCopy())

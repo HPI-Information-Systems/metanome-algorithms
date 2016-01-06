@@ -1,5 +1,6 @@
 package de.hpi.mpss2015n.approxind.utils;
 
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.ColumnPermutation;
 import de.metanome.algorithm_integration.input.InputGenerationException;
@@ -27,7 +28,7 @@ public final class IndConverter {
     }
 
 
-    public List<InclusionDependency> toMetanomeInds(List<SimpleInd> result, String[] tablenames) throws InputGenerationException {
+    public List<InclusionDependency> toMetanomeInds(List<SimpleInd> result, String[] tablenames) throws InputGenerationException, AlgorithmConfigurationException {
         List<List<ColumnIdentifier>> columns = new ArrayList<>();
         for (int i = 0; i < fileInputGenerators.length; i++) {
             RelationalInput input = fileInputGenerators[i].generateNewCopy();

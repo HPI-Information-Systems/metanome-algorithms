@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.metanome.algorithm_helper.data_structures.PLIBuilder;
 import de.metanome.algorithm_helper.data_structures.PositionListIndex;
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.algorithm_types.FunctionalDependencyAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.RelationalInputParameterAlgorithm;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
@@ -42,7 +43,7 @@ public class Fun implements FunctionalDependencyAlgorithm, RelationalInputParame
     }
 
     @Override
-    public void execute() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException {
+    public void execute() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
         RelationalInput input = inputGenerator.generateNewCopy();
         PLIBuilder pliBuilder = new PLIBuilder(input);
         List<PositionListIndex> pliList = pliBuilder.getPLIList();

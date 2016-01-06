@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.ColumnPermutation;
@@ -143,7 +144,7 @@ public class SPIDER {
 		}		
 	}
 	
-	protected void collectStatistics() throws InputGenerationException {
+	protected void collectStatistics() throws InputGenerationException, AlgorithmConfigurationException {
 		if ((this.databaseConnectionGenerator == null) && (this.fileInputGenerator == null))
 			throw new InputGenerationException("No input generator specified!");
 		
@@ -165,7 +166,7 @@ public class SPIDER {
 		this.maxMemoryUsage = (long)(this.availableMemory * this.maxMemoryUsagePercentage);
 	}
 	
-	protected void collectStatisticsFrom(DatabaseConnectionGenerator inputGenerator, int tableIndex) throws InputGenerationException {
+	protected void collectStatisticsFrom(DatabaseConnectionGenerator inputGenerator, int tableIndex) throws InputGenerationException, AlgorithmConfigurationException {
 		ResultSet resultSet = null;
 		try {
 			// Query attribute names and types
@@ -187,7 +188,7 @@ public class SPIDER {
 		}
 	}
 
-	protected void collectStatisticsFrom(FileInputGenerator inputGenerator) throws InputGenerationException {
+	protected void collectStatisticsFrom(FileInputGenerator inputGenerator) throws InputGenerationException, AlgorithmConfigurationException {
 		RelationalInput input = null;
 		try {
 			// Query attribute names and types

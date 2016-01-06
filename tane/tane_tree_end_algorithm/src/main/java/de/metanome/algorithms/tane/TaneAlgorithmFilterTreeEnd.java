@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.lucene.util.OpenBitSet;
 
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.ColumnCombination;
 import de.metanome.algorithm_integration.ColumnIdentifier;
@@ -171,8 +172,9 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
      * @return A ObjectArrayList with the HashMaps.
      * @throws InputGenerationException
      * @throws InputIterationException
+     * @throws AlgorithmConfigurationException 
      */
-    private ObjectArrayList<Object2ObjectOpenHashMap<Object, LongBigArrayBigList>> loadData() throws InputGenerationException, InputIterationException {
+    private ObjectArrayList<Object2ObjectOpenHashMap<Object, LongBigArrayBigList>> loadData() throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
         RelationalInput input = null;
         if (this.relationalInputGenerator != null) {
             input = this.relationalInputGenerator.generateNewCopy();

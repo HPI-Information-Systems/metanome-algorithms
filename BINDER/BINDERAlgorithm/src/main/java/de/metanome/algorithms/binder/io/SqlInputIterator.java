@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.input.DatabaseConnectionGenerator;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
@@ -17,7 +18,7 @@ public class SqlInputIterator implements InputIterator {
 	private ResultSet resultSet = null;
 	private List<String> record = null;
 	
-	public SqlInputIterator(DatabaseConnectionGenerator inputGenerator, DataAccessObject dao, String tableName, int inputRowLimit) throws InputGenerationException {
+	public SqlInputIterator(DatabaseConnectionGenerator inputGenerator, DataAccessObject dao, String tableName, int inputRowLimit) throws InputGenerationException, AlgorithmConfigurationException {
 		this.resultSet = inputGenerator.generateResultSetFromSql(dao.buildSelectEverythingQuery(tableName, inputRowLimit));
 	}
 	

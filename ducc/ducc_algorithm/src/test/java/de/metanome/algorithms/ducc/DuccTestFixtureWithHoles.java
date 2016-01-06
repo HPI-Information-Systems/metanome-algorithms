@@ -2,6 +2,7 @@ package de.metanome.algorithms.ducc;
 
 import com.google.common.collect.ImmutableList;
 
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
@@ -58,7 +59,7 @@ public class DuccTestFixtureWithHoles {
   }
 
   public RelationalInputGenerator getInputGenerator()
-      throws InputGenerationException, InputIterationException {
+      throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
     RelationalInputGenerator inputGenerator = mock(RelationalInputGenerator.class);
     RelationalInput input = this.getRelationalInput();
     when(inputGenerator.generateNewCopy())

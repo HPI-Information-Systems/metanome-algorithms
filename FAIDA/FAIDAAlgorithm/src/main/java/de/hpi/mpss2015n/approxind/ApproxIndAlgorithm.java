@@ -10,6 +10,7 @@ import de.hpi.mpss2015n.approxind.utils.DebugCounter;
 import de.hpi.mpss2015n.approxind.utils.IndConverter;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import de.hpi.mpss2015n.approxind.utils.SimpleInd;
+import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
@@ -55,7 +56,7 @@ public final class ApproxIndAlgorithm {
   }
 
   public List<InclusionDependency> execute(RelationalInputGenerator[] fileInputGenerators)
-      throws InputGenerationException, InputIterationException {
+      throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
     IndConverter converter = new IndConverter(fileInputGenerators);
     List<SimpleInd> result = executeInternal(fileInputGenerators);
     logger.info("Result size: {}", result.size());
@@ -71,7 +72,7 @@ public final class ApproxIndAlgorithm {
 
 
   List<SimpleInd> executeInternal(RelationalInputGenerator[] fileInputGenerators)
-      throws InputGenerationException, InputIterationException {
+      throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
     fileInputGenerators = sampler.createSample(fileInputGenerators);
 
     ColumnStore[] stores = ColumnStore.create(fileInputGenerators, readExisting, 10000);

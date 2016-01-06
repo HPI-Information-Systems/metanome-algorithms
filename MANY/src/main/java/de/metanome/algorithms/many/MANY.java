@@ -325,7 +325,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
 
     }
 
-    private void initialize() throws InputGenerationException, SQLException, InputIterationException {
+    private void initialize() throws InputGenerationException, SQLException, InputIterationException, AlgorithmConfigurationException {
         // Ensure the presence of an input generator
         if (this.relationalInputGenerators == null) {
             throw new InputGenerationException("No input generator specified!");
@@ -567,7 +567,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         }
     }
 
-    public String getTableNameFor(int column, int[] tableColumnStartIndexes) throws InputGenerationException {
+    public String getTableNameFor(int column, int[] tableColumnStartIndexes) throws InputGenerationException, AlgorithmConfigurationException {
         for (int i = 1; i < tableColumnStartIndexes.length; i++) {
             if (tableColumnStartIndexes[i] > column) {
                 return this.relationalInputGenerators[i - 1].generateNewCopy().relationName();
