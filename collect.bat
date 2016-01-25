@@ -34,3 +34,5 @@ copy ORDER\target\*.jar _COLLECTION_
 copy AIDFD\target\*.jar _COLLECTION_
 
 copy FAIDA\FAIDAAlgorithm\target\*.jar _COLLECTION_
+
+copy SCDP\target\*.jar _COLLECTION_

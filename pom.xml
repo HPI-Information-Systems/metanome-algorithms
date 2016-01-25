@@ -75,5 +75,6 @@
         <module>AIDFD</module>
         <module>ORDER</module>
         <module>FAIDA</module>
+        <module>SCDP</module>
     </modules>
 </project>
