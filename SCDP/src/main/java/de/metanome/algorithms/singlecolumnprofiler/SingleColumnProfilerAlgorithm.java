@@ -91,8 +91,8 @@ public class SingleColumnProfilerAlgorithm {
    // JSONObject General = new JSONObject();
    // General.put(NUMCOLUMN, columnNames.size());
    // General.put(NUMTUPLE, NumofTuples);
-    String general=NUMCOLUMN+columnNames.size()+"\n"+NUMTUPLE+NumofTuples;
-    addStatistic("General", general, "*", relationName);
+    addStatistic(NUMCOLUMN, columnNames.size(), "*", relationName);
+    addStatistic(NUMTUPLE, NumofTuples, "*", relationName);
     for (int i = 0; i < columnsProfile.size(); i++) {
       // System.out.println(columnsProfile.get(i).toString());
       generateColumnStatistic(columnsProfile.get(i));
