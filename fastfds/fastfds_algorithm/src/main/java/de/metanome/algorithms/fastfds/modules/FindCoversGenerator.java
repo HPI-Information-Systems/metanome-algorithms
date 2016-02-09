@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.lucene.util.OpenBitSet;
 
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
@@ -34,7 +35,7 @@ public class FindCoversGenerator extends Algorithm_Group2_Modul {
     }
 
     public List<FunctionalDependencyGroup2> execute(List<DifferenceSet> differenceSets, int numberOfAttributes)
-            throws CouldNotReceiveResultException {
+            throws CouldNotReceiveResultException, ColumnNameMismatchException {
 
         if (this.timeMesurement) {
             this.startTime();
@@ -148,7 +149,7 @@ public class FindCoversGenerator extends Algorithm_Group2_Modul {
 
     private void doRecusiveCrap(int currentAttribute, IntList currentOrdering, List<DifferenceSet> setsNotCovered,
                                 IntList currentPath, List<DifferenceSet> originalDiffSet, List<FunctionalDependencyGroup2> result)
-            throws CouldNotReceiveResultException {
+            throws CouldNotReceiveResultException, ColumnNameMismatchException {
 
         // Basic Case
         // FIXME
@@ -266,7 +267,7 @@ public class FindCoversGenerator extends Algorithm_Group2_Modul {
         return result;
     }
 
-    private void addFdToReceivers(FunctionalDependencyGroup2 fdg) throws CouldNotReceiveResultException {
+    private void addFdToReceivers(FunctionalDependencyGroup2 fdg) throws CouldNotReceiveResultException, ColumnNameMismatchException {
 
         FunctionalDependency fd = fdg.buildDependency(this.tableIdentifier, this.columnNames);
         this.receiver.receiveResult(fd);

@@ -14,6 +14,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 
@@ -43,7 +44,7 @@ public class Fun implements FunctionalDependencyAlgorithm, RelationalInputParame
     }
 
     @Override
-    public void execute() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
+    public void execute() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException, ColumnNameMismatchException {
         RelationalInput input = inputGenerator.generateNewCopy();
         PLIBuilder pliBuilder = new PLIBuilder(input);
         List<PositionListIndex> pliList = pliBuilder.getPLIList();

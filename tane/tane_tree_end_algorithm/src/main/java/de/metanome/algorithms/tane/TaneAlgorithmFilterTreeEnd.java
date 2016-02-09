@@ -30,6 +30,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
@@ -503,9 +504,10 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
      * @param X: A OpenBitSet representing the Columns of the determinant.
      * @param a: The number of the dependent column (starting from 1).
      * @throws CouldNotReceiveResultException
+     * @throws ColumnNameMismatchException 
      */
     @SuppressWarnings("unused")
-    private void addDependencyToResultReceiver(OpenBitSet X, int a) throws CouldNotReceiveResultException {
+    private void addDependencyToResultReceiver(OpenBitSet X, int a) throws CouldNotReceiveResultException, ColumnNameMismatchException {
         if (this.fdResultReceiver == null) {
             return;
         }
@@ -570,8 +572,9 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
      * @param fds
      * @param activePath
      * @throws CouldNotReceiveResultException
+     * @throws ColumnNameMismatchException 
      */
-    private void addAllDependenciesToResultReceiver(FDTreeElement fds, OpenBitSet activePath) throws CouldNotReceiveResultException {
+    private void addAllDependenciesToResultReceiver(FDTreeElement fds, OpenBitSet activePath) throws CouldNotReceiveResultException, ColumnNameMismatchException {
         if (this.fdResultReceiver == null) {
             return;
         }
@@ -603,8 +606,9 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
      * Do nothing if the object does not have a result receiver.
      *
      * @throws CouldNotReceiveResultException
+     * @throws ColumnNameMismatchException 
      */
-    private void addAllDependenciesToResultReceiver() throws CouldNotReceiveResultException {
+    private void addAllDependenciesToResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
         if (this.fdResultReceiver == null) {
             return;
         }

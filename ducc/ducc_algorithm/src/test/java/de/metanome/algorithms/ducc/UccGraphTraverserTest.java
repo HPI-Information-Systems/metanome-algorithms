@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 
 import de.metanome.algorithm_helper.data_structures.ColumnCombinationBitset;
 import de.metanome.algorithm_helper.data_structures.PositionListIndex;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.UniqueColumnCombinationResultReceiver;
 
@@ -33,7 +34,7 @@ public class UccGraphTraverserTest {
   }
 
   @Test
-  public void testTraverseGraph() throws CouldNotReceiveResultException {
+  public void testTraverseGraph() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     // Setup
     List<PositionListIndex> pliList = fixture.getPLIList();
     LinkedList<String> columnNames = new LinkedList<>();

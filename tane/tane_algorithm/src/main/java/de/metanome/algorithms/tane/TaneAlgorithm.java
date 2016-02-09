@@ -14,6 +14,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
@@ -340,9 +341,10 @@ public class TaneAlgorithm implements FunctionalDependencyAlgorithm,
      * @param lhs: left-hand-side of the functional dependency
      * @param a:   dependent attribute. Possible values: 1 <= a <= maxAttributeNumber.
      * @throws CouldNotReceiveResultException if the result receiver cannot handle the functional dependency.
+     * @throws ColumnNameMismatchException 
      */
     private void processFunctionalDependency(OpenBitSet lhs, int a)
-            throws CouldNotReceiveResultException {
+            throws CouldNotReceiveResultException, ColumnNameMismatchException {
         addDependencyToResultReceiver(lhs, a);
     }
 
@@ -527,8 +529,9 @@ public class TaneAlgorithm implements FunctionalDependencyAlgorithm,
      * @param X: A OpenBitSet representing the Columns of the determinant.
      * @param a: The number of the dependent column (starting from 1).
      * @throws CouldNotReceiveResultException if the result receiver cannot handle the functional dependency.
+     * @throws ColumnNameMismatchException 
      */
-    private void addDependencyToResultReceiver(OpenBitSet X, int a) throws CouldNotReceiveResultException {
+    private void addDependencyToResultReceiver(OpenBitSet X, int a) throws CouldNotReceiveResultException, ColumnNameMismatchException {
         if (this.fdResultReceiver == null) {
             return;
         }

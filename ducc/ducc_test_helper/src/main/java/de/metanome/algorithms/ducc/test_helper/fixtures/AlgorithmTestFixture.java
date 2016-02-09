@@ -12,6 +12,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
@@ -54,7 +55,7 @@ public class AlgorithmTestFixture {
       inclusionDependencyResultReceiver =
       mock(InclusionDependencyResultReceiver.class);
 
-  public AlgorithmTestFixture() throws CouldNotReceiveResultException {
+  public AlgorithmTestFixture() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     table.add(ImmutableList.of("NF", "AL", "Tuesday", "09:00", "09:00", "A2", "150", "Monday"));
     table.add(ImmutableList.of("DM", "NW", "Friday", "09:00", "09:00", "A2", "150", "Tuesday"));
     table.add(ImmutableList.of("ML", "OS", "Monday", "09:00", "14:00", "I10", "30", "Wednesday"));
@@ -169,7 +170,7 @@ public class AlgorithmTestFixture {
     return uccList;
   }
 
-  public void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException {
+  public void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnIdentifier
         expectedIdentifierPROF =
         new ColumnIdentifier(this.relationName, this.columnNames.get(0));
@@ -305,7 +306,7 @@ public class AlgorithmTestFixture {
     //verifyNoMoreInteractions(fdResultReceiver);
   }
 
-  public void verifyUniqueColumnCombinationResultReceiver() throws CouldNotReceiveResultException {
+  public void verifyUniqueColumnCombinationResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnIdentifier
         expectedIdentifierPROF =
         new ColumnIdentifier(this.relationName, this.columnNames.get(0));
@@ -348,7 +349,7 @@ public class AlgorithmTestFixture {
   }
 
   public void verifyFunctionalDependencyResultReceiverForFDMine()
-      throws CouldNotReceiveResultException {
+      throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnIdentifier
         expectedIdentifierPROF =
         new ColumnIdentifier(this.relationName, this.columnNames.get(0));
@@ -494,7 +495,7 @@ public class AlgorithmTestFixture {
                                   expectedIdentifierCAP), expectedIdentifierID));
   }
 
-  public void verifyPartialUCCResultReceiver() throws CouldNotReceiveResultException {
+  public void verifyPartialUCCResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnIdentifier
         expectedIdentifierPROF =
         new ColumnIdentifier(this.relationName, this.columnNames.get(0));

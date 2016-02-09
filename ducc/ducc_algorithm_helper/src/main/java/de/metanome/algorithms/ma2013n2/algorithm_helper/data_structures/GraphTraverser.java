@@ -2,6 +2,7 @@ package de.metanome.algorithms.ma2013n2.algorithm_helper.data_structures;
 
 import de.metanome.algorithm_helper.data_structures.ColumnCombinationBitset;
 import de.metanome.algorithm_helper.data_structures.PositionListIndex;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 
 import java.util.Collection;
@@ -49,7 +50,7 @@ public abstract class GraphTraverser {
 
   // TODO: find overlappings in init() and buildInitialPlis() in FD and UCC GraphTraverser
 
-  public int traverseGraph() throws CouldNotReceiveResultException {
+  public int traverseGraph() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     this.found = 0;
     //initial PLI
     ColumnCombinationBitset currentColumn = this.getSeed();
@@ -64,7 +65,7 @@ public abstract class GraphTraverser {
   }
 
   protected void randomWalk(ColumnCombinationBitset currentColumnCombination)
-      throws CouldNotReceiveResultException {
+      throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnCombinationBitset newColumn;
     while (null != currentColumnCombination) {
       // Check currentColumn
@@ -302,7 +303,7 @@ public abstract class GraphTraverser {
   }
 
   protected void addMinimalPositive(ColumnCombinationBitset positiveColumnCombination)
-      throws CouldNotReceiveResultException {
+      throws CouldNotReceiveResultException, ColumnNameMismatchException {
     this.minimalPositives.add(positiveColumnCombination);
     this.found += 1;
   }

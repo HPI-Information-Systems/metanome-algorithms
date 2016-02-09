@@ -12,6 +12,7 @@ import ch.javasoft.bitset.LongBitSet;
 import ch.javasoft.bitset.search.TreeSearch;
 import de.metanome.algorithms.aidfd.helpers.ArrayIndexComparator;
 import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 
 public class PrefixTreeResultGen {
@@ -35,7 +36,7 @@ public class PrefixTreeResultGen {
 		invalid.add(set);
 	}
 
-	public void generateResults() {
+	public void generateResults() throws ColumnNameMismatchException {
 		int[] counts = new int[numberAttributes];
 		invalid.stream().forEach(
 			bitset -> {
@@ -103,7 +104,12 @@ public class PrefixTreeResultGen {
 						.nextSetBit(i + 1)) {
 					valid.set(indexes[i]);
 				}
-				resultReceiver.receiveResult(valid, finalTarget);
+				try {
+					resultReceiver.receiveResult(valid, finalTarget);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			});
 		}
 		
@@ -168,7 +174,7 @@ public class PrefixTreeResultGen {
 		return remove;
 	}
 
-	public void setConstantColumns(IBitSet constantColumns) {
+	public void setConstantColumns(IBitSet constantColumns) throws ColumnNameMismatchException {
 		this.constantColumns = constantColumns;
 		for (int i = constantColumns.nextSetBit(0); i >= 0; i = constantColumns
 				.nextSetBit(i + 1)) {

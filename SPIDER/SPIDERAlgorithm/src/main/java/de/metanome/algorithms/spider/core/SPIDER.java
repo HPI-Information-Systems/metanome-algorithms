@@ -21,6 +21,7 @@ import de.metanome.algorithm_integration.input.DatabaseConnectionGenerator;
 import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.InclusionDependency;
@@ -249,7 +250,7 @@ public class SPIDER {
 		}
 	}
 	
-	protected void output() throws CouldNotReceiveResultException {
+	protected void output() throws CouldNotReceiveResultException, ColumnNameMismatchException {
 		// Read the discovered INDs from the attributes
 		Int2ObjectOpenHashMap<IntList> dep2ref = new Int2ObjectOpenHashMap<IntList>(this.numColumns);
 		for (Attribute spiderAttribute : this.attributeId2attributeObject.values())

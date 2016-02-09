@@ -8,6 +8,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.UniqueColumnCombinationResultReceiver;
 import de.metanome.algorithm_integration.results.UniqueColumnCombination;
@@ -39,7 +40,7 @@ public class DuccTestFixtureWithHoles {
       mock(UniqueColumnCombinationResultReceiver.class);
   protected int rowPosition;
 
-  public DuccTestFixtureWithHoles() throws CouldNotReceiveResultException {
+  public DuccTestFixtureWithHoles() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     table.add(ImmutableList.of("1", "1", "1", "1", "1"));
     table.add(ImmutableList.of("1", "2", "2", "1", "1"));
     table.add(ImmutableList.of("1", "1", "1", "1", "2"));
@@ -114,7 +115,7 @@ public class DuccTestFixtureWithHoles {
     return this.uniqueColumnCombinationResultReceiver;
   }
 
-  public void verifyUniqueColumnCombinationResultReceiver() throws CouldNotReceiveResultException {
+  public void verifyUniqueColumnCombinationResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnIdentifier
         expectedIdentifierDAY =
         new ColumnIdentifier(this.relationName, this.columnNames.get(0));

@@ -13,6 +13,7 @@ import de.metanome.algorithm_helper.data_structures.PositionListIndex;
 import de.metanome.algorithm_integration.ColumnCombination;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.input.InputIterationException;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.result_receiver.UniqueColumnCombinationResultReceiver;
@@ -61,7 +62,7 @@ public class FunAlgorithm {
     }
 
     public void run(List<PositionListIndex> pliList)
-            throws InputIterationException, CouldNotReceiveResultException {
+            throws InputIterationException, CouldNotReceiveResultException, ColumnNameMismatchException {
 
         LinkedList<FunQuadruple> lkminusOne = new LinkedList<>();
         lkminusOne.add(new FunQuadruple(new ColumnCombinationBitset(), Long.MAX_VALUE,
@@ -140,7 +141,7 @@ public class FunAlgorithm {
         }
     }
 
-    protected void displayUCC(ColumnCombinationBitset ucc) throws CouldNotReceiveResultException {
+    protected void displayUCC(ColumnCombinationBitset ucc) throws CouldNotReceiveResultException, ColumnNameMismatchException {
         if (uccReceiver != null) {
             uccReceiver.receiveResult(
                     new UniqueColumnCombination(createColumnCombination(ucc)));
@@ -148,7 +149,7 @@ public class FunAlgorithm {
     }
 
     protected void displayFD(List<FunQuadruple> lkMinus1)
-            throws CouldNotReceiveResultException {
+            throws CouldNotReceiveResultException, ColumnNameMismatchException {
         for (FunQuadruple quadruple : lkMinus1) {
             if (quadruple.candidate.size() == 0) {
                 continue;

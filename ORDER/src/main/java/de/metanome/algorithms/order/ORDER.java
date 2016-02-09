@@ -26,6 +26,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.OrderDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.OrderDependency;
@@ -229,7 +230,7 @@ public class ORDER implements OrderDependencyAlgorithm, RelationalInputParameter
 
   public void signalFoundOrderDependency(final byte[] lhs, final byte[] rhs,
       final OrderDependency.ComparisonOperator comparisonOperator,
-      final OrderDependency.OrderType orderType) {
+      final OrderDependency.OrderType orderType) throws ColumnNameMismatchException {
     this.logger.info(
         "Table {} contains a valid OD: {} ~> {} (Comparison operator: {}, ordering: {})",
         this.tableName, this.permutationToColumnNames(lhs), this.permutationToColumnNames(rhs),

@@ -19,6 +19,7 @@ import de.metanome.algorithm_integration.configuration.ConfigurationRequirementR
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.uni_potsdam.hpi.metanome.algorithms.test_helper.fixtures.AbaloneFixture;
@@ -66,7 +67,7 @@ public class FunTest {
 	}
 
 	@Test 
-	public void testExecute() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
+	public void testExecute() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException, ColumnNameMismatchException {
 		// Setup
 		AlgorithmTestFixture fixture = new AlgorithmTestFixture();
         algorithm.setRelationalInputConfigurationValue(Fun.INPUT_FILE_TAG, fixture.getInputGenerator());
@@ -79,7 +80,7 @@ public class FunTest {
 	}
 	
 	@Test 
-	public void testExecuteFDFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
+	public void testExecuteFDFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException, ColumnNameMismatchException {
 		// Setup
 		FDmineFixture fixture = new FDmineFixture();
         algorithm.setRelationalInputConfigurationValue(Fun.INPUT_FILE_TAG, fixture.getInputGenerator());
@@ -111,7 +112,7 @@ public class FunTest {
 	}
 	
 	@Test
-	public void testUCCMinimizeFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
+	public void testUCCMinimizeFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException, ColumnNameMismatchException {
 		// Setup
 		FDminimizerShadowedFDFixture fixture = new FDminimizerShadowedFDFixture();
         algorithm.setRelationalInputConfigurationValue(Fun.INPUT_FILE_TAG, fixture.getInputGenerator());
@@ -124,7 +125,7 @@ public class FunTest {
 	}
 
     @Test
-    public void testAbaloneFixture() throws CouldNotReceiveResultException, InputGenerationException, InputIterationException, UnsupportedEncodingException, FileNotFoundException, URISyntaxException, AlgorithmConfigurationException {
+    public void testAbaloneFixture() throws CouldNotReceiveResultException, InputGenerationException, InputIterationException, UnsupportedEncodingException, FileNotFoundException, URISyntaxException, AlgorithmConfigurationException, ColumnNameMismatchException {
         AbaloneFixture fixture = new AbaloneFixture();
         algorithm.setRelationalInputConfigurationValue(Fun.INPUT_FILE_TAG, fixture.getInputGenerator());
         algorithm.setResultReceiver(fixture.getFdResultReceiver());
@@ -136,7 +137,7 @@ public class FunTest {
     }
 
     @Test
-    public void testBridgesFixture() throws CouldNotReceiveResultException, InputGenerationException, InputIterationException, UnsupportedEncodingException, FileNotFoundException, AlgorithmConfigurationException {
+    public void testBridgesFixture() throws CouldNotReceiveResultException, InputGenerationException, InputIterationException, UnsupportedEncodingException, FileNotFoundException, AlgorithmConfigurationException, ColumnNameMismatchException {
         BridgesFixture fixture = new BridgesFixture();
         algorithm.setRelationalInputConfigurationValue(Fun.INPUT_FILE_TAG, fixture.getInputGenerator());
         algorithm.setResultReceiver(fixture.getFdResultReceiver());
@@ -148,7 +149,7 @@ public class FunTest {
     }
     
     @Test
-	public void testShadowedFds() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
+	public void testShadowedFds() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException, ColumnNameMismatchException {
 		// Setup
     	System.out.println("Shadowed Fds");
     	ShadowedSuperSetFixture fixture = new ShadowedSuperSetFixture();

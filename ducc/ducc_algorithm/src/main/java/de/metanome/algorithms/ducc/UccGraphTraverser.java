@@ -3,6 +3,7 @@ package de.metanome.algorithms.ducc;
 import de.metanome.algorithm_helper.data_structures.ColumnCombinationBitset;
 import de.metanome.algorithm_helper.data_structures.PositionListIndex;
 import de.metanome.algorithm_integration.ColumnIdentifier;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.UniqueColumnCombinationResultReceiver;
 import de.metanome.algorithm_integration.results.UniqueColumnCombination;
@@ -37,7 +38,7 @@ public class UccGraphTraverser extends GraphTraverser {
 
   public void init(List<PositionListIndex> basePLIs,
                    UniqueColumnCombinationResultReceiver resultReceiver, String relationName,
-                   List<String> columnNames) throws CouldNotReceiveResultException {
+                   List<String> columnNames) throws CouldNotReceiveResultException, ColumnNameMismatchException {
     this.resultReceiver = resultReceiver;
     this.relationName = relationName;
     this.columnNames = columnNames;
@@ -55,7 +56,7 @@ public class UccGraphTraverser extends GraphTraverser {
   }
 
   protected void filterNonUniqueColumnCombinationBitsets(List<PositionListIndex> basePLIs)
-      throws CouldNotReceiveResultException {
+      throws CouldNotReceiveResultException, ColumnNameMismatchException {
     int columnIndex = 0;
     this.bitmaskForNonUniqueColumns = new ColumnCombinationBitset();
 
@@ -84,7 +85,7 @@ public class UccGraphTraverser extends GraphTraverser {
 
   @Override
   protected void addMinimalPositive(ColumnCombinationBitset positiveColumnCombination)
-      throws CouldNotReceiveResultException {
+      throws CouldNotReceiveResultException, ColumnNameMismatchException {
     this.minimalPositives.add(positiveColumnCombination);
     this.resultReceiver.receiveResult(new UniqueColumnCombination(
         positiveColumnCombination.createColumnCombination(this.relationName, this.columnNames)));

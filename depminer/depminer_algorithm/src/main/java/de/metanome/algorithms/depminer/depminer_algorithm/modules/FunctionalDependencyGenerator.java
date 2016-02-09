@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithms.depminer.depminer_helper.modules.Algorithm_Group2_Modul;
@@ -24,7 +25,7 @@ public class FunctionalDependencyGenerator extends Algorithm_Group2_Modul {
     private List<String> columns;
     private Int2ObjectMap<List<OpenBitSet>> lhss;
 
-    private CouldNotReceiveResultException exception = null;
+    private AlgorithmExecutionException exception = null;
 
     private List<FunctionalDependencyGroup2> result;
 
@@ -75,7 +76,7 @@ public class FunctionalDependencyGenerator extends Algorithm_Group2_Modul {
     }
 
     // TODO: find better name for method
-    private void executePara(int attribute) throws CouldNotReceiveResultException {
+    private void executePara(int attribute) throws CouldNotReceiveResultException, ColumnNameMismatchException {
 
         for (OpenBitSet lhs : this.lhss.get(attribute)) {
             if (lhs.get(attribute)) {
@@ -110,7 +111,9 @@ public class FunctionalDependencyGenerator extends Algorithm_Group2_Modul {
                 executePara(this.task);
             } catch (CouldNotReceiveResultException e) {
                 exception = e;
-            }
+            } catch (ColumnNameMismatchException e) {
+            	exception = e;
+			}
 
         }
 

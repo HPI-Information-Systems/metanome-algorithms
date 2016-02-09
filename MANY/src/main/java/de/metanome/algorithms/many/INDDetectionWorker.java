@@ -11,6 +11,7 @@ import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.ColumnPermutation;
 import de.metanome.algorithm_integration.input.InputGenerationException;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.InclusionDependency;
@@ -213,7 +214,9 @@ public class INDDetectionWorker implements Runnable {
                 this.receiver.receiveResult(ind);
             } catch (CouldNotReceiveResultException e) {
                 e.printStackTrace();
-            }
+            } catch (ColumnNameMismatchException e) {
+				e.printStackTrace();
+			}
         }
         this.parent.numUnaryINDs.addAndGet(truePositives);
         this.parent.falsePositives.addAndGet(falsePositives);

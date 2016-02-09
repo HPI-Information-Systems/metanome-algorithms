@@ -12,6 +12,8 @@ package de.metanome.algorithms.many.test;
 import static org.junit.Assert.assertEquals;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,11 +23,13 @@ import org.slf4j.LoggerFactory;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
+import de.metanome.algorithm_integration.input.InputGenerationException;
+import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.results.Result;
-import de.metanome.algorithms.many.MANY;
 import de.metanome.algorithms.many.driver.AnelosimusDriver;
 import de.metanome.backend.result_receiver.ResultCache;
+import de.metanome.backend.result_receiver.ResultReceiver;
 
 public class MANYTest {
 
@@ -48,6 +52,7 @@ public class MANYTest {
     boolean filterDependentRefs;
     boolean isFastVector;
     boolean condenseMatrix;
+    String tableName;
 
     {
         System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
@@ -74,23 +79,34 @@ public class MANYTest {
         filterDependentRefs = false;
         isFastVector = false;
         condenseMatrix = false;
-
+        tableName = "table1";
     }
 
     @After
     public void tearDown() throws Exception {
     }
 
+    public static List<String> getAcceptedColumns(RelationalInputGenerator[] relationalInputGenerators) throws InputGenerationException, AlgorithmConfigurationException {
+    	List<String> acceptedColumns = new ArrayList<>();
+        for (RelationalInputGenerator relationalInputGenerator: relationalInputGenerators) {
+        	RelationalInput relationalInput = relationalInputGenerator.generateNewCopy();
+        	String tableName = relationalInput.relationName();
+        	for (String columnName : relationalInput.columnNames())
+        		acceptedColumns.add(tableName + ResultReceiver.TABLE_COLUMN_SEPARATOR + columnName);
+        }
+        return acceptedColumns;
+    }
+    
     @Test
     public void testNoFilters() {
         // conf
         RelationalInputGenerator[] relationalInputGenerators = new RelationalInputGenerator[1];
-        RelationalInputMock table1 = new RelationalInputMock("table1", new String[] { "foo", "bar" },
+        RelationalInputMock table1 = new RelationalInputMock(tableName, new String[] { "foo", "bar" },
                 new String[][] { { "", "" }, { "", "" }, { "", "" } });
         relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
+            ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
             AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
@@ -115,15 +131,15 @@ public class MANYTest {
     public void testFilterNullCols() {
         // conf
         RelationalInputGenerator[] relationalInputGenerators = new RelationalInputGenerator[1];
-        RelationalInputMock table1 = new RelationalInputMock("table1", new String[] { "foo", "bar", "1", "2" },
+        RelationalInputMock table1 = new RelationalInputMock(tableName, new String[] { "foo", "bar", "1", "2" },
                 new String[][] { { "", "", "A", "A" }, { "", "", "A", "A" }, { "", "", "A", "A" } });
         relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
 
         filterNullCols = true;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
-            AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
+            ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
+            AnelosimusDriver.run(resultReceiver, new String[] { tableName }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
@@ -146,15 +162,15 @@ public class MANYTest {
     public void testRefCoverageMinPercentage() {
         // conf
         RelationalInputGenerator[] relationalInputGenerators = new RelationalInputGenerator[1];
-        RelationalInputMock table1 = new RelationalInputMock("table1", new String[] { "foo", "bar", "1" },
+        RelationalInputMock table1 = new RelationalInputMock(tableName, new String[] { "foo", "bar", "1" },
                 new String[][] { { "A", "A", "A" }, { "B", "A", "A" }, { "C", "A", "B" } });
         relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
 
         refCoverageMinPercentage = 50;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
-            AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
+            ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
+            AnelosimusDriver.run(resultReceiver, new String[] { tableName }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
@@ -177,15 +193,15 @@ public class MANYTest {
     public void testFilterNonUniqueRefs() {
         // conf
         RelationalInputGenerator[] relationalInputGenerators = new RelationalInputGenerator[1];
-        RelationalInputMock table1 = new RelationalInputMock("table1", new String[] { "foo", "bar", "A" },
+        RelationalInputMock table1 = new RelationalInputMock(tableName, new String[] { "foo", "bar", "A" },
                 new String[][] { { "A", "A", "A" }, { "D", "A", "B" }, { "D", "A", "C" } });
         relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
 
         filterNonUniqueRefs = true;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
-            AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
+            ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
+            AnelosimusDriver.run(resultReceiver, new String[] { tableName }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
@@ -208,7 +224,7 @@ public class MANYTest {
     public void testFilterRefCandidates() {
         // conf
         RelationalInputGenerator[] relationalInputGenerators = new RelationalInputGenerator[1];
-        RelationalInputMock table1 = new RelationalInputMock("table1", new String[] { "foo", "bar", "A", "B" },
+        RelationalInputMock table1 = new RelationalInputMock(tableName, new String[] { "foo", "bar", "A", "B" },
                 new String[][] { { "1", "1", "AAAA", "AAAA" }, { "2", "1", "AAAB", "AAAB" },
                         { "3", "1", "AAAC", "AAAC" }, { "4", "1", "AAAA", "AAAD" } });
         relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
@@ -216,8 +232,8 @@ public class MANYTest {
         filterNumericAndShortCols = true;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
-            AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
+            ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
+            AnelosimusDriver.run(resultReceiver, new String[] { tableName }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
@@ -240,7 +256,7 @@ public class MANYTest {
     public void testFilterRefCandidatesWithCoverageFilter() {
         // conf
         RelationalInputGenerator[] relationalInputGenerators = new RelationalInputGenerator[1];
-        RelationalInputMock table1 = new RelationalInputMock("table1", new String[] { "foo", "bar", "A" },
+        RelationalInputMock table1 = new RelationalInputMock(tableName, new String[] { "foo", "bar", "A" },
                 new String[][] { { "1", "1", "1" }, { "2", "1", "2" },
                         { "3", "1", "1" }, { "4", "1", "2" }, { "5", "1", "2" } });
         relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
@@ -250,8 +266,8 @@ public class MANYTest {
         refCoverageMinPercentage = 50;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
-            AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
+            ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
+            AnelosimusDriver.run(resultReceiver, new String[] { tableName }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
@@ -274,15 +290,15 @@ public class MANYTest {
     public void testStrategyRefToDeps() {
         // conf
         RelationalInputGenerator[] relationalInputGenerators = new RelationalInputGenerator[1];
-        RelationalInputMock table1 = new RelationalInputMock("table1", new String[] { "foo", "bar", "boo" },
+        RelationalInputMock table1 = new RelationalInputMock(tableName, new String[] { "foo", "bar", "boo" },
                 new String[][] { { "1", "1", "1" }, { "2", "1", "2" }, { "3", "1", "1" } });
         relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
 
         strategyRef2Deps = true;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
-            AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
+            ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
+            AnelosimusDriver.run(resultReceiver, new String[] { tableName }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
@@ -305,7 +321,7 @@ public class MANYTest {
     public void testFilterDependentRefs() {
         // conf
         RelationalInputGenerator[] relationalInputGenerators = new RelationalInputGenerator[1];
-        RelationalInputMock table1 = new RelationalInputMock("table1", new String[] { "foo1", "bar", "boo", "foo2" },
+        RelationalInputMock table1 = new RelationalInputMock(tableName, new String[] { "foo1", "bar", "boo", "foo2" },
                 new String[][] { { "1", "1", "1", "1" }, { "2", "1", "1", "3" }, { "3", "1", "2", "2" } });
         relationalInputGenerators[0] = new RelationalInputGeneratorMock(table1);
 
@@ -313,8 +329,8 @@ public class MANYTest {
         filterDependentRefs = true;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
-            AnelosimusDriver.run(resultReceiver, new String[] { "table1" }, inputRowLimit, nEstStrategy, p, m,
+            ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
+            AnelosimusDriver.run(resultReceiver, new String[] { tableName }, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,

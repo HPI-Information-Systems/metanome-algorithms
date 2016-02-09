@@ -27,6 +27,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
@@ -45,7 +46,7 @@ public class FDminimizerShadowedFDFixture {
     protected UniqueColumnCombinationResultReceiver uniqueColumnCombinationResultReceiver = mock(UniqueColumnCombinationResultReceiver.class);
     protected InclusionDependencyResultReceiver inclusionDependencyResultReceiver = mock(InclusionDependencyResultReceiver.class);
 
-    public FDminimizerShadowedFDFixture() throws CouldNotReceiveResultException {
+    public FDminimizerShadowedFDFixture() throws CouldNotReceiveResultException, ColumnNameMismatchException {
         table.add(ImmutableList.of("1", "0", "0", "0", "0", "3"));
         table.add(ImmutableList.of("0", "1", "0", "0", "0", "0"));
         table.add(ImmutableList.of("1", "1", "0", "0", "0", "0"));
@@ -159,7 +160,7 @@ public class FDminimizerShadowedFDFixture {
         return uccList;
     }
 
-    public void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException {
+    public void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
         ColumnIdentifier expectedIdentifierA = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
         ColumnIdentifier expectedIdentifierB = new ColumnIdentifier(this.relationName, this.columnNames.get(1));
         ColumnIdentifier expectedIdentifierC = new ColumnIdentifier(this.relationName, this.columnNames.get(2));

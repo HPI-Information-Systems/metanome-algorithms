@@ -29,6 +29,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 
 public class AIDFD implements FunctionalDependencyAlgorithm,
@@ -190,7 +191,7 @@ public class AIDFD implements FunctionalDependencyAlgorithm,
 		return madeCheck;
 	}
 
-	private void checkConstantColumns() {
+	private void checkConstantColumns() throws ColumnNameMismatchException {
 		constantColumns = LongBitSet.FACTORY.create();
 		for (int i = 0; i < numberAttributes; ++i) {
 			if(clusters.get(0)[i].size() == numberTuples) {

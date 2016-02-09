@@ -7,6 +7,7 @@ import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
@@ -100,7 +101,7 @@ public class BridgesFixture {
     return this.inclusionDependencyResultReceiver;
   }
 
-  public void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException {
+  public void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnIdentifier
         expectedIdentifier1 =
         new ColumnIdentifier(this.relationName, this.columnNames.get(0));

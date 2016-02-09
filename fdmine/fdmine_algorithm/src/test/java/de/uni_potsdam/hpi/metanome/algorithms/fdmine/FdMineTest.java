@@ -16,6 +16,7 @@ import de.metanome.algorithm_integration.configuration.ConfigurationRequirementR
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.uni_potsdam.hpi.metanome.algorithms.test_helper.fixtures.AlgorithmTestFixture;
@@ -73,7 +74,7 @@ public class FdMineTest {
     }
 
     @Test
-    public void testExecuteFDFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException {
+    public void testExecuteFDFixture() throws InputGenerationException, InputIterationException, CouldNotReceiveResultException, AlgorithmConfigurationException, ColumnNameMismatchException {
         // Setup
         FDmineFixture fixture = new FDmineFixture();
         algorithm.setRelationalInputConfigurationValue(FdMine.INPUT_FILE_TAG, fixture.getInputGenerator());

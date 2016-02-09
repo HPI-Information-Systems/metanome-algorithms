@@ -7,6 +7,7 @@ import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 
@@ -37,5 +38,5 @@ public abstract class AbstractAlgorithmTestFixture {
 
     public abstract RelationalInput getRelationalInput() throws InputIterationException;
 
-    public abstract void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException;
+    public abstract void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException;
 }

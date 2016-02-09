@@ -39,6 +39,7 @@ import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.InclusionDependency;
@@ -1627,7 +1628,7 @@ public class BINDER {
 				naryDep2ref.get(attributeCombination).retainAll(attributeCombinationGroup);
 	}
 	
-	protected void output() throws CouldNotReceiveResultException {
+	protected void output() throws CouldNotReceiveResultException, ColumnNameMismatchException {
 		// Output unary INDs
 		for (int dep : this.dep2ref.keySet()) {
 			String depTableName = this.getTableNameFor(dep, this.tableColumnStartIndexes);

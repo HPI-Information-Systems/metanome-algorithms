@@ -21,6 +21,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
@@ -218,7 +219,7 @@ public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
         }
     }
 
-    private void addAllDependenciesToResultReceiver(FDTreeElement fds, OpenBitSet activePath) throws CouldNotReceiveResultException {
+    private void addAllDependenciesToResultReceiver(FDTreeElement fds, OpenBitSet activePath) throws CouldNotReceiveResultException, ColumnNameMismatchException {
         if (this.fdResultReceiver == null) {
             return;
         }
@@ -251,8 +252,9 @@ public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
      * Do nothing if the object does not have a result receiver.
      *
      * @throws CouldNotReceiveResultException
+     * @throws ColumnNameMismatchException 
      */
-    private void addAllDependenciesToResultReceiver() throws CouldNotReceiveResultException {
+    private void addAllDependenciesToResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
         if (this.fdResultReceiver == null) {
             return;
         }

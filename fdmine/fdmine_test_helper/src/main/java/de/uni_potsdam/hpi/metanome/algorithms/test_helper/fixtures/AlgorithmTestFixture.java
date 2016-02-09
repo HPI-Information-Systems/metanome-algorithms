@@ -27,6 +27,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
@@ -158,7 +159,7 @@ public class AlgorithmTestFixture {
         return uccList;
     }
 
-    public void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException {
+    public void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
         ColumnIdentifier expectedIdentifierPROF = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
         ColumnIdentifier expectedIdentifierCSE = new ColumnIdentifier(this.relationName, this.columnNames.get(1));
         ColumnIdentifier expectedIdentifierDAY = new ColumnIdentifier(this.relationName, this.columnNames.get(2));
@@ -215,7 +216,7 @@ public class AlgorithmTestFixture {
         //verifyNoMoreInteractions(fdResultReceiver);
     }
 
-    public void verifyUniqueColumnCombinationResultReceiver() throws CouldNotReceiveResultException {
+    public void verifyUniqueColumnCombinationResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
         ColumnIdentifier expectedIdentifierPROF = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
         ColumnIdentifier expectedIdentifierCSE = new ColumnIdentifier(this.relationName, this.columnNames.get(1));
         ColumnIdentifier expectedIdentifierDAY = new ColumnIdentifier(this.relationName, this.columnNames.get(2));
@@ -236,7 +237,7 @@ public class AlgorithmTestFixture {
         verifyNoMoreInteractions(uniqueColumnCombinationResultReceiver);
     }
 
-    public void verifyInclusionDependencyResultReceiver() throws CouldNotReceiveResultException {
+    public void verifyInclusionDependencyResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
         //ColumnIdentifier expectedIdentifierPROF = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
         //ColumnIdentifier expectedIdentifierCSE = new ColumnIdentifier(this.relationName, this.columnNames.get(1));
         ColumnIdentifier expectedIdentifierDAY = new ColumnIdentifier(this.relationName, this.columnNames.get(2));
@@ -252,7 +253,7 @@ public class AlgorithmTestFixture {
         verifyNoMoreInteractions(inclusionDependencyResultReceiver);
     }
 
-    public void verifyFunctionalDependencyResultReceiverForFDMine() throws CouldNotReceiveResultException {
+    public void verifyFunctionalDependencyResultReceiverForFDMine() throws CouldNotReceiveResultException, ColumnNameMismatchException {
         ColumnIdentifier expectedIdentifierPROF = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
         ColumnIdentifier expectedIdentifierCSE = new ColumnIdentifier(this.relationName, this.columnNames.get(1));
         ColumnIdentifier expectedIdentifierDAY = new ColumnIdentifier(this.relationName, this.columnNames.get(2));

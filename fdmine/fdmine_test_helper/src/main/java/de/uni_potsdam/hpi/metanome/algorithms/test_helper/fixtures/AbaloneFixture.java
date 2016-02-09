@@ -21,6 +21,7 @@ import de.metanome.algorithm_integration.ColumnCombination;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.configuration.ConfigurationSettingFileInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
@@ -94,7 +95,7 @@ public class AbaloneFixture {
         return this.inclusionDependencyResultReceiver;
     }
 
-    public void verifyFdResultReceiver() throws CouldNotReceiveResultException {
+    public void verifyFdResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
         verify(fdResultReceiver).receiveResult(new FunctionalDependency(new ColumnCombination(expectedIdentifier1, expectedIdentifier2, expectedIdentifier3, expectedIdentifier4, expectedIdentifier6, expectedIdentifier8), expectedIdentifier5));
         verify(fdResultReceiver).receiveResult(new FunctionalDependency(new ColumnCombination(expectedIdentifier1, expectedIdentifier2, expectedIdentifier3, expectedIdentifier4, expectedIdentifier6, expectedIdentifier8), expectedIdentifier7));
         verify(fdResultReceiver).receiveResult(new FunctionalDependency(new ColumnCombination(expectedIdentifier1, expectedIdentifier2, expectedIdentifier3, expectedIdentifier4, expectedIdentifier6, expectedIdentifier9), expectedIdentifier5));
@@ -236,7 +237,7 @@ public class AbaloneFixture {
         verifyNoMoreInteractions(fdResultReceiver);
     }
 
-    public void verifyUccResultReceiver() throws CouldNotReceiveResultException {
+    public void verifyUccResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
         verify(uccResultReceiver).receiveResult(new UniqueColumnCombination(expectedIdentifier5, expectedIdentifier6, expectedIdentifier8));
         verify(uccResultReceiver).receiveResult(new UniqueColumnCombination(expectedIdentifier5, expectedIdentifier7, expectedIdentifier8));
         verify(uccResultReceiver).receiveResult(new UniqueColumnCombination(expectedIdentifier3, expectedIdentifier4, expectedIdentifier5, expectedIdentifier6));

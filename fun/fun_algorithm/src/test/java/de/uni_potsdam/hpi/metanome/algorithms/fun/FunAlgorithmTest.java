@@ -12,6 +12,7 @@ import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.uni_potsdam.hpi.metanome.algorithms.test_helper.fixtures.AlgorithmTestFixture;
 import de.uni_potsdam.hpi.metanome.algorithms.test_helper.fixtures.FunFastCountFixture;
@@ -62,9 +63,10 @@ public class FunAlgorithmTest {
 	 * @throws InputIterationException 
 	 * @throws InputGenerationException 
 	 * @throws AlgorithmConfigurationException 
+	 * @throws ColumnNameMismatchException 
 	 */
 	@Test
-	public void testYieldsAllFDsAndUCCs() throws InputIterationException, CouldNotReceiveResultException, InputGenerationException, AlgorithmConfigurationException {
+	public void testYieldsAllFDsAndUCCs() throws InputIterationException, CouldNotReceiveResultException, InputGenerationException, AlgorithmConfigurationException, ColumnNameMismatchException {
 		// Setup
 		AlgorithmTestFixture fixture = new AlgorithmTestFixture();
 		RelationalInput relationalInput = fixture.getInputGenerator().generateNewCopy();
@@ -89,9 +91,10 @@ public class FunAlgorithmTest {
 	 * @throws InputGenerationException
 	 * @throws InputIterationException
 	 * @throws AlgorithmConfigurationException 
+	 * @throws ColumnNameMismatchException 
 	 */
 	@Test
-	public void testFunFastCount() throws CouldNotReceiveResultException, InputGenerationException, InputIterationException, AlgorithmConfigurationException {
+	public void testFunFastCount() throws CouldNotReceiveResultException, InputGenerationException, InputIterationException, AlgorithmConfigurationException, ColumnNameMismatchException {
 		// Setup
 		FunFastCountFixture fixture = new FunFastCountFixture();
 		RelationalInput relationalInput = fixture.getInputGenerator().generateNewCopy();

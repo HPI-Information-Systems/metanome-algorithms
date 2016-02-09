@@ -11,6 +11,8 @@ package de.metanome.algorithms.many.test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,9 +23,12 @@ import org.slf4j.LoggerFactory;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
-import de.metanome.algorithms.many.MANY;
+import de.metanome.algorithm_integration.input.InputGenerationException;
+import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithms.many.driver.AnelosimusDriver;
 import de.metanome.backend.result_receiver.ResultCache;
+import de.metanome.backend.result_receiver.ResultReceiver;
 
 public class MANYIT {
 
@@ -79,6 +84,17 @@ public class MANYIT {
     public void tearDown() throws Exception {
     }
 
+    public static List<String> getAcceptedColumns(RelationalInputGenerator[] relationalInputGenerators) throws InputGenerationException, AlgorithmConfigurationException {
+    	List<String> acceptedColumns = new ArrayList<>();
+        for (RelationalInputGenerator relationalInputGenerator: relationalInputGenerators) {
+        	RelationalInput relationalInput = relationalInputGenerator.generateNewCopy();
+        	String tableName = relationalInput.relationName();
+        	for (String columnName : relationalInput.columnNames())
+        		acceptedColumns.add(tableName + ResultReceiver.TABLE_COLUMN_SEPARATOR + columnName);
+        }
+        return acceptedColumns;
+    }
+    
     @Test
     @Ignore
     public void test() {
@@ -94,7 +110,7 @@ public class MANYIT {
 
         String[] tableNames = AnelosimusDriver.listFiles(inputFolderPath + databaseName + File.separator,
                 inputFileEnding, limit);
-
+        
         m = 650;
         k = 42;
 
@@ -116,15 +132,15 @@ public class MANYIT {
         output = false;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
+            RelationalInputGenerator[] relationalInputGenerators = AnelosimusDriver.getRelationalInputs(databaseName, inputFileEnding, inputFolderPath, hasHeader,
+                    seperator, quote, escape, tableNames);
+        	ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
             AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps,
-                    AnelosimusDriver.getRelationalInputs(databaseName, inputFileEnding, inputFolderPath, hasHeader,
-                            seperator, quote, escape,
-                            tableNames));
+                    relationalInputGenerators);
         } catch (AlgorithmConfigurationException e) {
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
@@ -171,15 +187,15 @@ public class MANYIT {
         output = false;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
+        	RelationalInputGenerator[] relationalInputGenerators = AnelosimusDriver.getRelationalInputs(databaseName, inputFileEnding, inputFolderPath, hasHeader,
+                    seperator, quote, escape, tableNames);
+                	ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
             AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps,
-                    AnelosimusDriver.getRelationalInputs(databaseName, inputFileEnding, inputFolderPath, hasHeader,
-                            seperator, quote, escape,
-                            tableNames));
+                    relationalInputGenerators);
         } catch (AlgorithmConfigurationException e) {
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
@@ -225,15 +241,15 @@ public class MANYIT {
         condenseMatrix = true;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
+        	RelationalInputGenerator[] relationalInputGenerators = AnelosimusDriver.getRelationalInputs(databaseName, inputFileEnding, inputFolderPath, hasHeader,
+                    seperator, quote, escape, tableNames);
+                	ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
             AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps,
-                    AnelosimusDriver.getRelationalInputs(databaseName, inputFileEnding, inputFolderPath, hasHeader,
-                            seperator, quote, escape,
-                            tableNames));
+                    relationalInputGenerators);
         } catch (AlgorithmConfigurationException e) {
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {
@@ -264,15 +280,15 @@ public class MANYIT {
         k = 1;
 
         try {
-            ResultCache resultReceiver = new ResultCache("test");
+        	RelationalInputGenerator[] relationalInputGenerators = AnelosimusDriver.getRelationalInputs(databaseName, inputFileEnding, inputFolderPath, hasHeader,
+                    seperator, quote, escape, tableNames);
+                	ResultCache resultReceiver = new ResultCache("test", getAcceptedColumns(relationalInputGenerators));
             AnelosimusDriver.run(resultReceiver, tableNames, inputRowLimit, nEstStrategy, p, m,
                     k, passes, nullValues, dop, refCoverageMinPercentage, verify, output, filterNonUniqueRefs,
                     filterNullCols,
                     filterNumericAndShortCols, filterDependentRefs, isFastVector, condenseMatrix,
                     strategyRef2Deps,
-                    AnelosimusDriver.getRelationalInputs(databaseName, inputFileEnding, inputFolderPath, hasHeader,
-                            seperator, quote, escape,
-                            tableNames));
+                    relationalInputGenerators);
         } catch (AlgorithmConfigurationException e) {
             e.printStackTrace();
         } catch (AlgorithmExecutionException e) {

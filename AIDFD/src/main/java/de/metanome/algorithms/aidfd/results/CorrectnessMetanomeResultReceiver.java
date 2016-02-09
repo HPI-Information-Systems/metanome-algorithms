@@ -12,6 +12,7 @@ import de.metanome.algorithms.aidfd.helpers.ArrayIndexComparator;
 import de.metanome.algorithms.aidfd.helpers.FD;
 import de.metanome.algorithms.aidfd.helpers.StrippedPartition;
 import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 
 public class CorrectnessMetanomeResultReceiver extends MetanomeResultReceiver {
@@ -31,7 +32,7 @@ public class CorrectnessMetanomeResultReceiver extends MetanomeResultReceiver {
 	}
 
 	@Override
-	public void finish() {
+	public void finish() throws ColumnNameMismatchException {
 		long time = System.currentTimeMillis();
 		System.out.println("Filtering incorrect FDs");
 
@@ -62,7 +63,7 @@ public class CorrectnessMetanomeResultReceiver extends MetanomeResultReceiver {
 		System.out.println("Checked " + nextPos + " FDs in " + (System.currentTimeMillis() - time) + " ms");
 	}
 	
-	public void check(StrippedPartition current, int currentPos) {
+	public void check(StrippedPartition current, int currentPos) throws ColumnNameMismatchException {
 
 		int pos = fds.get(nextPos).lhsSort.nextSetBit(currentPos);
 		if (pos < 0) {
