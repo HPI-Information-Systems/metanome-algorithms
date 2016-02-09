@@ -34,17 +34,17 @@ public class SingleColumnProfilerAlgorithm {
   protected List<ColumnMainProfile> columnsProfile;
   protected String outputPath;
   // statistic Names
-  public final String NUMCOLUMN = "# Columns";
-  public final String NUMTUPLE = "# Tuples";
-  public final String COLUMNNAME = "column Name";
-  public final String NUMBEROFNULL = "# Null";
-  public final String PERCENTOFNULL = "% Null";
-  public final String NUMBEROFDISTINCT = "# Distinct";
-  public final String PERCENTODFISTINCT = "% Distinct";
+  public final String NUMCOLUMN = "Number of Columns";
+  public final String NUMTUPLE = "Number of Tuples";
+  public final String COLUMNNAME = "Column Name";
+  public final String NUMBEROFNULL = "Nulls";
+  public final String PERCENTOFNULL = "Percentage of Nulls";
+  public final String NUMBEROFDISTINCT = "Number of Distinct Values";
+  public final String PERCENTODFISTINCT = "Percentage of Distinct Values";
   public final String DISTINCTVALUES = "Distinct Values";
   public final String VALUEDISTRIBUTION = "Value Distribution";
   public final String STRINGLENGTHDISTRIBUTION = "String Length Distribution";
-  public final String TOPKITEM = "Top " + Numoftopk + " frquent Items";
+  public final String TOPKITEM = "Top " + Numoftopk + " frequent items";
   public final String DATATYPE = "Data Type";
   public final String LONGESTSTRING = "Longest String";
   public final String SHORTESTSTRING = "Shortest String";
@@ -91,8 +91,8 @@ public class SingleColumnProfilerAlgorithm {
    // JSONObject General = new JSONObject();
    // General.put(NUMCOLUMN, columnNames.size());
    // General.put(NUMTUPLE, NumofTuples);
-    String general=NUMCOLUMN+columnNames.size()+"\n"+NUMTUPLE+NumofTuples;
-    addStatistic("General", general, "*", relationName);
+    addStatistic(NUMCOLUMN, columnNames.size(), "*", relationName);
+    addStatistic(NUMTUPLE, NumofTuples, "*", relationName);
     for (int i = 0; i < columnsProfile.size(); i++) {
       // System.out.println(columnsProfile.get(i).toString());
       generateColumnStatistic(columnsProfile.get(i));
@@ -227,58 +227,66 @@ public class SingleColumnProfilerAlgorithm {
 
   private void generateColumnStatistic(ColumnMainProfile cs) throws AlgorithmExecutionException {
 
-    String column ="";
+    String column =cs.getColumnName();
 
     // for all with string
-    column+=COLUMNNAME+" : "+ cs.getColumnName()+",";
-    column+=NUMBEROFNULL+" : "+  cs.getNumofNull()+",";
-    column+=PERCENTOFNULL+" : "+ cs.getPercentNull()+",";
-    column+=NUMBEROFDISTINCT+" : "+cs.getNumDistinct()+",";
-    column+=PERCENTODFISTINCT+" : "+ cs.getPercentDistinct()+",";
+    addStatistic(NUMBEROFNULL,cs.getNumofNull()+"",column, relationName);
+    addStatistic(PERCENTOFNULL,  cs.getPercentNull()+"",column, relationName);
+    addStatistic(NUMBEROFDISTINCT, cs.getNumDistinct()+"",column, relationName);
+    addStatistic(PERCENTODFISTINCT,  cs.getPercentDistinct()+"",column, relationName);
+
 
     // if (cs.getDistinctValues() != null) column.put(DISTINCTVALUES, cs.getDistinctValues());
     // if(cs.getFreq()!=null) column.put(VALUEDISTRIBUTION, Util.mapToJson(cs.getFreq()));
    
     if (cs.getTopkValues() != null)
-      column+=TOPKITEM+" : "+ Util.mapTostring(cs.getTopkValues())+",";
+      addStatistic(TOPKITEM,  Util.mapTostring(cs.getTopkValues()),column, relationName);
+
 
     // just for strings
     if (cs.getDataType() == DataTypes.mySTRING) {
       String stringwithlength =
           cs.getDataType() + "[" + Util.roundUp(cs.getLongestString().length(), 16) + "]";
-      column+=DATATYPE+" : "+ stringwithlength+",";
+      addStatistic(DATATYPE,  stringwithlength,column, relationName);
       if (cs.getLongestString() != null)
-        column+=LONGESTSTRING+" : "+cs.getLongestString()+",";
+        addStatistic(LONGESTSTRING, cs.getLongestString(),column, relationName);
       if (cs.getShortestString() != null)
-        column+=SHORTESTSTRING+" : "+cs.getShortestString()+",";
+        addStatistic(SHORTESTSTRING, cs.getShortestString(),column, relationName);
+   
       if (cs.getFirstString() != null)
-        column+=MINSTRING+" : "+cs.getFirstString()+",";
+        addStatistic(MINSTRING, cs.getFirstString(),column, relationName);
+ 
       if (cs.getLasttString() != null)
-        column+=MAXSTRING+" : "+cs.getLasttString()+",";
+        addStatistic(MAXSTRING, cs.getLasttString(),column, relationName);
+  
       if (cs.getSemantictype() != null && cs.getSemantictype() !=DataTypes.UNKOWN)
-        column+=SEMANTICDATATYPE+" : "+ cs.getSemantictype()+",";
+        addStatistic(SEMANTICDATATYPE, cs.getSemantictype(),column, relationName);
       // if(cs.getLengthdist()!=null) column.put(STRINGLENGTHDISTRIBUTION,Util.mapToJsonIntegerKey(
       // cs.getLengthdist()));
 
     } else {
       // all types not string
-      column+=DATATYPE+" : "+cs.getDataType()+",";
-
+      addStatistic(DATATYPE, cs.getDataType(),column, relationName);
+      
       // just numbers
       if (DataTypes.isNumeric(cs.getDataType())) {
         if (cs.getMin() != null)
-          column+=MIN+" : "+ cs.getMin()+",";
+          addStatistic(MIN, cs.getMin()+"",column, relationName);
+         
         if (cs.getMax() != null)
-          column+=MAX+" : "+ cs.getMax()+",";
-        column+=AVG+" : "+cs.getAvg()+",";
+          addStatistic(MAX, cs.getMax()+"",column, relationName);
+       
+        addStatistic(AVG, cs.getAvg()+"",column, relationName);
+      
         Double stdev = cs.getStdDev();
         if (!stdev.equals(Double.NaN))
-          column+=STDD+" : "+ cs.getStdDev();
+          addStatistic(STDD, cs.getStdDev()+"",column, relationName);
+
       }
 
     }
 
-    addStatistic("Single Column Profiler", column, cs.getColumnName(), relationName);
+    
   }
   
   private void generateColumnStatisticJson(ColumnMainProfile cs) throws AlgorithmExecutionException {
