@@ -4,40 +4,40 @@ package de.metanome.algorithms.singlecolumnprofiler;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Map.Entry;
+import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
+
 
 
 
 public class ColumnMainProfile {
   // Delimiter used in CSV file
-  private static final String COMMA_DELIMITER = ",";
-  private static final String NEW_LINE_SEPARATOR = "\n";
+   private static final String COMMA_DELIMITER = ",";
+   private static final String NEW_LINE_SEPARATOR = "\n";
   //////////////////////////////////////////////////
   // valid for all types
   private String ColumnName;
   private String DataType;
   private long NumNull;
-  private String Defaultvalue;// *******
+ // private String Defaultvalue;// *******
   // %Distinct Percentage of distinct values
-  private int percentDistinct;// -------Calculated
+ // private int percentDistinct;// -------Calculated
   // %NULL Percentage of Null values
-  private long percentNull;// -------Calculated
+ //private long percentNull;// -------Calculated
   // #Distinct : the number of distinct values is the size of the hash tree
-  private int NumDistinct; // -------Calculated
+  //private int NumDistinct; // -------Calculated
   // top k value
   // column value distribution (int)
-  TreeMap<String, MutableInt> freq;
-  TreeMap<String, MutableInt> topk;// ------calculated
+  Object2IntRBTreeMap<String> freq;
+ // TreeMap<String,Integer> topk;// ------calculated
 
   ////////////////////////////////////////////////////////
   // text
   private String LongestString;
   private String ShortestString;
   // max and min for strings are the first and list strings in the tree
-  private String firstString;// -------Calculated
-  private String lasttString;// -------Calculated
+  //private String firstString;// -------Calculated
+ // private String lasttString;// -------Calculated
   private String Semantictype;// ------secondpass
   // column length distribution (text)
   // TreeMap<String, MutableInt> lengthdist; ; //------secondpass
@@ -46,7 +46,7 @@ public class ColumnMainProfile {
   private double Max;
   private double Min;
   private double Sum;
-  private double Avg;// ------calculated
+  //private double Avg;// ------calculated
   private double stdDev;// ------secondpass
 
   /////////////////// constructor////////////////////////////////
@@ -57,30 +57,15 @@ public class ColumnMainProfile {
     setMin(Double.MAX_VALUE);
     setLongestString("");
     setSum(0.0);
-    setNumofNull(0);
+    setNumNull(0);
     setStdDev(0);
-    freq = new TreeMap<String, MutableInt>();
-    topk = new TreeMap<String, MutableInt>();
+    freq = new Object2IntRBTreeMap<String>();
+    freq.defaultReturnValue(0);
+    //topk = new TreeMap<String,Integer>();
 
   }
   /////////////////////// getter and setter///////////////////
 
-
-  public int getPercentDistinct() {
-    return percentDistinct;
-  }
-
-  public long getPercentNull() {
-    return percentNull;
-  }
-
-  public String getFirstString() {
-    return firstString;
-  }
-
-  public String getLasttString() {
-    return lasttString;
-  }
 
   public String getColumnName() {
     return ColumnName;
@@ -138,32 +123,13 @@ public class ColumnMainProfile {
     Sum = sum;
   }
 
-  public long getNumofNull() {
-    return NumNull;
-  }
-
-  public void setNumofNull(long numofNull) {
-    NumNull = numofNull;
-  }
-
-  public String getDefaultvalue() {
-    return Defaultvalue;
-  }
-
-  public void setDefaultvalue(String defaultvalue) {
-    Defaultvalue = defaultvalue;
-  }
+ 
 
   public ArrayList<String> getDistinctValues() {
     return new ArrayList<String>(freq.keySet());
   }
 
-  public TreeMap<String, MutableInt> getTopkValues() {
-    if (topk != null && topk.size() > 0)
-      return topk;
-    return null;
-  }
-
+ 
   public long getNumNull() {
     return NumNull;
   }
@@ -172,9 +138,6 @@ public class ColumnMainProfile {
     NumNull = numNull;
   }
 
-  public int getNumDistinct() {
-    return NumDistinct;
-  }
 
   public String getSemantictype() {
     return Semantictype;
@@ -184,16 +147,6 @@ public class ColumnMainProfile {
     Semantictype = semantictype;
   }
 
-  public double getAvg() {
-    return Avg;
-  }
-
-
-  public void setAvg(double avg) {
-    Avg = avg;
-  }
-
-
   public double getStdDev() {
     return stdDev;
   }
@@ -202,33 +155,6 @@ public class ColumnMainProfile {
   public void setStdDev(double stdDev) {
     this.stdDev = stdDev;
   }
-
-
-
-  public void setPercentDistinct(int percentDistinct) {
-    this.percentDistinct = percentDistinct;
-  }
-
-
-  public void setPercentNull(long percentNull) {
-    this.percentNull = percentNull;
-  }
-
-
-  public void setNumDistinct(int numDistinct) {
-    NumDistinct = numDistinct;
-  }
-
-
-  public void setFirstString(String firstString) {
-    this.firstString = firstString;
-  }
-
-
-  public void setLasttString(String lasttString) {
-    this.lasttString = lasttString;
-  }
-
 
   public void setMax(double max) {
     Max = max;
@@ -247,64 +173,13 @@ public class ColumnMainProfile {
 
   //////////////////////////////////// Special setter for calculated values from others
 
-  public void setCalculatedFields(int numoftuples) {
-    if (numoftuples != 0 && freq != null) {
-      NumDistinct = freq.size();
-      percentDistinct = NumDistinct * 100 / numoftuples;
-      percentNull = NumNull * 100 / numoftuples;
-
-      // for strings
-      if (DataType == DataTypes.mySTRING) {
-        firstString = freq.firstKey().toString();
-        lasttString = freq.lastKey().toString();
-        if(LongestString.length()>255)
-          DataType=DataTypes.myTEXT;
-        else if( DataType==DataTypes.mySTRING && 
-            LongestString.length()==ShortestString.length() &&
-            NumNull==0 &&
-            DataTypes.isUUID(LongestString)&&
-            DataTypes.isUUID(ShortestString)&&
-            DataTypes.isUUID(firstString)&&
-            DataTypes.isUUID(lasttString)
-            )
-        {DataType=DataTypes.myUUID;}
-      }
-      // for numbers
-      if (DataTypes.isNumeric(DataType))
-        Avg = Sum / numoftuples;
-
-      // all
-      freq = (TreeMap<String, MutableInt>) Util.sortByValues(freq);
-      if (DataType==DataTypes.myINTEGER && NumDistinct==numoftuples && Min>0 && Max<=2147483647)
-      {
-        Iterator it = freq.entrySet().iterator();
-        MutableInt prev=new MutableInt(),current=new MutableInt();
-        if(it.hasNext())
-          {Map.Entry pair = (Map.Entry)it.next();
-          prev=(MutableInt)pair.getValue();
-          }
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            current=(MutableInt)pair.getValue();
-            if(prev.getMutableInt()-current.getMutableInt()!=1)
-              break;
-                    }
-        
-      }
-      topk =
-          (TreeMap<String, MutableInt>) Util.getTopK(freq, SingleColumnProfilerAlgorithm.Numoftopk);
-
-    }
-  }
-
+ 
   public void addValueforfreq(String newvalue) {
     if (newvalue != null) {
-      MutableInt count = freq.get(newvalue);
-      if (count == null) {
-        freq.put(newvalue, new MutableInt());
-      } else {
-        count.increment();
-      }
+    int oldvalue= freq.getInt(newvalue);
+    freq.put(newvalue, oldvalue+1);
+     // freq.addTo(newvalue, 1);
+      
     }
   }
 
@@ -359,7 +234,7 @@ public class ColumnMainProfile {
 
   }
 
-  public void updateColumnProfilesecondpass(String newvalue) { // string values
+  public void updateColumnProfilesecondpass(String newvalue, int numberoftuples) { // string values
     if (DataType == DataTypes.mySTRING || DataType == DataTypes.myTEXT) { 
       // length distribution
       // addValueforlengdist(newvalue.length());
@@ -374,16 +249,16 @@ public class ColumnMainProfile {
 
     if (DataTypes.isNumeric(DataType))
       stdDev +=
-          (Avg - Util.getnumberfromstring(newvalue)) * (Avg - Util.getnumberfromstring(newvalue));
+          (Sum/numberoftuples - Util.getnumberfromstring(newvalue)) * (Sum/numberoftuples - Util.getnumberfromstring(newvalue));
 
   }
 
-  public TreeMap<String, MutableInt> getFreq() {
+  public  Object2IntRBTreeMap<String> getFreq() {
     return freq;
   }
 
 
-  public void setFreq(TreeMap<String, MutableInt> freq) {
+  public void setFreq( Object2IntRBTreeMap<String> freq) {
     this.freq = freq;
   }
 
@@ -398,16 +273,7 @@ public class ColumnMainProfile {
   // }
 
 
-  @Override
-  public String toString() {
-    return "ColumnMainProfile [ColumnName=" + ColumnName + ", DataType=" + DataType + ", NumNull="
-        + NumNull + ", Defaultvalue=" + Defaultvalue + ", percentDistinct=" + percentDistinct
-        + ", percentNull=" + percentNull + ", NumDistinct=" + NumDistinct + ", freq=" + freq
-        + ", topk=" + topk + ", LongestString=" + LongestString + ", ShortestString="
-        + ShortestString + ", firstString=" + firstString + ", lasttString=" + lasttString
-        + ", Semantictype=" + Semantictype + ", Max=" + Max + ", Min=" + Min + ", Sum=" + Sum
-        + ", Avg=" + Avg + ", stdDev=" + stdDev + "]";
-  }
+ 
 
   public void writeMapToCsv(String path, String relation, String columnname) throws Exception {
     if (freq != null) {
@@ -422,7 +288,7 @@ public class ColumnMainProfile {
 
       FileWriter fileWriter = new FileWriter(path + "value_" + relation + "_" + columnname);
 
-      for (Map.Entry<String, MutableInt> entry : freq.entrySet()) {
+      for (Entry<String, Integer> entry : freq.entrySet()) {
         fileWriter.append(entry.getKey().replace(',', ' '));
         fileWriter.append(COMMA_DELIMITER);
         fileWriter.append(String.valueOf(entry.getValue()));
@@ -447,31 +313,81 @@ public class ColumnMainProfile {
 
   }
 
-  private class MutableInt implements Comparable<MutableInt> {
-    int value = 1;
 
-    public void increment() {
-      ++value;
-    }
-
-    public int getMutableInt() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return value + "";
-    }
-
-    public int compareTo(MutableInt arg0) {
-      if (value == arg0.getMutableInt())
-        return 0;
-      else if (value > arg0.getMutableInt())
-        return 1;
-      else
-        return -1;
-    }
-
-
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((ColumnName == null) ? 0 : ColumnName.hashCode());
+    result = prime * result + ((DataType == null) ? 0 : DataType.hashCode());
+    result = prime * result + ((LongestString == null) ? 0 : LongestString.hashCode());
+    long temp;
+    temp = Double.doubleToLongBits(Max);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(Min);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + (int) (NumNull ^ (NumNull >>> 32));
+    result = prime * result + ((Semantictype == null) ? 0 : Semantictype.hashCode());
+    result = prime * result + ((ShortestString == null) ? 0 : ShortestString.hashCode());
+    temp = Double.doubleToLongBits(Sum);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + ((freq == null) ? 0 : freq.hashCode());
+    temp = Double.doubleToLongBits(stdDev);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    return result;
   }
-}
+
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    ColumnMainProfile other = (ColumnMainProfile) obj;
+    if (ColumnName == null) {
+      if (other.ColumnName != null)
+        return false;
+    } else if (!ColumnName.equals(other.ColumnName))
+      return false;
+    if (DataType == null) {
+      if (other.DataType != null)
+        return false;
+    } else if (!DataType.equals(other.DataType))
+      return false;
+    if (LongestString == null) {
+      if (other.LongestString != null)
+        return false;
+    } else if (!LongestString.equals(other.LongestString))
+      return false;
+    if (Double.doubleToLongBits(Max) != Double.doubleToLongBits(other.Max))
+      return false;
+    if (Double.doubleToLongBits(Min) != Double.doubleToLongBits(other.Min))
+      return false;
+    if (NumNull != other.NumNull)
+      return false;
+    if (Semantictype == null) {
+      if (other.Semantictype != null)
+        return false;
+    } else if (!Semantictype.equals(other.Semantictype))
+      return false;
+    if (ShortestString == null) {
+      if (other.ShortestString != null)
+        return false;
+    } else if (!ShortestString.equals(other.ShortestString))
+      return false;
+    if (Double.doubleToLongBits(Sum) != Double.doubleToLongBits(other.Sum))
+      return false;
+    if (freq == null) {
+      if (other.freq != null)
+        return false;
+    } else if (!freq.equals(other.freq))
+      return false;
+    if (Double.doubleToLongBits(stdDev) != Double.doubleToLongBits(other.stdDev))
+      return false;
+    return true;
+  }
+
+ }
