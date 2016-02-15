@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
+import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
@@ -84,13 +85,13 @@ public class MANYIT {
     public void tearDown() throws Exception {
     }
 
-    public static List<String> getAcceptedColumns(RelationalInputGenerator[] relationalInputGenerators) throws InputGenerationException, AlgorithmConfigurationException {
-    	List<String> acceptedColumns = new ArrayList<>();
+    public static List<ColumnIdentifier> getAcceptedColumns(RelationalInputGenerator[] relationalInputGenerators) throws InputGenerationException, AlgorithmConfigurationException {
+    	List<ColumnIdentifier> acceptedColumns = new ArrayList<>();
         for (RelationalInputGenerator relationalInputGenerator: relationalInputGenerators) {
         	RelationalInput relationalInput = relationalInputGenerator.generateNewCopy();
         	String tableName = relationalInput.relationName();
         	for (String columnName : relationalInput.columnNames())
-        		acceptedColumns.add(tableName + ResultReceiver.TABLE_COLUMN_SEPARATOR + columnName);
+        		acceptedColumns.add(new ColumnIdentifier(tableName, columnName));
         }
         return acceptedColumns;
     }

@@ -7,7 +7,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 
@@ -20,6 +22,8 @@ import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.BasicStatisticsResultReceiver;
 import de.metanome.algorithm_integration.results.BasicStatistic;
+import de.metanome.algorithm_integration.results.basic_statistic_values.BasicStatisticValueString;
+import de.metanome.algorithm_integration.results.basic_statistic_values.BasicStatisticValueInteger;
 
 
 public class SingleColumnProfilerAlgorithm {
@@ -217,10 +221,22 @@ public class SingleColumnProfilerAlgorithm {
           .setStdDev(Math.sqrt((columnsProfile.get(i).getStdDev() / (NumofTuples - 1))));
   }
 
-  private void addStatistic(String StatisticName, Object Value, String ColumnName,
+  private void addStatistic(String StatisticName, String Value, String ColumnName,
       String RelationName) throws AlgorithmExecutionException {
     BasicStatistic bs =
-        new BasicStatistic(StatisticName, Value, new ColumnIdentifier(RelationName, ColumnName));
+        new BasicStatistic(new ColumnIdentifier(RelationName, ColumnName));
+    Map<String, BasicStatisticValueString> statistics = new HashMap<>();
+    statistics.put(StatisticName, new BasicStatisticValueString(Value));
+    // System.out.println(StatisticName + " of " + ColumnName + " : " + Value);
+    resultReceiver.receiveResult(bs);
+  }
+  
+  private void addStatistic(String StatisticName, int Value, String ColumnName,
+      String RelationName) throws AlgorithmExecutionException {
+    BasicStatistic bs =
+        new BasicStatistic(new ColumnIdentifier(RelationName, ColumnName));
+    Map<String, BasicStatisticValueInteger> statistics = new HashMap<>();
+    statistics.put(StatisticName, new BasicStatisticValueInteger(Integer.valueOf(Value)));
     // System.out.println(StatisticName + " of " + ColumnName + " : " + Value);
     resultReceiver.receiveResult(bs);
   }
