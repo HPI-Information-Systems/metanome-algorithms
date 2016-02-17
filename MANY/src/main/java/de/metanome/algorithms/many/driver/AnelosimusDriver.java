@@ -124,32 +124,19 @@ public class AnelosimusDriver {
 
         anelosimus.setIntegerConfigurationValue(MANY.Identifier.INPUT_ROW_LIMIT.name(), inputRowLimit);
 
-        anelosimus
-                .setIntegerConfigurationValue(MANY.Identifier.HASH_FUNCTION_COUNT.name(), k);
+        anelosimus.setIntegerConfigurationValue(MANY.Identifier.HASH_FUNCTION_COUNT.name(), k);
         anelosimus.setIntegerConfigurationValue(MANY.Identifier.BIT_VECTOR_SIZE.name(), m);
-        anelosimus.setIntegerConfigurationValue(MANY.Identifier.DOP.name(), dop);
+        anelosimus.setIntegerConfigurationValue(MANY.Identifier.DEGREE_OF_PARALLELISM.name(), dop);
         anelosimus.setIntegerConfigurationValue(MANY.Identifier.PASSES.name(), passes);
         anelosimus.setBooleanConfigurationValue(MANY.Identifier.VERIFY.name(), verify);
         anelosimus.setBooleanConfigurationValue(MANY.Identifier.OUTPUT.name(), output);
-
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NON_UNIQUE_REFS.name(),
-                filterNonUniqueRefs);
-
-        anelosimus.setIntegerConfigurationValue(MANY.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name(),
-                refCoverageMinPercentage);
-
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NON_UNIQUE_REFS.name(), filterNonUniqueRefs);
+        anelosimus.setIntegerConfigurationValue(MANY.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name(), refCoverageMinPercentage);
         anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NULL_COLS.name(), filterNullCols);
-
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NUMERIC_AND_SHORT_COLS.name(),
-                filterNumericAndShortCols);
-
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_DEPENDENT_REFS.name(),
-                filterDependentRefs);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FASTVECTOR.name(),
-                useFastVector);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.CONDENSE_MATRIX.name(),
-                condenseMatrix);
-
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NUMERIC_AND_SHORT_COLS.name(), filterNumericAndShortCols);
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_DEPENDENT_REFS.name(), filterDependentRefs);
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FASTVECTOR.name(), useFastVector);
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.CONDENSE_MATRIX.name(), condenseMatrix);
         anelosimus.setBooleanConfigurationValue(MANY.Identifier.STRATEGY_REF2DEPS.name(), strategyRef2Deps);
 
         long start = System.currentTimeMillis();

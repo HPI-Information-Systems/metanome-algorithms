@@ -63,7 +63,6 @@
         <module>dao</module> 
         <module>SPIDER</module>
         <module>BINDER</module>
-        <module>MANY</module>
         <module>tane</module>
         <module>fun</module>
         <module>fdmine</module>
@@ -76,5 +75,6 @@
         <module>ORDER</module>
         <module>FAIDA</module>
         <module>SCDP</module>
+        <module>MANY</module>
     </modules>
 </project>

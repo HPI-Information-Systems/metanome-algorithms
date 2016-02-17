@@ -62,8 +62,7 @@ public class INDDetectionWorker implements Runnable {
     private boolean isEqual(int ref, int dep) throws Exception {
 
         Set<String> refValueSet = this.parent.getValueSetFor(ref);
-        Set<String> depValueSet =
-                this.parent.getValueSetFor(dep);
+        Set<String> depValueSet = this.parent.getValueSetFor(dep);
         return refValueSet.equals(depValueSet);
 
     }

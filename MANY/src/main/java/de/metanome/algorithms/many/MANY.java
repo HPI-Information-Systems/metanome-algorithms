@@ -45,8 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgorithm,
-        BooleanParameterAlgorithm, RelationalInputParameterAlgorithm {
+public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgorithm, BooleanParameterAlgorithm, RelationalInputParameterAlgorithm {
 
     Logger logger = LoggerFactory.getLogger(MANY.class);
     String timePattern = "MM/dd/yy HH:mm:ss";
@@ -58,7 +57,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         HASH_FUNCTION_COUNT,
         STRATEGY_REF2DEPS,
         PASSES,
-        DOP,
+        DEGREE_OF_PARALLELISM,
         VERIFY,
         FASTVECTOR,
         FILTER_NUMERIC_AND_SHORT_COLS,
@@ -76,8 +75,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
     int[] tableColumnStartIndexes;
     List<String> columnNames;
     final List<List<String>> columnValueLists = new ArrayList<List<String>>();
-    final Map<Integer, Set<String>> verificationCache = Collections
-            .synchronizedMap(new HashMap<Integer, Set<String>>());
+    final Map<Integer, Set<String>> verificationCache = Collections.synchronizedMap(new HashMap<Integer, Set<String>>());
     int[] condensedMatrixMapping;
 
     int m;
@@ -86,7 +84,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
     int dop;
     int refMinCoverage;
     boolean verify;
-    public boolean outputINDS;
+    public boolean outputINDS = true;
     boolean filterNumericAndShortCols;
     boolean filterDependentRefs;
     boolean filterNonUniqueRefs;
@@ -289,8 +287,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
                 }
             }
 
-            logger.debug("ind detection: {}",
-                    DateFormatUtils.formatUTC(System.currentTimeMillis(), timePattern));
+            logger.debug("ind detection: {}", DateFormatUtils.formatUTC(System.currentTimeMillis(), timePattern));
 
             final ExecutorService executor = Executors.newFixedThreadPool(dop);
 
@@ -314,8 +311,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
                 logger.debug("Awaiting completion of threads.");
             }
 
-            logger.debug("ind done: {}",
-                    DateFormatUtils.formatUTC(System.currentTimeMillis(), timePattern));
+            logger.debug("ind done: {}", DateFormatUtils.formatUTC(System.currentTimeMillis(), timePattern));
             logger.info("#uinds: {}", numUnaryINDs);
             logger.info("#fp: {}", falsePositives);
         } catch (Exception e) {
@@ -344,8 +340,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
 
             final int numTableColumns = input.numberOfColumns();
 
-            final InputIterator inputIterator = new FileInputIterator(input,
-                    inputRowLimit);
+            final InputIterator inputIterator = new FileInputIterator(input, inputRowLimit);
 
             List<List<String>> tableColumns = new ArrayList<>();
             for (int i = 0; i < numTableColumns; i++) {
@@ -378,8 +373,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         logger.debug("Number of columns: {}", numColumns);
     }
 
-    private void storeColumnIdentifier(RelationalInput input) throws InputIterationException,
-            InputGenerationException {
+    private void storeColumnIdentifier(RelationalInput input) throws InputIterationException, InputGenerationException {
         // Query attribute name
         for (final String columnName : input.columnNames()) {
             this.columnNames.add(columnName);
@@ -394,91 +388,82 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
 
         ConfigurationRequirementInteger m = new ConfigurationRequirementInteger(MANY.Identifier.BIT_VECTOR_SIZE.name());
         Integer[] defaultM = new Integer[1];
-        defaultM[0] = -1;
+        defaultM[0] = 500;
         m.setDefaultValues(defaultM);
         m.setRequired(true);
         configs.add(m);
 
-        ConfigurationRequirementInteger k = new ConfigurationRequirementInteger(
-                MANY.Identifier.HASH_FUNCTION_COUNT.name());
+        ConfigurationRequirementInteger k = new ConfigurationRequirementInteger(MANY.Identifier.HASH_FUNCTION_COUNT.name());
         Integer[] defaultK = new Integer[1];
-        defaultK[0] = -1;
+        defaultK[0] = 4;
         k.setDefaultValues(defaultK);
         k.setRequired(true);
         configs.add(k);
 
         ConfigurationRequirementInteger passes = new ConfigurationRequirementInteger(MANY.Identifier.PASSES.name());
         Integer[] defaultPasses = new Integer[1];
-        defaultPasses[0] = -1;
+        defaultPasses[0] = 2;
         passes.setDefaultValues(defaultPasses);
         passes.setRequired(true);
         configs.add(passes);
 
-        ConfigurationRequirementInteger dop = new ConfigurationRequirementInteger(MANY.Identifier.DOP.name());
+        ConfigurationRequirementInteger dop = new ConfigurationRequirementInteger(MANY.Identifier.DEGREE_OF_PARALLELISM.name());
         Integer[] defaultDop = new Integer[1];
-        defaultDop[0] = -1;
+        defaultDop[0] = 2;
         dop.setDefaultValues(defaultDop);
         dop.setRequired(true);
         configs.add(dop);
 
-        ConfigurationRequirementBoolean filterNumericAndShortCols = new ConfigurationRequirementBoolean(
-                MANY.Identifier.FILTER_NUMERIC_AND_SHORT_COLS.name());
+        ConfigurationRequirementBoolean filterNumericAndShortCols = new ConfigurationRequirementBoolean(MANY.Identifier.FILTER_NUMERIC_AND_SHORT_COLS.name());
         Boolean[] defaultFilterNumericAndShortCols = new Boolean[1];
-        defaultFilterNumericAndShortCols[0] = true;
+        defaultFilterNumericAndShortCols[0] = false;
         filterNumericAndShortCols.setDefaultValues(defaultFilterNumericAndShortCols);
         filterNumericAndShortCols.setRequired(true);
         configs.add(filterNumericAndShortCols);
 
-        ConfigurationRequirementBoolean filterDependentRefs = new ConfigurationRequirementBoolean(
-                MANY.Identifier.FILTER_DEPENDENT_REFS.name());
+        ConfigurationRequirementBoolean filterDependentRefs = new ConfigurationRequirementBoolean(MANY.Identifier.FILTER_DEPENDENT_REFS.name());
         Boolean[] defaultFilterDependentRefs = new Boolean[1];
-        defaultFilterDependentRefs[0] = true;
+        defaultFilterDependentRefs[0] = false;
         filterDependentRefs.setDefaultValues(defaultFilterDependentRefs);
         filterDependentRefs.setRequired(true);
         configs.add(filterDependentRefs);
 
-        ConfigurationRequirementBoolean filterNonUniqueRefs = new ConfigurationRequirementBoolean(
-                MANY.Identifier.FILTER_NON_UNIQUE_REFS.name());
+        ConfigurationRequirementBoolean filterNonUniqueRefs = new ConfigurationRequirementBoolean(MANY.Identifier.FILTER_NON_UNIQUE_REFS.name());
         Boolean[] defaultFilterNonUniqueRefs = new Boolean[1];
-        defaultFilterNonUniqueRefs[0] = true;
+        defaultFilterNonUniqueRefs[0] = false;
         filterNonUniqueRefs.setDefaultValues(defaultFilterNonUniqueRefs);
         filterNonUniqueRefs.setRequired(true);
         configs.add(filterNonUniqueRefs);
 
-        ConfigurationRequirementBoolean filterNullCols = new ConfigurationRequirementBoolean(
-                MANY.Identifier.FILTER_NULL_COLS.name());
+        ConfigurationRequirementBoolean filterNullCols = new ConfigurationRequirementBoolean(MANY.Identifier.FILTER_NULL_COLS.name());
         Boolean[] defaultFilterNullCols = new Boolean[1];
-        defaultFilterNullCols[0] = true;
+        defaultFilterNullCols[0] = false;
         filterNullCols.setDefaultValues(defaultFilterNullCols);
         filterNullCols.setRequired(true);
         configs.add(filterNullCols);
 
-        ConfigurationRequirementBoolean condenseMatrix = new ConfigurationRequirementBoolean(
-                MANY.Identifier.CONDENSE_MATRIX.name());
+        ConfigurationRequirementBoolean condenseMatrix = new ConfigurationRequirementBoolean(MANY.Identifier.CONDENSE_MATRIX.name());
         Boolean[] defaultCondenseMatrix = new Boolean[1];
         defaultCondenseMatrix[0] = true;
         condenseMatrix.setDefaultValues(defaultCondenseMatrix);
         condenseMatrix.setRequired(true);
         configs.add(condenseMatrix);
 
-        ConfigurationRequirementInteger refCoverageMinPercentage = new ConfigurationRequirementInteger(
-                MANY.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name());
+        ConfigurationRequirementInteger refCoverageMinPercentage = new ConfigurationRequirementInteger(MANY.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name());
         Integer[] defaultRefCoverageMinPercentage = new Integer[1];
-        defaultRefCoverageMinPercentage[0] = -1;
+        defaultRefCoverageMinPercentage[0] = 0;
         refCoverageMinPercentage.setDefaultValues(defaultRefCoverageMinPercentage);
         refCoverageMinPercentage.setRequired(true);
         configs.add(refCoverageMinPercentage);
 
-        ConfigurationRequirementBoolean strategyRef2Deps = new ConfigurationRequirementBoolean(
-                MANY.Identifier.STRATEGY_REF2DEPS.name());
+        ConfigurationRequirementBoolean strategyRef2Deps = new ConfigurationRequirementBoolean(MANY.Identifier.STRATEGY_REF2DEPS.name());
         Boolean[] defaultStrategyRef2Deps = new Boolean[1];
         defaultStrategyRef2Deps[0] = true;
         strategyRef2Deps.setDefaultValues(defaultStrategyRef2Deps);
         strategyRef2Deps.setRequired(true);
         configs.add(strategyRef2Deps);
 
-        ConfigurationRequirementBoolean fastvector = new ConfigurationRequirementBoolean(
-                MANY.Identifier.FASTVECTOR.name());
+        ConfigurationRequirementBoolean fastvector = new ConfigurationRequirementBoolean(MANY.Identifier.FASTVECTOR.name());
         Boolean[] defaultFastvector = new Boolean[1];
         defaultFastvector[0] = true;
         fastvector.setDefaultValues(defaultFastvector);
@@ -492,8 +477,14 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
         verify.setRequired(true);
         configs.add(verify);
 
-        ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(
-                MANY.Identifier.INPUT_ROW_LIMIT.name());
+        ConfigurationRequirementBoolean output = new ConfigurationRequirementBoolean(MANY.Identifier.OUTPUT.name());
+        Boolean[] defaultOutput = new Boolean[1];
+        defaultOutput[0] = true;
+        output.setDefaultValues(defaultOutput);
+        output.setRequired(true);
+        configs.add(output);
+
+        ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(MANY.Identifier.INPUT_ROW_LIMIT.name());
         Integer[] defaultInputRowLimit = new Integer[1];
         defaultInputRowLimit[0] = -1;
         inputRowLimit.setDefaultValues(defaultInputRowLimit);
@@ -509,9 +500,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
     }
 
     @Override
-    public void setRelationalInputConfigurationValue(String identifier,
-            RelationalInputGenerator... values)
-            throws AlgorithmConfigurationException {
+    public void setRelationalInputConfigurationValue(String identifier, RelationalInputGenerator... values) throws AlgorithmConfigurationException {
         if (MANY.Identifier.RELATIONAL_INPUT.name().equals(identifier)) {
             this.relationalInputGenerators = values;
         } else {
@@ -558,8 +547,8 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
             k = values[0];
         } else if (MANY.Identifier.PASSES.name().equals(identifier)) {
             passes = values[0];
-        } else if (MANY.Identifier.DOP.name().equals(identifier)) {
-            dop = values[0];
+        } else if (MANY.Identifier.DEGREE_OF_PARALLELISM.name().equals(identifier)) {
+            dop = (values[0] > 0) ? values[0] : 1;
         } else if (MANY.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name().equals(identifier)) {
             refMinCoverage = values[0];
         } else {
@@ -573,8 +562,7 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
                 return this.relationalInputGenerators[i - 1].generateNewCopy().relationName();
             }
         }
-        return this.relationalInputGenerators[this.relationalInputGenerators.length - 1].generateNewCopy()
-                .relationName();
+        return this.relationalInputGenerators[this.relationalInputGenerators.length - 1].generateNewCopy().relationName();
     }
 
     public Set<String> getValueSetFor(int col) throws Exception {
