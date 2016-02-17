@@ -212,33 +212,22 @@ public class ORDER implements OrderDependencyAlgorithm, RelationalInputParameter
 
   }
 
-  public String permutationToColumnNames(final byte[] permutation) {
-    if (permutation.length == 0) {
-      return "[]";
-    }
-    final int[] colIndices = new int[permutation.length];
-    final StringBuilder sb = new StringBuilder();
-    sb.append("[");
-    for (int i = 0; i < colIndices.length; i++) {
-      sb.append(this.columnNames.get(permutation[i]));
-      sb.append(",");
-    }
-    sb.deleteCharAt(sb.length() - 1);
-    sb.append("]");
-    return sb.toString();
+  public ColumnIdentifier[] permutationToColumnIdentifiers(final String tableName, final byte[] permutation) {
+    ColumnIdentifier[] columnidentifiers = new ColumnIdentifier[permutation.length];
+	for (int i = 0; i < permutation.length; i++)
+    	columnidentifiers[i] = new ColumnIdentifier(tableName, this.columnNames.get(permutation[i]));
+    return columnidentifiers;
   }
 
   public void signalFoundOrderDependency(final byte[] lhs, final byte[] rhs,
       final OrderDependency.ComparisonOperator comparisonOperator,
       final OrderDependency.OrderType orderType) throws ColumnNameMismatchException {
-    this.logger.info(
-        "Table {} contains a valid OD: {} ~> {} (Comparison operator: {}, ordering: {})",
-        this.tableName, this.permutationToColumnNames(lhs), this.permutationToColumnNames(rhs),
-        comparisonOperator.name(), orderType.name());
     final OrderDependency orderDependency =
-        new OrderDependency(new ColumnPermutation(new ColumnIdentifier(this.tableName,
-            this.permutationToColumnNames(lhs))), new ColumnPermutation(new ColumnIdentifier(
-            this.tableName, this.permutationToColumnNames(rhs))), orderType, comparisonOperator);
+        new OrderDependency(
+            new ColumnPermutation(this.permutationToColumnIdentifiers(this.tableName, lhs)), 
+            new ColumnPermutation(this.permutationToColumnIdentifiers(this.tableName, rhs)), 
+            orderType, comparisonOperator);
+    this.logger.info(orderDependency.toString());
     try {
       this.resultReceiver.receiveResult(orderDependency);
     } catch (final CouldNotReceiveResultException e) {

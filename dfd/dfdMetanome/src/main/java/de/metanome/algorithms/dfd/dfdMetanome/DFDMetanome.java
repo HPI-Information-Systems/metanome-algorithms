@@ -9,17 +9,20 @@ import de.metanome.algorithm_integration.algorithm_types.FunctionalDependencyAlg
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementFileInput;
 import de.metanome.algorithm_integration.input.FileInputGenerator;
+import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import fdiscovery.approach.runner.DFDMiner;
 import fdiscovery.columns.ColumnCollection;
 import fdiscovery.general.FunctionalDependencies;
 import fdiscovery.preprocessing.SVFileProcessor;
+import groovy.util.ObjectGraphBuilder.RelationNameResolver;
 
 public class DFDMetanome implements FunctionalDependencyAlgorithm,
                                     FileInputParameterAlgorithm {
@@ -70,6 +73,11 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
       DFDMiner dfdMiner = new DFDMiner(inputFileProcessor);
       dfdMiner.run();
       FunctionalDependencies fds = dfdMiner.getDependencies();
+      
+      RelationalInput input = fileInput.generateNewCopy();
+      String relationName = input.relationName();
+      List<String> columnNames = input.columnNames();
+      
       for (ColumnCollection determining : fds.keySet()) {
         for (Integer dependentColumn : fds.get(determining).getSetBits()) {
           ColumnIdentifier[]
@@ -78,13 +86,13 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
           int i = 0;
           for (Integer determiningColumn : determining.getSetBits()) {
             determiningColumns[i] =
-                new ColumnIdentifier(this.identifier, "Column " + determiningColumn);
+                new ColumnIdentifier(relationName, columnNames.get(determiningColumn));
             i++;
           }
           FunctionalDependency fd =
               new FunctionalDependency(
                   new ColumnCombination(determiningColumns),
-                  new ColumnIdentifier(this.identifier, "Column " + dependentColumn));
+                  new ColumnIdentifier(relationName, columnNames.get(dependentColumn)));
           this.resultReceiver.receiveResult(fd);
         }
       }

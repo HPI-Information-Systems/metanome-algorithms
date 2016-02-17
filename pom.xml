@@ -70,11 +70,11 @@
         <module>fastfds</module>
         <module>fdep</module>
         <module>ducc</module>
-        <module>dfd</module>
         <module>AIDFD</module>
-        <module>ORDER</module>
         <module>FAIDA</module>
         <module>SCDP</module>
         <module>MANY</module>
+        <module>dfd</module>
+        <module>ORDER</module>
     </modules>
 </project>
