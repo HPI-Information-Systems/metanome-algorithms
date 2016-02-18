@@ -63,6 +63,7 @@
         <module>dao</module> 
         <module>SPIDER</module>
         <module>BINDER</module>
+        <module>HyFD</module>
         <module>tane</module>
         <module>fun</module>
         <module>fdmine</module>
