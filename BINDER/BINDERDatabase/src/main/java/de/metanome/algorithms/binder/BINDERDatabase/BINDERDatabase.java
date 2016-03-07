@@ -168,4 +168,14 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 	public void execute() throws AlgorithmExecutionException {
 		super.execute();
 	}
+	
+	@Override
+	public String getAuthors() {
+		return this.getAuthorName();
+	}
+
+	@Override
+	public String getDescription() {
+		return this.getDescriptionText();
+	}
 }

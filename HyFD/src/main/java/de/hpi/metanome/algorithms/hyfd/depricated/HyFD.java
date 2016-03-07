@@ -80,6 +80,16 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 	
 	private String tableName;
 	private List<String> attributeNames;
+
+	@Override
+	public String getAuthors() {
+		return "Thorsten Papenbrock";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Hybrid Sampling- and Lattice-Traversal-based FD discovery";
+	}
 	
 	@Override
 	public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {

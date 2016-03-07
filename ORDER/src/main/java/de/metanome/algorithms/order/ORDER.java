@@ -253,4 +253,14 @@ public class ORDER implements OrderDependencyAlgorithm, RelationalInputParameter
     }
   }
 
+  @Override
+  public String getAuthors() {
+	return "Philipp Langer";
+  }
+
+  @Override
+  public String getDescription() {
+	return "PLI-based OD discovery";
+  }
+
 }

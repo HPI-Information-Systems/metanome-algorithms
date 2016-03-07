@@ -59,7 +59,7 @@
     </build>
 
     <modules>
-        <module>utils</module>
+        <module>utils</module>  
         <module>dao</module> 
         <module>SPIDER</module>
         <module>BINDER</module>

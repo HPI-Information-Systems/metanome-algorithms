@@ -33,4 +33,13 @@ public class AlgorithmGroup2DepMiner2Kerne extends AlgorithmMetaGroup2 {
 
     }
 
+    @Override
+	public String getAuthors() {
+		return DepMiner.getAuthorName();
+	}
+
+	@Override
+	public String getDescription() {
+		return DepMiner.getDescriptionText();
+	}
 }

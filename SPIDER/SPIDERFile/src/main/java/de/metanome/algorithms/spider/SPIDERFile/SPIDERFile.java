@@ -112,4 +112,14 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 	public void execute() throws AlgorithmExecutionException {
 		super.execute();
 	}
+	
+	@Override
+	public String getAuthors() {
+		return this.getAuthorName();
+	}
+
+	@Override
+	public String getDescription() {
+		return this.getDescriptionText();
+	}
 }

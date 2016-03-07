@@ -87,4 +87,14 @@ public class Ducc implements UniqueColumnCombinationsAlgorithm, RelationalInputP
       throw new AlgorithmConfigurationException("Operation should not be called");
     }
   }
+
+  @Override
+  public String getAuthors() {
+	return "Jens Ehrlich, Jakob Zwiener, Mandy Roick, Lukas Schulze";
+  }
+
+  @Override
+  public String getDescription() {
+	return "Random Walk-based UCC discovery";
+  }
 }

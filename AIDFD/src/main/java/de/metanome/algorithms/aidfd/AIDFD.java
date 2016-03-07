@@ -338,4 +338,14 @@ public class AIDFD implements FunctionalDependencyAlgorithm,
 		}
 	}
 
+	@Override
+	public String getAuthors() {
+		return "Susanne Bülow, Tobias Bleifuß, Georg Wiese, Johannes Frohnhofen, Julian Risch";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Approximate FD detection";
+	}
+
 }

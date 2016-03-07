@@ -621,4 +621,14 @@ public class TaneAlgorithmFilterTreeDirect implements FunctionalDependencyAlgori
         }
         this.addAllDependenciesToResultReceiver(dependencies, new OpenBitSet());
     }
+
+	@Override
+	public String getAuthors() {
+		return "Jannik Marten, Jan-Peer Rudolph";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Lattice Traversal-based FD discovery";
+	}
 }

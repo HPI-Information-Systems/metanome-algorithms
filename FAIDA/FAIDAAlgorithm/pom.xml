@@ -82,12 +82,12 @@
         <dependency>
             <groupId>de.metanome</groupId>
             <artifactId>algorithm_integration</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <version>${metanome.version}</version>
         </dependency>
         <dependency>
             <groupId>de.metanome</groupId>
             <artifactId>backend</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <version>${metanome.version}</version>
         </dependency>
         <dependency>
             <groupId>it.unimi.dsi</groupId>

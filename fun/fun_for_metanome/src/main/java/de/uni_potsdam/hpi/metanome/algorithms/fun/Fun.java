@@ -60,4 +60,14 @@ public class Fun implements FunctionalDependencyAlgorithm, RelationalInputParame
         this.resultReceiver = resultReceiver;
     }
 
+	@Override
+	public String getAuthors() {
+		return "Jens Ehrlich, Jakob Zwiener";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Lattice Traversal-based FD discovery";
+	}
+
 }

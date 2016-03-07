@@ -55,5 +55,15 @@ public class SingleColumnProfiler extends SingleColumnProfilerAlgorithm
     super.execute();
   }
 
+  @Override
+  public String getAuthors() {
+    return "Hazar Harmouch";
+  }
+
+  @Override
+  public String getDescription() {
+    return "Basic Statistics discovery";
+  }
+
 }
 

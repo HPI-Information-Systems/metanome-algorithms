@@ -568,4 +568,14 @@ public class MANY implements InclusionDependencyAlgorithm, IntegerParameterAlgor
     public Set<String> getValueSetFor(int col) throws Exception {
         return this.verificationCache.get(col);
     }
+
+	@Override
+	public String getAuthors() {
+		return "Fabian Tschirschnitz";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Bloomfilter-based IND discovery";
+	}
 }

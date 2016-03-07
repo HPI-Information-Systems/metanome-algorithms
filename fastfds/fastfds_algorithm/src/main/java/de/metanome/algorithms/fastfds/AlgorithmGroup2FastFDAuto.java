@@ -32,4 +32,14 @@ public class AlgorithmGroup2FastFDAuto extends AlgorithmMetaGroup2 {
         ffd.execute(((RelationalInputGenerator) input).generateNewCopy());
 
     }
+
+    @Override
+	public String getAuthors() {
+		return FastFD.getAuthorName();
+	}
+
+	@Override
+	public String getDescription() {
+		return FastFD.getDescriptionText();
+	}
 }

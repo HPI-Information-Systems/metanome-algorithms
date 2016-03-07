@@ -43,4 +43,11 @@ public class DepMiner {
 
     }
 
+    public static String getAuthorName() {
+		return "Tommy Neubert, Martin Schönberg";
+	}
+
+    public static String getDescriptionText() {
+		return "Difference- and Agree-Set-based FD discovery";
+	}
 }

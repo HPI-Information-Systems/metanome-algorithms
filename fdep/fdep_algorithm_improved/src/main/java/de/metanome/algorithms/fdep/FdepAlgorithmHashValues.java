@@ -278,4 +278,14 @@ public class FdepAlgorithmHashValues implements FunctionalDependencyAlgorithm,
         }
         this.addAllDependenciesToResultReceiver(posCoverTree, new OpenBitSet());
     }
+
+	@Override
+	public String getAuthors() {
+		return "Jannik Marten, Jan-Peer Rudolph";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Dependency Induction-based FD discovery";
+	}
 }

@@ -111,4 +111,14 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
         throw new AlgorithmConfigurationException("Unknown configuration: " + identifier + " -> " + value);
     }
 
+	@Override
+	public String getAuthors() {
+		return "Moritz Finke, Christian Dullweber, Martin Zabel, Manuel Hegner, Christian Zöllner";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Approximate IND detection";
+	}
+
 }

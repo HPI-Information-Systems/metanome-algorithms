@@ -324,4 +324,14 @@ public class FdMine implements FunctionalDependencyAlgorithm, RelationalInputPar
         }
     }
 
+	@Override
+	public String getAuthors() {
+		return "Jens Ehrlich, Jakob Zwiener";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Lattice Traversal-based FD discovery";
+	}
+
 }

@@ -100,4 +100,14 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
     }
   }
 
+  @Override
+  public String getAuthors() {
+  	return "Patrick Schulze";
+  }
+
+  @Override
+  public String getDescription() {
+	return "Random Walk-based FD discovery";
+  }
+
 }

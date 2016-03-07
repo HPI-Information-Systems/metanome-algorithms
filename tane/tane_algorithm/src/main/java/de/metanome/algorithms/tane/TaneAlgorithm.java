@@ -583,4 +583,14 @@ public class TaneAlgorithm implements FunctionalDependencyAlgorithm,
         }
         return ch;
     }
+
+	@Override
+	public String getAuthors() {
+		return "Jannik Marten, Jan-Peer Rudolph";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Lattice Traversal-based FD discovery";
+	}
 }

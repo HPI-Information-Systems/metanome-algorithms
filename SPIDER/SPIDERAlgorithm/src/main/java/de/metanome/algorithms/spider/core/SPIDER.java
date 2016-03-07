@@ -91,6 +91,14 @@ public class SPIDER {
 			"outputTime: " + this.outputTime;
 	}
 	
+	protected String getAuthorName() {
+		return "Thorsten Papenbrock";
+	}
+
+	protected String getDescriptionText() {
+		return "Sort-Merge-Join-based IND discovery";
+	}
+	
 	public void execute() throws AlgorithmExecutionException {
 		// Clean temp if there are files from previous runs that may pollute this run
 		FileUtils.cleanDirectory(new File(this.tempFolderPath));

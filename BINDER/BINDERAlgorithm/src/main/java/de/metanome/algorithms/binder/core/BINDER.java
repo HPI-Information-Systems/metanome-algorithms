@@ -178,6 +178,14 @@ public class BINDER {
 		return builder.toString();
 	}
 
+	protected String getAuthorName() {
+		return "Thorsten Papenbrock";
+	}
+
+	protected String getDescriptionText() {
+		return "Divide and Conquer-based IND discovery";
+	}
+
 	public void execute() throws AlgorithmExecutionException {
 		// Disable Logging (FastSet sometimes complains about skewed key distributions with lots of WARNINGs)
 		LoggingUtils.disableLogging();
