@@ -35,9 +35,6 @@ public final class IndConverter {
             List<ColumnIdentifier> identifiers = new ArrayList<>();
             for (String name : input.columnNames()) {
                 String tableName = tablenames[i];
-                if(tableName.contains(".")){
-                    tableName = tableName.substring(0, tableName.lastIndexOf('.'));
-                }
                 identifiers.add(new ColumnIdentifier(tableName, name));
             }
             columns.add(identifiers);
