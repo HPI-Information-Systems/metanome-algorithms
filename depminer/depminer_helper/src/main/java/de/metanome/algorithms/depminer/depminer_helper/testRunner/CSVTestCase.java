@@ -188,4 +188,9 @@ public class CSVTestCase implements RelationalInput, RelationalInputGenerator, F
         // System.out.println(fd.getDeterminant() + "-->" + fd.getDependant());
 
     }
+
+	@Override
+	public Boolean acceptedResult(FunctionalDependency arg0) {
+		return new Boolean(true);
+	}
 }

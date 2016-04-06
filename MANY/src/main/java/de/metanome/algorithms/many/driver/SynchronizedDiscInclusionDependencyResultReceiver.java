@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
+import de.metanome.algorithm_integration.results.FunctionalDependency;
 import de.metanome.algorithm_integration.results.InclusionDependency;
 
 public class SynchronizedDiscInclusionDependencyResultReceiver implements InclusionDependencyResultReceiver {
@@ -38,5 +39,9 @@ public class SynchronizedDiscInclusionDependencyResultReceiver implements Inclus
         builder.append("\n");
         writer.write(builder.toString());
     }
-
+    
+	@Override
+	public Boolean acceptedResult(InclusionDependency arg0) {
+		return new Boolean(true);
+	}
 }
