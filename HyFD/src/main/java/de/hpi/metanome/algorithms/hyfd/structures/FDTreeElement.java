@@ -328,13 +328,15 @@ public class FDTreeElement {
 			return true;
 		}
 		
-		// Move to the next child with the next lhs attribute
-		if (!this.children[currentLhsAttr].removeRecursive(lhs, rhs, lhs.nextSetBit(currentLhsAttr + 1)))
-			return false; // This is a shortcut: if the child was unable to remove the rhs, then this node can also not remove it
-			
-		// Delete the child node if it has no rhs attributes any more
-		if (this.children[currentLhsAttr].getRhsAttributes().cardinality() == 0)
-			this.children[currentLhsAttr] = null;
+		if ((this.children != null) && (this.children[currentLhsAttr] != null)) {
+			// Move to the next child with the next lhs attribute
+			if (!this.children[currentLhsAttr].removeRecursive(lhs, rhs, lhs.nextSetBit(currentLhsAttr + 1)))
+				return false; // This is a shortcut: if the child was unable to remove the rhs, then this node can also not remove it
+				
+			// Delete the child node if it has no rhs attributes any more
+			if (this.children[currentLhsAttr].getRhsAttributes().cardinality() == 0)
+				this.children[currentLhsAttr] = null;
+		}
 		
 		// Check if another child requires the rhs and if not, remove it from this node
 		if (this.isLastNodeOf(rhs)) {

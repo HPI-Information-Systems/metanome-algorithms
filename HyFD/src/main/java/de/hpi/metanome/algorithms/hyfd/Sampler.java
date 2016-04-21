@@ -1,43 +1,48 @@
 package de.hpi.metanome.algorithms.hyfd;
 
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 import org.apache.lucene.util.OpenBitSet;
 
+import de.hpi.metanome.algorithms.hyfd.structures.FDList;
+import de.hpi.metanome.algorithms.hyfd.structures.FDSet;
+import de.hpi.metanome.algorithms.hyfd.structures.FDTree;
 import de.hpi.metanome.algorithms.hyfd.structures.IntegerPair;
 import de.hpi.metanome.algorithms.hyfd.structures.PositionListIndex;
 import de.hpi.metanome.algorithms.hyfd.utils.ValueComparator;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 public class Sampler {
 
-	private Set<OpenBitSet> negCover;
+	private FDSet negCover;
+	private FDTree posCover;
 	private int[][] compressedRecords;
 	private List<PositionListIndex> plis;
 	private float efficiencyThreshold;
 	private ValueComparator valueComparator;
 	private List<AttributeRepresentant> attributeRepresentants = null;
+	private MemoryGuardian memoryGuardian;
 
-	public Sampler(Set<OpenBitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis, float efficiencyThreshold, ValueComparator valueComparator) {
+	public Sampler(FDSet negCover, FDTree posCover, int[][] compressedRecords, List<PositionListIndex> plis, float efficiencyThreshold, ValueComparator valueComparator, MemoryGuardian memoryGuardian) {
 		this.negCover = negCover;
+		this.posCover = posCover;
 		this.compressedRecords = compressedRecords;
 		this.plis = plis;
 		this.efficiencyThreshold = efficiencyThreshold;
 		this.valueComparator = valueComparator;
+		this.memoryGuardian = memoryGuardian;
 	}
 
-	public ArrayList<OpenBitSet> enrichNegativeCover(List<IntegerPair> comparisonSuggestions) {
+	public FDList enrichNegativeCover(List<IntegerPair> comparisonSuggestions) {
 		int numAttributes = this.compressedRecords[0].length;
 		
 		System.out.println("Investigating comparison suggestions ... ");
-		ArrayList<OpenBitSet> newNonFds = new ArrayList<>();
+		FDList newNonFds = new FDList(numAttributes, this.negCover.getMaxDepth());
 		for (IntegerPair comparisonSuggestion : comparisonSuggestions) {
 			OpenBitSet nonFd = this.getViolatedFds(comparisonSuggestion.a(), comparisonSuggestion.b());
 			
@@ -60,9 +65,10 @@ public class Sampler {
 			System.out.print("Running initial windows ...");
 			time = System.currentTimeMillis();
 			this.attributeRepresentants = new ArrayList<AttributeRepresentant>(numAttributes);
+			float efficiencyFactor = (int)Math.ceil(1 / this.efficiencyThreshold);
 			for (int i = 0; i < numAttributes; i++) {
-				AttributeRepresentant attributeRepresentant = new AttributeRepresentant(this.plis.get(i).getClusters(), (int)Math.ceil(1 / this.efficiencyThreshold), this);
-				attributeRepresentant.runNext(this.negCover, newNonFds, this.compressedRecords);
+				AttributeRepresentant attributeRepresentant = new AttributeRepresentant(this.plis.get(i).getClusters(), efficiencyFactor, this.negCover, this.posCover, this, this.memoryGuardian);
+				attributeRepresentant.runNext(newNonFds, this.compressedRecords);
 				if (attributeRepresentant.getEfficiency() != 0)
 					this.attributeRepresentants.add(attributeRepresentant);
 			}
@@ -79,7 +85,7 @@ public class Sampler {
 		PriorityQueue<AttributeRepresentant> queue = new PriorityQueue<AttributeRepresentant>(this.attributeRepresentants);
 		while (!queue.isEmpty()) {
 			AttributeRepresentant attributeRepresentant = queue.remove();
-			if (!attributeRepresentant.runNext(this.negCover, newNonFds, this.compressedRecords))
+			if (!attributeRepresentant.runNext(newNonFds, this.compressedRecords))
 				continue;
 			
 			if (attributeRepresentant.getEfficiency() != 0)
@@ -153,7 +159,10 @@ public class Sampler {
 		private IntArrayList numComparisons = new IntArrayList();
 		private float efficiencyFactor;
 		private List<IntArrayList> clusters;
+		private FDSet negCover;
+		private FDTree posCover;
 		private Sampler sampler;
+		private MemoryGuardian memoryGuardian;
 		
 		public float getEfficiencyFactor() {
 			return this.efficiencyFactor;
@@ -177,10 +186,13 @@ public class Sampler {
 			return (int)(sumNonFds * (this.efficiencyFactor / sumComparisons));
 		}
 		
-		public AttributeRepresentant(List<IntArrayList> clusters, float efficiencyFactor, Sampler sampler) {
+		public AttributeRepresentant(List<IntArrayList> clusters, float efficiencyFactor, FDSet negCover, FDTree posCover, Sampler sampler, MemoryGuardian memoryGuardian) {
 			this.clusters = new ArrayList<IntArrayList>(clusters);
 			this.efficiencyFactor = efficiencyFactor;
+			this.negCover = negCover;
+			this.posCover = posCover;
 			this.sampler = sampler;
+			this.memoryGuardian = memoryGuardian;
 		}
 		
 		@Override
@@ -189,12 +201,12 @@ public class Sampler {
 			return (int)Math.signum(o.getEfficiency() - this.getEfficiency());
 		}
 		
-		public boolean runNext(Set<OpenBitSet> negCover, ArrayList<OpenBitSet> newNonFds, int[][] compressedRecords) {
+		public boolean runNext(FDList newNonFds, int[][] compressedRecords) {
 			this.windowDistance++;
 			int numNewNonFds = 0;
 			int numComparisons = 0;
 			
-			int previousNegCoverSize = negCover.size();
+			int previousNegCoverSize = newNonFds.size();
 			Iterator<IntArrayList> clusterIterator = this.clusters.iterator();
 			while (clusterIterator.hasNext()) {
 				IntArrayList cluster = clusterIterator.next();
@@ -210,13 +222,16 @@ public class Sampler {
 					
 					OpenBitSet nonFd = this.sampler.getViolatedFds(compressedRecords[recordId], compressedRecords[partnerRecordId]);
 					
-					if (negCover.add(nonFd))
+					if (this.negCover.add(nonFd)) {
 						newNonFds.add(nonFd);
 					
+						this.memoryGuardian.memoryChanged(1);
+						this.memoryGuardian.match(this.negCover, this.posCover, newNonFds);
+					}
 					numComparisons++;
 				}
 			}
-			numNewNonFds = negCover.size() - previousNegCoverSize;
+			numNewNonFds = newNonFds.size() - previousNegCoverSize;
 			
 			this.numNewNonFds.add(numNewNonFds);
 			this.numComparisons.add(numComparisons);

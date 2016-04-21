@@ -1,9 +1,5 @@
 package de.hpi.metanome.algorithms.hyfd.structures;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -11,13 +7,14 @@ import java.util.List;
 
 import org.apache.lucene.util.OpenBitSet;
 
-import de.hpi.metanome.algorithms.hyfd.MemoryGuardian;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
 import de.uni_potsdam.hpi.utils.FileUtils;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 public class FDTree extends FDTreeElement {
 
@@ -428,7 +425,7 @@ public class FDTree extends FDTreeElement {
 				this.markFd(rhs);
 	}
 	
-	public void validateFDsFdWise(List<PositionListIndex> plis, Int2ObjectMap<Int2ObjectMap<PositionListIndex>> intersectedPlis, int[][] invertedPlis, int numRecords) {
+/*	public void validateFDsFdWise(List<PositionListIndex> plis, Int2ObjectMap<Int2ObjectMap<PositionListIndex>> intersectedPlis, int[][] invertedPlis, int numRecords) {
 		List<FDTreeElementLhsPair> currentLevel = new ArrayList<>();
 		
 		// Initialize first level with root
@@ -542,7 +539,7 @@ System.out.print("(G); ");
 		}
 	}
 	
-	public void validateFDsElementWise(List<PositionListIndex> plis, int[][] invertedPlis, int numRecords, MemoryGuardian memoryGuardian) {
+//	public void validateFDsElementWise(List<PositionListIndex> plis, int[][] invertedPlis, int numRecords, MemoryGuardian memoryGuardian) {
 		int numAttributes = this.numAttributes;
 		List<FDTreeElementLhsPair> currentLevel = new ArrayList<>();
 		
@@ -679,7 +676,7 @@ System.out.print("(G); ");
 		
 		return childLhs;
 	}
-
+*/
 /*	private OpenBitSet lookupAggressively(OpenBitSet lhs, int rhs, PositionListIndex pli, List<PositionListIndex> plis) {
 		// Extend the lhs with some attribute
 		int extensionAttr = -1;

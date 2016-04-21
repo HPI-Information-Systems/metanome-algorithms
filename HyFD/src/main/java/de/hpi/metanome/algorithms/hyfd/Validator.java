@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.util.OpenBitSet;
 
+import de.hpi.metanome.algorithms.hyfd.structures.FDSet;
 import de.hpi.metanome.algorithms.hyfd.structures.FDTree;
 import de.hpi.metanome.algorithms.hyfd.structures.FDTreeElement;
 import de.hpi.metanome.algorithms.hyfd.structures.FDTreeElementLhsPair;
@@ -20,6 +21,7 @@ import de.metanome.algorithm_integration.AlgorithmExecutionException;
 
 public class Validator {
 
+	private FDSet negCover;
 	private FDTree posCover;
 	private int numRecords;
 	private List<PositionListIndex> plis;
@@ -30,7 +32,8 @@ public class Validator {
 	
 	private int level = 0;
 
-	public Validator(FDTree posCover, int numRecords, int[][] compressedRecords, List<PositionListIndex> plis, float efficiencyThreshold, boolean parallel, MemoryGuardian memoryGuardian) {
+	public Validator(FDSet negCover, FDTree posCover, int numRecords, int[][] compressedRecords, List<PositionListIndex> plis, float efficiencyThreshold, boolean parallel, MemoryGuardian memoryGuardian) {
+		this.negCover = negCover;
 		this.posCover = posCover;
 		this.numRecords = numRecords;
 		this.plis = plis;
@@ -176,7 +179,7 @@ public class Validator {
 	public List<IntegerPair> validatePositiveCover() throws AlgorithmExecutionException {
 		int numAttributes = this.plis.size();
 		
-		System.out.println("Validating fds using plis ...");
+		System.out.println("Validating FDs using plis ...");
 		
 		List<FDTreeElementLhsPair> currentLevel = null;
 		if (this.level == 0) {
@@ -234,20 +237,20 @@ public class Validator {
 			
 			int candidates = 0;
 			for (FD invalidFD : validationResult.invalidFDs) {
-				int newCandidates = 0;
 				for (int extensionAttr = 0; extensionAttr < numAttributes; extensionAttr++) {
 					OpenBitSet childLhs = this.extendWith(invalidFD.lhs, invalidFD.rhs, extensionAttr);
 					if (childLhs != null) {
 						FDTreeElement child = this.posCover.addFunctionalDependencyGetIfNew(childLhs, invalidFD.rhs);
-						if (child != null)
+						if (child != null) {
 							nextLevel.add(new FDTreeElementLhsPair(child, childLhs));
-						newCandidates++;
+							candidates++;
+							
+							this.memoryGuardian.memoryChanged(1);
+							this.memoryGuardian.match(this.negCover, this.posCover, null);
+						}
 					}
 				}
-				candidates += newCandidates;
 				
-				this.memoryGuardian.memoryChanged(newCandidates);
-				this.memoryGuardian.match(this.posCover);
 				if ((this.posCover.getMaxDepth() > -1) && (this.level >= this.posCover.getMaxDepth()))
 					break;
 			}
@@ -288,7 +291,7 @@ public class Validator {
 		OpenBitSet childLhs = lhs.clone(); // TODO: This clone() could be avoided when done externally
 		childLhs.set(extensionAttr);
 		
-		// TODO: Add more pruning here:
+		// TODO: Add more pruning here
 		
 		// if contains FD: element was a child before and has already been added to the next level
 		// if contains Generalization: element cannot be minimal, because generalizations have already been validated

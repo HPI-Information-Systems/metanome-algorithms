@@ -17,6 +17,8 @@ import de.hpi.metanome.algorithms.hyfd.MemoryGuardian;
 import de.hpi.metanome.algorithms.hyfd.Sampler;
 import de.hpi.metanome.algorithms.hyfd.Validator;
 import de.hpi.metanome.algorithms.hyfd.fdep.FDEP;
+import de.hpi.metanome.algorithms.hyfd.structures.FDList;
+import de.hpi.metanome.algorithms.hyfd.structures.FDSet;
 import de.hpi.metanome.algorithms.hyfd.structures.FDTree;
 import de.hpi.metanome.algorithms.hyfd.structures.IntegerPair;
 import de.hpi.metanome.algorithms.hyfd.structures.NonFDTree;
@@ -258,7 +260,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		invertedPlis = null;
 		
 		// Initialize the negative cover
-		Set<OpenBitSet> negCover = new HashSet<>(this.numAttributes);
+		FDSet negCover = new FDSet(this.numAttributes, this.maxLhsSize);
 		
 		// Initialize the positive cover
 		FDTree posCover = new FDTree(this.numAttributes, this.maxLhsSize);
@@ -268,14 +270,13 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		// Build the components //
 		//////////////////////////
 		
-		Sampler sampler = new Sampler(negCover, compressedRecords, plis, this.efficiencyThreshold, this.valueComparator);
-		Inductor inductor = new Inductor(posCover, this.memoryGuardian);
-		Validator validator = new Validator(posCover, numRecords, compressedRecords, plis, this.efficiencyThreshold, this.validateParallel, this.memoryGuardian);
+		Sampler sampler = new Sampler(negCover, posCover, compressedRecords, plis, this.efficiencyThreshold, this.valueComparator, this.memoryGuardian);
+		Inductor inductor = new Inductor(negCover, posCover, this.memoryGuardian);
+		Validator validator = new Validator(negCover, posCover, numRecords, compressedRecords, plis, this.efficiencyThreshold, this.validateParallel, this.memoryGuardian);
 		
 		List<IntegerPair> comparisonSuggestions = new ArrayList<>();
-		List<OpenBitSet> newNonFds = null;
 		do {
-			newNonFds = sampler.enrichNegativeCover(comparisonSuggestions);
+			FDList newNonFds = sampler.enrichNegativeCover(comparisonSuggestions);
 			inductor.updatePositiveCover(newNonFds);
 			comparisonSuggestions = validator.validatePositiveCover();
 		}
@@ -527,7 +528,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		
 		System.out.println("Validating fds using plis ...");
 		//posCover.validateFDsFdWise(plis, intersectedPlis, invertedPlis, numRecords);
-		this.posCover.validateFDsElementWise(plis, invertedPlis, numRecords, this.memoryGuardian);
+	//	this.posCover.validateFDsElementWise(plis, invertedPlis, numRecords, this.memoryGuardian);
 		invertedPlis = null;
 		
 		// Output all valid FDs
@@ -1636,7 +1637,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 			}
 			
 			// If dynamic memory management is enabled, frequently check the memory consumption and trim the positive cover if it does not fit anymore
-			this.memoryGuardian.match(posCover);
+		//	this.memoryGuardian.match(posCover);
 			
 //			previous2Lhs = previous1Lhs;
 //			previous1Lhs = lhs;
