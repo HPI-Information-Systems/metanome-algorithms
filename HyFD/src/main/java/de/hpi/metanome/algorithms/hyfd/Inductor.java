@@ -36,7 +36,7 @@ public class Inductor {
 		
 		System.out.println("Inducing FD candidates ...");
 		for (int i = nonFds.getFdLevels().size() - 1; i >= 0; i--) {
-			if (nonFds.getFdLevels().size() < i - 1) // If this level has been trimmed during iteration
+			if (i >= nonFds.getFdLevels().size()) // If this level has been trimmed during iteration
 				continue;
 			
 			List<OpenBitSet> nonFdLevel = nonFds.getFdLevels().get(i);
