@@ -43,6 +43,15 @@ public class FDSet {
 		return this.fdLevels.get(length).add(fd);
 	}
 
+	public boolean contains(OpenBitSet fd) {
+		int length = (int) fd.cardinality();
+		
+		if ((this.maxDepth > 0) && (length > this.maxDepth))
+			return false;
+		
+		return this.fdLevels.get(length).contains(fd);
+	}
+	
 	public void trim(int newDepth) {
 		while (this.fdLevels.size() > (newDepth + 1)) // +1 because uccLevels contains level 0
 			this.fdLevels.remove(this.fdLevels.size() - 1);

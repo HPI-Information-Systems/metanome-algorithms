@@ -43,11 +43,18 @@ public class Sampler {
 		
 		System.out.println("Investigating comparison suggestions ... ");
 		FDList newNonFds = new FDList(numAttributes, this.negCover.getMaxDepth());
+		OpenBitSet equalAttrs = new OpenBitSet(this.posCover.getNumAttributes());
 		for (IntegerPair comparisonSuggestion : comparisonSuggestions) {
-			OpenBitSet nonFd = this.getViolatedFds(comparisonSuggestion.a(), comparisonSuggestion.b());
+			this.match(equalAttrs, comparisonSuggestion.a(), comparisonSuggestion.b());
 			
-			if (this.negCover.add(nonFd))
-				newNonFds.add(nonFd);
+			if (!this.negCover.contains(equalAttrs)) {
+				OpenBitSet equalAttrsCopy = equalAttrs.clone();
+				this.negCover.add(equalAttrsCopy);
+				newNonFds.add(equalAttrsCopy);
+				
+				this.memoryGuardian.memoryChanged(1);
+				this.memoryGuardian.match(this.negCover, this.posCover, newNonFds);
+			}
 		}
 		
 		if (this.attributeRepresentants == null) { // if this is the first call of this method
@@ -205,6 +212,7 @@ public class Sampler {
 			this.windowDistance++;
 			int numNewNonFds = 0;
 			int numComparisons = 0;
+			OpenBitSet equalAttrs = new OpenBitSet(this.posCover.getNumAttributes());
 			
 			int previousNegCoverSize = newNonFds.size();
 			Iterator<IntArrayList> clusterIterator = this.clusters.iterator();
@@ -220,11 +228,13 @@ public class Sampler {
 					int recordId = cluster.getInt(recordIndex);
 					int partnerRecordId = cluster.getInt(recordIndex + this.windowDistance);
 					
-					OpenBitSet nonFd = this.sampler.getViolatedFds(compressedRecords[recordId], compressedRecords[partnerRecordId]);
+					this.sampler.match(equalAttrs, compressedRecords[recordId], compressedRecords[partnerRecordId]);
 					
-					if (this.negCover.add(nonFd)) {
-						newNonFds.add(nonFd);
-					
+					if (!this.negCover.contains(equalAttrs)) {
+						OpenBitSet equalAttrsCopy = equalAttrs.clone();
+						this.negCover.add(equalAttrsCopy);
+						newNonFds.add(equalAttrsCopy);
+						
 						this.memoryGuardian.memoryChanged(1);
 						this.memoryGuardian.match(this.negCover, this.posCover, newNonFds);
 					}
@@ -242,17 +252,14 @@ public class Sampler {
 		}
 	}
 	
-	public OpenBitSet getViolatedFds(int t1, int t2) {
-		return this.getViolatedFds(this.compressedRecords[t1], this.compressedRecords[t2]);
+	private void match(OpenBitSet equalAttrs, int t1, int t2) {
+		this.match(equalAttrs, this.compressedRecords[t1], this.compressedRecords[t2]);
 	}
 	
-	public OpenBitSet getViolatedFds(int[] t1, int[] t2) {
-		// NOTE: This is a copy of the same function in HyFD
-		OpenBitSet equalAttrs = new OpenBitSet(t1.length);
+	private void match(OpenBitSet equalAttrs, int[] t1, int[] t2) {
+		equalAttrs.clear(0, t1.length);
 		for (int i = 0; i < t1.length; i++)
 			if (this.valueComparator.isEqual(t1[i], t2[i]))
 				equalAttrs.set(i);
-		return equalAttrs;
 	}
-	
 }

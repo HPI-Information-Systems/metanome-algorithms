@@ -31,6 +31,10 @@ public class FDTreeElement {
 		this.rhsFds = new OpenBitSet(numAttributes);
 		this.numAttributes = numAttributes;
 	}
+
+	public int getNumAttributes() {
+		return this.numAttributes;
+	}
 	
 	// children
 	
