@@ -2,39 +2,41 @@
 package de.hpi.mpss2015n.approxind;
 
 import com.google.common.base.Joiner;
-
 import de.hpi.mpss2015n.approxind.inclusiontester.HLLInclusionTester;
 import de.hpi.mpss2015n.approxind.sampler.IdentityRowSampler;
 import de.hpi.mpss2015n.approxind.utils.Arity;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
-import de.metanome.algorithm_integration.algorithm_types.BooleanParameterAlgorithm;
-import de.metanome.algorithm_integration.algorithm_types.FileInputParameterAlgorithm;
-import de.metanome.algorithm_integration.algorithm_types.InclusionDependencyAlgorithm;
-import de.metanome.algorithm_integration.algorithm_types.IntegerParameterAlgorithm;
-import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
-import de.metanome.algorithm_integration.configuration.ConfigurationRequirementBoolean;
-import de.metanome.algorithm_integration.configuration.ConfigurationRequirementFileInput;
-import de.metanome.algorithm_integration.configuration.ConfigurationRequirementInteger;
+import de.metanome.algorithm_integration.algorithm_types.*;
+import de.metanome.algorithm_integration.configuration.*;
 import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.InclusionDependency;
+import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm, FileInputParameterAlgorithm,
-        BooleanParameterAlgorithm, IntegerParameterAlgorithm {
+        BooleanParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm {
 
     private InclusionDependencyResultReceiver resultReceiver;
+
     private FileInputGenerator[] fileInputGenerator;
+
     private String[] tableNames;
+
     private int inputRowLimit;
+
     private boolean detectNary;
+
+    private double hllRelativeStddev;
+
+    private int sampleGoal;
 
 
     public enum Identifier {
-        INPUT_FILES, INPUT_ROW_LIMIT, DETECT_NARY
+        INPUT_FILES, INPUT_ROW_LIMIT, DETECT_NARY, HLL_REL_STD_DEV, SAMPLE_GOAL
     }
 
     @Override
@@ -52,6 +54,16 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
         detectNary.setRequired(true);
         configs.add(detectNary);
 
+        ConfigurationRequirementString hllRelativeStandardDeviation = new ConfigurationRequirementString(Identifier.HLL_REL_STD_DEV.name());
+        hllRelativeStandardDeviation.setDefaultValues(new String[]{"0.001"});
+        hllRelativeStandardDeviation.setRequired(true);
+        configs.add(hllRelativeStandardDeviation);
+
+        ConfigurationRequirementInteger sampleGoal = new ConfigurationRequirementInteger(Identifier.SAMPLE_GOAL.name());
+        sampleGoal.setDefaultValues(new Integer[]{500});
+        sampleGoal.setRequired(true);
+        configs.add(sampleGoal);
+
         return configs;
     }
 
@@ -59,8 +71,13 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
     public void execute() throws AlgorithmExecutionException {
 
         boolean readExisting = false;
-        ApproxIndAlgorithm algorithm = new ApproxIndAlgorithm(detectNary ? Arity.N_ARY : Arity.UNARY,
-                                                              new IdentityRowSampler(), new HLLInclusionTester(0.001), readExisting);
+        ApproxIndAlgorithm algorithm = new ApproxIndAlgorithm(
+                detectNary ? Arity.N_ARY : Arity.UNARY,
+                new IdentityRowSampler(),
+                new HLLInclusionTester(this.hllRelativeStddev),
+                sampleGoal,
+                readExisting
+        );
         List<InclusionDependency> result = algorithm.execute(fileInputGenerator);
 
         for (InclusionDependency inclusionDependency : result) {
@@ -93,6 +110,10 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
             if (values.length > 0)
                 this.inputRowLimit = values[0];
 
+        } else if (Identifier.SAMPLE_GOAL.name().equals(identifier)) {
+            Validate.inclusiveBetween(1, 1, values.length);
+            this.sampleGoal = values[0];
+
         } else {
             this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
         }
@@ -107,18 +128,28 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
         }
     }
 
+    @Override
+    public void setStringConfigurationValue(String identifier, String... values) throws AlgorithmConfigurationException {
+        if (Identifier.HLL_REL_STD_DEV.name().equals(identifier)) {
+            Validate.inclusiveBetween(1, 1, values.length);
+            this.hllRelativeStddev = Double.parseDouble(values[0]);
+        } else {
+            this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
+        }
+    }
+
     protected void handleUnknownConfiguration(String identifier, String value) throws AlgorithmConfigurationException {
         throw new AlgorithmConfigurationException("Unknown configuration: " + identifier + " -> " + value);
     }
 
-	@Override
-	public String getAuthors() {
-		return "Moritz Finke, Christian Dullweber, Martin Zabel, Manuel Hegner, Christian Zöllner";
-	}
+    @Override
+    public String getAuthors() {
+        return "Moritz Finke, Christian Dullweber, Martin Zabel, Manuel Hegner, Christian Zöllner";
+    }
 
-	@Override
-	public String getDescription() {
-		return "Approximate IND detection";
-	}
+    @Override
+    public String getDescription() {
+        return "Approximate IND detection";
+    }
 
 }

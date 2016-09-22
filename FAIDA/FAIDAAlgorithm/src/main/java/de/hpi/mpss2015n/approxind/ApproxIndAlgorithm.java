@@ -38,18 +38,20 @@ public final class ApproxIndAlgorithm {
   private final boolean readExisting;
   private final boolean ignoreNullValueColumns;
   private final boolean ignoreAllConstantColumns;
+  private final int sampleGoal;
 
   public ApproxIndAlgorithm(Arity arity, RowSampler sampler, InclusionTester inclusionTester,
-                            boolean readExisting) {
-    this(arity, sampler, inclusionTester, readExisting, true, true);
+                            int sampleGoal, boolean readExisting) {
+    this(arity, sampler, inclusionTester, sampleGoal, readExisting, true, true);
   }
   
-  public ApproxIndAlgorithm(Arity arity, RowSampler sampler, InclusionTester inclusionTester,
+  public ApproxIndAlgorithm(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal,
                             boolean readExisting, boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns) {
     this.detectNary = arity == Arity.N_ARY;
     this.sampler = sampler;
     this.inclusionTester = inclusionTester;
     this.candidateLogic = new CandidateGenerator();
+    this.sampleGoal = sampleGoal;
     this.readExisting = readExisting;
     this.ignoreNullValueColumns=ignoreNullValueColumns;
     this.ignoreAllConstantColumns=ignoreAllConstantColumns;
@@ -73,9 +75,10 @@ public final class ApproxIndAlgorithm {
 
   List<SimpleInd> executeInternal(RelationalInputGenerator[] fileInputGenerators)
       throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
+    // Probably for row scalability tests... not the sample described in the paper.
     fileInputGenerators = sampler.createSample(fileInputGenerators);
 
-    ColumnStore[] stores = ColumnStore.create(fileInputGenerators, readExisting, 10000);
+    ColumnStore[] stores = ColumnStore.create(fileInputGenerators, this.sampleGoal);
 
     List<SimpleColumnCombination> nullColumns = new ArrayList<>();
     int constantColumnCounter = 0;

@@ -39,20 +39,26 @@ import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 
+/**
+ * Stores the columns of a relational table and a row-wise sample.
+ */
 public final class ColumnStore {
 
   private static final Logger logger = LoggerFactory.getLogger(ColumnStore.class);
 
+  /** Temporary directory for the created files. */
   public static final String DIRECTORY = "temp/";
   public static final int BUFFERSIZE = 1024 * 1024;
   public static final HashFunction HASH_FUNCTION = Hashing.murmur3_128();
   public static final long NULLHASH = HASH_FUNCTION.hashString("", Charsets.UTF_8).asLong();
+  /** Number of hashes to cache while converting the original data. */
   private static final int CACHE_THRESHOLD = 10;
 
   private final File[] columns;
   private final File sample;
   private final ArrayList<AOCacheMap<String, Long>> hashCaches = new ArrayList<>();
-  private final int sampleSize;
+  /** The minimum number of distinct values of each column to include in the sample (unless there are less values). **/
+  private final int sampleGoal;
   private boolean[] isConstantColumn;
   private Set<SimpleColumnCombination> nullColumns;
   private File constantColumnsFile;
@@ -60,9 +66,14 @@ public final class ColumnStore {
   private final List<LongSet> itemSet;
 
 
-  ColumnStore(String dataset, int table, RelationalInput input,
-              int sampleSize) {
-    this.sampleSize = sampleSize;
+  /**
+   * Creates a new instance, thereby creating all relevant files.
+   *
+   * @param sampleGoal see {@link #sampleGoal}
+   */
+  ColumnStore(String dataset, int table, RelationalInput input, int sampleGoal) {
+    // Do some initialization work.
+    this.sampleGoal = sampleGoal;
     this.columns = new File[input.numberOfColumns()];
     isConstantColumn = new boolean[columns.length];
     Arrays.fill(isConstantColumn, true);
@@ -75,6 +86,8 @@ public final class ColumnStore {
     //Arrays.fill(constantColumnValues, null);
 
     nullColumns = new HashSet<>();
+
+    // Prepare the working directory.
     String tableName = com.google.common.io.Files.getNameWithoutExtension(input.relationName());
     Path dir = Paths.get(DIRECTORY, dataset, tableName);
     try {
@@ -156,6 +169,7 @@ public final class ColumnStore {
   }
 
   private void writeColumns(RelationalInput input) throws InputIterationException, IOException {
+
     FileOutputStream[] out = new FileOutputStream[columns.length];
     FileChannel[] channel = new FileChannel[columns.length];
     ByteBuffer[] bb = new ByteBuffer[columns.length];
@@ -166,7 +180,6 @@ public final class ColumnStore {
       hashCaches.add(new AOCacheMap<>(CACHE_THRESHOLD));
     }
 
-    ReservoirSampler<List<String>> sampler = new ReservoirSampler<>(sampleSize);
     List<List<String>> alternativeSamples = new ArrayList<>();
 
     int rowCounter = 0;
@@ -187,7 +200,7 @@ public final class ColumnStore {
         String str = row.get(i);
         long hash = getHash(str, i);
 
-        if(itemSet.get(i).size() < 500 && itemSet.get(i).add(hash)){
+        if(itemSet.get(i).size() < this.sampleGoal && itemSet.get(i).add(hash)){
           newValue = true;
         }
         bb[i].putLong(hash);
@@ -203,18 +216,12 @@ public final class ColumnStore {
       if(newValue){
         alternativeSamples.add(row);
       }
-      /*
-      else{
-        sampler.sample(row);
-      }*/
 
       counter.countUp();
       rowCounter++;
     }
     counter.done();
-    List<List<String>> sampleRows = sampler.getSample();
-    sampleRows.addAll(alternativeSamples);
-    writeSample(sampleRows);
+    writeSample(alternativeSamples);
 
     for (int i = 0; i < columns.length; i++) {
       bb[i].flip();
@@ -286,8 +293,7 @@ public final class ColumnStore {
    * @param fileInputGenerators input
    * @return column stores
    */
-  public static ColumnStore[] create(RelationalInputGenerator[] fileInputGenerators,
-                                     boolean readExisting, int sampleSize) {
+  public static ColumnStore[] create(RelationalInputGenerator[] fileInputGenerators, int sampleGoal) {
     ColumnStore[] stores = new ColumnStore[fileInputGenerators.length];
 
     for (int i=0;i<fileInputGenerators.length;i++) {
@@ -299,7 +305,7 @@ public final class ColumnStore {
 	      } else {
 	        datasetDir = "unknown";
 	      }
-	      stores[i] = new ColumnStore(datasetDir, i, input, sampleSize);
+	      stores[i] = new ColumnStore(datasetDir, i, input, sampleGoal);
         input.close();
       } catch (Exception e) {
         throw new RuntimeException(e);

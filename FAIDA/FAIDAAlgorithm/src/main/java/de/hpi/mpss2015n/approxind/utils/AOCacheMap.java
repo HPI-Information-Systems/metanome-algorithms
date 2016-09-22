@@ -2,6 +2,9 @@ package de.hpi.mpss2015n.approxind.utils;
 
 import java.util.LinkedHashMap;
 
+/**
+ * Key-value cache with LRU semantics.
+ */
 public class AOCacheMap<K, V> extends LinkedHashMap<K, V>{
 
 	private int maxCapacity;

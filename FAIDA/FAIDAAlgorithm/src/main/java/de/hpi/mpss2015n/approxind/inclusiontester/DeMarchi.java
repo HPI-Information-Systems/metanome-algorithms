@@ -94,6 +94,9 @@ public class DeMarchi {
         return false;
       }
 
+      // FIXME: This looks very suspicious: If the column combination becomes big, we are not adding the hash to the inverted
+      // index. When the column is already big, we are again adding it.
+      // Moreover, the paper does not report on such a threshold....
       //if set != null
       if (!hllData.isBig()) {
         hllData.incrementCounter();
