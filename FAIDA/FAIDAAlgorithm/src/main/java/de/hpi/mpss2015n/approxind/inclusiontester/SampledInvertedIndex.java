@@ -11,7 +11,12 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class DeMarchi {
+/**
+ * This is an inverted index that maps hash values to the {@link SimpleColumnCombination}s that contain it. However,
+ * the keys in this inverted index are restricted to a sample.
+ */
+public class SampledInvertedIndex {
+
     private final Long2ObjectOpenHashMap<BitSet> invertedIndex;
 
     private final Set<SimpleInd> discoveredInds;
@@ -21,7 +26,7 @@ public class DeMarchi {
      */
     private int maxIndex;
 
-    public DeMarchi(int threshold) {
+    public SampledInvertedIndex() {
         invertedIndex = new Long2ObjectOpenHashMap<>();
         discoveredInds = new HashSet<>();
     }
@@ -77,9 +82,9 @@ public class DeMarchi {
         return discoveredInds.contains(new SimpleInd(a, b));
     }
 
-    public void initialize(List<Long> relevantHashes) {
+    public void initialize(List<Long> sampledHashes) {
         // Initialize the inverted index for the given hash values.
-        for (Long longHash : relevantHashes) {
+        for (Long longHash : sampledHashes) {
             BitSet set = new BitSet(maxIndex + 1);
             invertedIndex.put(longHash, set);
         }
@@ -87,14 +92,12 @@ public class DeMarchi {
     }
 
     /**
-     * @return true if the processed hash already exists in the relation
+     * Try to map the given {@code longHash} to the given {@link SimpleColumnCombination}.
+     *
+     * @return true if the mapping was successful, which is the case if the {@code longHash} is a valid key in this instance
      */
-    public boolean processHash(SimpleColumnCombination combination, HLLData hllData, long longHash) {
+    public boolean update(SimpleColumnCombination combination, HLLData hllData, long longHash) {
         BitSet set = invertedIndex.get(longHash);
-
-        if (set != null && set.get(combination.getIndex())) {
-            return true;
-        }
 
         if (set == null) {
             hllData.setBig(true);
@@ -104,12 +107,6 @@ public class DeMarchi {
         set.set(combination.getIndex());
         return true;
 
-    }
-
-    public Stream<Long> getValues(SimpleColumnCombination combination) {
-        return invertedIndex.entrySet().stream()
-                .filter(tuple -> tuple.getValue().get(combination.getIndex()))
-                .map(Map.Entry::getKey);
     }
 
     public void setMaxIndex(int maxIndex) {

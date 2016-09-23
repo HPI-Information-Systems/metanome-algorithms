@@ -40,14 +40,9 @@ public final class HLLInclusionTester implements InclusionTester {
     private final double error;
 
     /**
-     * ???
-     */
-    private final int demarchiThreshold = 10000;
-
-    /**
      * Nested IND test via an inverted index as proposed by DeMarchi et al.
      */
-    private final DeMarchi deMarchi;
+    private final SampledInvertedIndex sampledInvertedIndex;
 
     /**
      * ???
@@ -58,7 +53,7 @@ public final class HLLInclusionTester implements InclusionTester {
         this.error = error;
         this.hllsByTable = new Int2ObjectOpenHashMap<>();
         cardinalityLookUp = new Object2LongOpenHashMap<>();
-        deMarchi = new DeMarchi(demarchiThreshold);
+        sampledInvertedIndex = new SampledInvertedIndex();
     }
 
     @Override
@@ -71,7 +66,7 @@ public final class HLLInclusionTester implements InclusionTester {
         for (int i = 0; i < combinations.size(); i++) {
             combinations.get(i).setIndex(i);
         }
-        deMarchi.setMaxIndex(combinations.size() - 1);
+        sampledInvertedIndex.setMaxIndex(combinations.size() - 1);
 
         // Now create according hashes from the table samples and initialize the inverted index with them.
         List<Long> samples = new ArrayList<>();
@@ -90,7 +85,7 @@ public final class HLLInclusionTester implements InclusionTester {
                 }
             }
         }
-        deMarchi.initialize(samples);
+        sampledInvertedIndex.initialize(samples);
     }
 
     @Override
@@ -118,7 +113,7 @@ public final class HLLInclusionTester implements InclusionTester {
                 }
             }
         }
-        deMarchi.finalizeInsertion(hllsByTable.values());
+        sampledInvertedIndex.finalizeInsertion(hllsByTable.values());
     }
 
     @Override
@@ -179,10 +174,10 @@ public final class HLLInclusionTester implements InclusionTester {
                 return false;
             }
 
-            return deMarchi.isIncludedIn(a, b) && isIncluded(dataA.getHll(), dataB.getHll());
+            return sampledInvertedIndex.isIncludedIn(a, b) && isIncluded(dataA.getHll(), dataB.getHll());
 
         } else {
-            return deMarchi.isIncludedIn(a, b);
+            return sampledInvertedIndex.isIncludedIn(a, b);
         }
     }
 
@@ -215,12 +210,10 @@ public final class HLLInclusionTester implements InclusionTester {
     }
 
     private void processHash(SimpleColumnCombination combination, HLLData hllData, long longHash) {
-        boolean exists = deMarchi.processHash(combination, hllData, longHash);
-        if (!exists && hllData.isBig()) {
+        if (!sampledInvertedIndex.update(combination, hllData, longHash)) {
             HyperLogLog hll = hllData.getHll();
             if (hll == null) {
                 hll = new HyperLogLog(error);
-                ;
                 hllData.setHll(hll);
             }
             hll.offerHashed(longHash);
