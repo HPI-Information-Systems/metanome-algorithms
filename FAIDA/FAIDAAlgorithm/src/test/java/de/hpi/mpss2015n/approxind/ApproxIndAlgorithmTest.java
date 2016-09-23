@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
+import de.hpi.mpss2015n.approxind.inclusiontester.HLLInclusionTester;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -25,8 +26,8 @@ public class ApproxIndAlgorithmTest {
     ApproxIndAlgorithm algo;
     private static String level;
 
-    private InclusionTester t = new HashSetInclusionTester();
-    private int sampleGoal = 500;
+    private InclusionTester t = new HLLInclusionTester(0.001);
+    private int sampleGoal = 2;
     //private InclusionTester t = new BloomFilterInclusionTester();
 
     // data() Parameters map to these constructor parameter

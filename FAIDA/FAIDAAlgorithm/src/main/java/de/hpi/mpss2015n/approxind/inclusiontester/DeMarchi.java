@@ -3,115 +3,111 @@ package de.hpi.mpss2015n.approxind.inclusiontester;
 import de.hpi.mpss2015n.approxind.utils.HLL.HLLData;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import de.hpi.mpss2015n.approxind.utils.SimpleInd;
-
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntCollection;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class DeMarchi {
-    private final Long2ObjectOpenHashMap<BitSet> deMarchiRelation;
-    private final int threshold;
-    private final Set<SimpleInd> partialResult;
+    private final Long2ObjectOpenHashMap<BitSet> invertedIndex;
+
+    private final Set<SimpleInd> discoveredInds;
+    /**
+     * Indices refer to column combinations that appear in INDs. This field keeps track of the maximum possible
+     * column combination index (inclusive).
+     */
     private int maxIndex;
 
     public DeMarchi(int threshold) {
-        this.threshold = threshold;
-        deMarchiRelation = new Long2ObjectOpenHashMap<>();
-        partialResult = new HashSet<>();
+        invertedIndex = new Long2ObjectOpenHashMap<>();
+        discoveredInds = new HashSet<>();
     }
 
-    public void finalizeInsertion(Collection<Map<SimpleColumnCombination, HLLData>> hllData) {
-        partialResult.clear();
-        Map<SimpleColumnCombination, Set<SimpleColumnCombination>> LHStoRHSMap = new HashMap<>();
-        SimpleColumnCombination[] columnCombinations = new SimpleColumnCombination[maxIndex+1];
-        List<SimpleColumnCombination> columnCombinationList = new ArrayList<>();
-        for (Map<SimpleColumnCombination, HLLData> logMap : hllData) {
-            for (SimpleColumnCombination scc : logMap.keySet()) {
+    public void finalizeInsertion(Collection<Map<SimpleColumnCombination, HLLData>> hllsByTable) {
+        // Initialize a mapping from dependent to referenced column combinations and ind the column combinations.
+        Map<SimpleColumnCombination, IntCollection> refByDepColumnCombos = new HashMap<>();
+        SimpleColumnCombination[] columnCombinations = new SimpleColumnCombination[maxIndex + 1];
+        // Collect all column combinations.
+        for (Map<SimpleColumnCombination, HLLData> hllsByColumnCombo : hllsByTable) {
+            for (SimpleColumnCombination scc : hllsByColumnCombo.keySet()) {
                 columnCombinations[scc.getIndex()] = scc;
-                columnCombinationList.add(scc);
-            }
-        }
-        for (Map<SimpleColumnCombination, HLLData> logMap : hllData) {
-            for (Map.Entry<SimpleColumnCombination, HLLData> entry : logMap.entrySet()) {
-                    LHStoRHSMap.put(entry.getKey(), new HashSet<>(columnCombinationList));
+                refByDepColumnCombos.put(scc, null);
             }
         }
 
-        for (BitSet candidates : deMarchiRelation.values()) {
-            for (int lhs : candidates.stream().toArray()) {
-                Set<SimpleColumnCombination> RHSs = LHStoRHSMap.get(columnCombinations[lhs]);
-                if (RHSs != null) {
-                    List<SimpleColumnCombination> copy = new ArrayList<>(RHSs);
-                    for (SimpleColumnCombination rhs : copy) {
-                        if(!candidates.get(rhs.getIndex())){
-                            RHSs.remove(rhs);
-                        }
+        // Apply DeMarchi et al. criterion on all candidate IND simultaneously while iterating over the inverted index.
+        for (BitSet valueGroup : invertedIndex.values()) {
+            for (int depColumnCombo = valueGroup.nextSetBit(0); depColumnCombo != -1; depColumnCombo = valueGroup.nextSetBit(depColumnCombo + 1)) {
+                IntCollection refColumnCombos = refByDepColumnCombos.get(columnCombinations[depColumnCombo]);
+
+                if (refColumnCombos == null) {
+                    // If value is unseen, initialize the referenced column combinations.
+                    refColumnCombos = new IntArrayList(valueGroup.cardinality() - 1);
+                    for (int refColumnCombo = valueGroup.nextSetBit(0); refColumnCombo != -1; refColumnCombo = valueGroup.nextSetBit(refColumnCombo + 1)) {
+                        if (depColumnCombo == refColumnCombo) continue;
+                        refColumnCombos.add(refColumnCombo);
+                    }
+                    refByDepColumnCombos.put(columnCombinations[depColumnCombo], refColumnCombos);
+
+                } else if (!refColumnCombos.isEmpty()) {
+                    // Otherwise, intersect referenced values with the values from the inverted index.
+                    for (IntIterator refIter = refColumnCombos.iterator(); refIter.hasNext();) {
+                        final int refColumnCombo = refIter.nextInt();
+                        if (!valueGroup.get(refColumnCombo)) refIter.remove();
                     }
                 }
             }
         }
-        for (Map.Entry<SimpleColumnCombination, Set<SimpleColumnCombination>> entry : LHStoRHSMap.entrySet()) {
+        invertedIndex.clear();
+
+        // Materialize the INDs.
+        for (Map.Entry<SimpleColumnCombination, IntCollection> entry : refByDepColumnCombos.entrySet()) {
             SimpleColumnCombination lhs = entry.getKey();
-            for (SimpleColumnCombination rhs : entry.getValue()) {
-                partialResult.add(new SimpleInd(lhs, rhs));
+            for (IntIterator refIter = entry.getValue().iterator(); refIter.hasNext();) {
+                final int rhs = refIter.nextInt();
+                discoveredInds.add(new SimpleInd(lhs, columnCombinations[rhs]));
             }
         }
-        deMarchiRelation.clear();
     }
 
     public boolean isIncludedIn(SimpleColumnCombination a, SimpleColumnCombination b) {
-        return partialResult.contains(new SimpleInd(a, b));
+        return discoveredInds.contains(new SimpleInd(a, b));
     }
 
-    public void initialize(List<Long> values){
-      for(Long longHash: values){
-        BitSet set = new BitSet(maxIndex+1);
-        deMarchiRelation.put(longHash, set);
-      }
-
+    public void initialize(List<Long> relevantHashes) {
+        // Initialize the inverted index for the given hash values.
+        for (Long longHash : relevantHashes) {
+            BitSet set = new BitSet(maxIndex + 1);
+            invertedIndex.put(longHash, set);
+        }
+        discoveredInds.clear();
     }
 
     /**
      * @return true if the processed hash already exists in the relation
      */
     public boolean processHash(SimpleColumnCombination combination, HLLData hllData, long longHash) {
-      BitSet set = deMarchiRelation.get(longHash);
+        BitSet set = invertedIndex.get(longHash);
 
-      if (set != null && set.get(combination.getIndex())) {
-        return true;
-      }
-
-      if(set == null){
-        hllData.setBig(true);
-        return false;
-      }
-
-      // FIXME: This looks very suspicious: If the column combination becomes big, we are not adding the hash to the inverted
-      // index. When the column is already big, we are again adding it.
-      // Moreover, the paper does not report on such a threshold....
-      //if set != null
-      if (!hllData.isBig()) {
-        hllData.incrementCounter();
-        if (hllData.getCounter() >= threshold) {
-          hllData.setBig(true);
-          return false;
+        if (set != null && set.get(combination.getIndex())) {
+            return true;
         }
-      }
-      set.set(combination.getIndex());
-      return true;
+
+        if (set == null) {
+            hllData.setBig(true);
+            return false;
+        }
+
+        set.set(combination.getIndex());
+        return true;
 
     }
 
     public Stream<Long> getValues(SimpleColumnCombination combination) {
-        return deMarchiRelation.entrySet().stream()
+        return invertedIndex.entrySet().stream()
                 .filter(tuple -> tuple.getValue().get(combination.getIndex()))
                 .map(Map.Entry::getKey);
     }

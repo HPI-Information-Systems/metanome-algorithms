@@ -5,22 +5,22 @@ import de.hpi.mpss2015n.approxind.datastructures.HyperLogLog;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This data class stores a HyperLogLog structure plus some more metadata for a column combination.
+ */
 public class HLLData {
 
   private HyperLogLog hll;
 
+  /**
+   * Tells whether the described column combination is big, i.e., it is not covered by the inverted index.
+   */
   private boolean big;
-
-  private int counter;
-
-  private List<Long> sample;
 
   public HLLData(){
     big = false;
-    sample = new ArrayList<>();
   }
 
-  public List<Long> getSample() { return sample; }
 
   public HyperLogLog getHll() {
     return hll;
@@ -38,11 +38,4 @@ public class HLLData {
     return big;
   }
 
-  public int getCounter() {
-    return counter;
-  }
-
-  public void incrementCounter() {
-    counter++;
-  }
 }
