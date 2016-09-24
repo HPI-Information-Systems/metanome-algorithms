@@ -70,13 +70,11 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
     @Override
     public void execute() throws AlgorithmExecutionException {
 
-        boolean readExisting = false;
         ApproxIndAlgorithm algorithm = new ApproxIndAlgorithm(
                 detectNary ? Arity.N_ARY : Arity.UNARY,
                 new IdentityRowSampler(),
                 new HLLInclusionTester(this.hllRelativeStddev),
-                sampleGoal,
-                readExisting
+                sampleGoal
         );
         List<InclusionDependency> result = algorithm.execute(fileInputGenerator);
 

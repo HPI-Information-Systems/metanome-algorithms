@@ -21,7 +21,8 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -43,18 +44,15 @@ public final class ColumnStore {
      */
     private static final int CACHE_THRESHOLD = 10;
 
-    private final File[] columns;
-    private final File sample;
+    private final File[] columnFiles;
+    private final File sampleFile;
     private final ArrayList<AOCacheMap<String, Long>> hashCaches = new ArrayList<>();
     /**
      * The minimum number of distinct values of each column to include in the sample (unless there are less values).
      **/
     private final int sampleGoal;
-    private boolean[] isConstantColumn;
-    private Set<SimpleColumnCombination> nullColumns;
-    private File constantColumnsFile;
-    private Long[] constantColumnValues;
-    private final List<LongSet> sampledColumnValues;
+
+    private boolean[] isConstantColumn, isNullColumn;
 
 
     /**
@@ -65,65 +63,39 @@ public final class ColumnStore {
     ColumnStore(String dataset, int table, RelationalInput input, int sampleGoal) {
         // Do some initialization work.
         this.sampleGoal = sampleGoal;
-        this.columns = new File[input.numberOfColumns()];
-        isConstantColumn = new boolean[columns.length];
-        Arrays.fill(isConstantColumn, true);
-        sampledColumnValues = new ArrayList<>();
-        for (int i = 0; i < columns.length; i++) {
-            sampledColumnValues.add(new LongOpenHashSet(this.sampleGoal));
-        }
-
-        constantColumnValues = new Long[columns.length];
-        //Arrays.fill(constantColumnValues, null);
-
-        nullColumns = new HashSet<>();
+        this.columnFiles = new File[input.numberOfColumns()];
+        isConstantColumn = new boolean[columnFiles.length];
+        isNullColumn = new boolean[columnFiles.length];
 
         // Prepare the working directory.
         String tableName = com.google.common.io.Files.getNameWithoutExtension(input.relationName());
         Path dir = Paths.get(DIRECTORY, dataset, tableName);
+        logger.info("writing table {} to {}", table, dir.toAbsolutePath());
         try {
             Files.createDirectories(dir);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        logger.info("writing table {} to {}", table, dir.toAbsolutePath());
-
         int i = 0;
         for (String column : input.columnNames()) {
-            columns[i++] = new File(dir.toFile(), "" + table + "_" + column + ".bin");
+            columnFiles[i++] = new File(dir.toFile(), "" + table + "_" + column + ".bin");
         }
+        sampleFile = new File(dir.toFile(), "" + table + "-sample.csv");
 
-        sample = new File(dir.toFile(), "" + table + "-sample.csv");
-        constantColumnsFile = new File(dir.toFile(), "" + table + "_" + "constantColumns" + ".csv");
-
+        // Read the original data and update all deliverables.
         File processingIndicator = new File(dir.toFile(), "" + table + "_PROCESSING");
         try {
-            processingIndicator.createNewFile();
+            if (!processingIndicator.createNewFile()) {
+                logger.warn("Could not create processing indicator.");
+            }
             Stopwatch sw = Stopwatch.createStarted();
             writeColumns(input);
-
-            if (constantColumnsFile.exists()) {
-                constantColumnsFile.delete();
-            }
-            constantColumnsFile.createNewFile();
-            FileOutputStream fos = new FileOutputStream(constantColumnsFile);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-            for (int j = 0; j < columns.length; j++) {
-                bw.write(Long.toString(constantColumnValues[j]));
-                bw.newLine();
-            }
-            bw.close();
-
             logger.info("{}", sw);
-            processingIndicator.delete();
+            if (!processingIndicator.delete()) {
+                logger.warn("Could not delete processing indicator.");
+            }
         } catch (InputIterationException | IOException e) {
             throw new RuntimeException(e);
-        }
-
-        for (int j = 0; j < columns.length; j++) {
-            if (isConstantColumn[j] && constantColumnValues[j] == NULLHASH) {
-                nullColumns.add(SimpleColumnCombination.create(table, j));
-            }
         }
     }
 
@@ -131,14 +103,14 @@ public final class ColumnStore {
      * @return Iterator for all columns
      */
     public ColumnIterator getRows() {
-        int[] ids = new int[columns.length];
+        int[] ids = new int[columnFiles.length];
         for (int i = 0; i < ids.length; i++) {
             ids[i] = i;
         }
         return getRows(new SimpleColumnCombination(0, ids));
     }
 
-    public List<long[]> getSample() {
+    public List<long[]> getSampleFile() {
         return readSample();
     }
 
@@ -151,7 +123,7 @@ public final class ColumnStore {
         int i = 0;
         for (int col : activeColumns.getColumns()) {
             try {
-                in[i++] = new FileInputStream(columns[col]);
+                in[i++] = new FileInputStream(columnFiles[col]);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -161,55 +133,57 @@ public final class ColumnStore {
 
     private void writeColumns(RelationalInput input) throws InputIterationException, IOException {
 
-        FileOutputStream[] out = new FileOutputStream[columns.length];
-        FileChannel[] channel = new FileChannel[columns.length];
-        ByteBuffer[] bb = new ByteBuffer[columns.length];
-        for (int i = 0; i < columns.length; i++) {
-            out[i] = new FileOutputStream(columns[i]);
+        FileOutputStream[] out = new FileOutputStream[columnFiles.length];
+        FileChannel[] channel = new FileChannel[columnFiles.length];
+        ByteBuffer[] bb = new ByteBuffer[columnFiles.length];
+        for (int i = 0; i < columnFiles.length; i++) {
+            out[i] = new FileOutputStream(columnFiles[i]);
             channel[i] = out[i].getChannel();
             bb[i] = ByteBuffer.allocateDirect(BUFFERSIZE);
             hashCaches.add(new AOCacheMap<>(CACHE_THRESHOLD));
         }
 
         List<List<String>> alternativeSamples = new ArrayList<>();
+        final List<LongSet> sampledColumnValues = new ArrayList<>();
+        for (int i = 0; i < columnFiles.length; i++) {
+            sampledColumnValues.add(new LongOpenHashSet(this.sampleGoal));
+        }
+        Long[] firstColumnValues = new Long[columnFiles.length];
 
         int rowCounter = 0;
         DebugCounter counter = new DebugCounter();
         while (input.hasNext()) {
+            // Prepare the output buffers.
             if (bb[0].remaining() == 0) {
-                for (int i = 0; i < columns.length; i++) {
+                for (int i = 0; i < columnFiles.length; i++) {
                     bb[i].flip();
                     channel[i].write(bb[i]);
                     bb[i].clear();
                 }
             }
+
             List<String> row = input.next();
-
-            boolean newValue = false;
-
-            for (int i = 0; i < columns.length; i++) {
+            boolean rowHasUnseenValue = false;
+            for (int i = 0; i < columnFiles.length; i++) {
+                // Write the hash to the column.
                 String str = row.get(i);
                 long hash = getHash(str, i);
                 bb[i].putLong(hash);
 
-                if (hash != NULLHASH) {
-                    final LongSet sampledColumnValues = this.sampledColumnValues.get(i);
-                    if (sampledColumnValues.size() < this.sampleGoal && sampledColumnValues.add(hash)) {
-                        newValue = true;
-                    }
-                }
+                // Keep track of the first column value and delete it if multiple values are observed.
+                if (rowCounter == 0) firstColumnValues[i] = hash;
+                else if (firstColumnValues[i] != null && firstColumnValues[i] != hash) firstColumnValues[i] = null;
 
-                if (isConstantColumn[i]) {
-                    if (rowCounter == 0) {
-                        constantColumnValues[i] = hash;
-                    } else if (hash != constantColumnValues[i]) {
-                        constantColumnValues[i] = 0L;
-                        isConstantColumn[i] = false;
+                // Check if the value requests to put the row into the sample.
+                if (hash != NULLHASH) {
+                    final LongSet sampledValues = sampledColumnValues.get(i);
+                    if (sampledValues.size() < this.sampleGoal && sampledValues.add(hash)) {
+                        rowHasUnseenValue = true;
                     }
                 }
             }
 
-            if (newValue) {
+            if (rowHasUnseenValue) {
                 alternativeSamples.add(row);
             }
 
@@ -219,7 +193,13 @@ public final class ColumnStore {
         counter.done();
         writeSample(alternativeSamples);
 
-        for (int i = 0; i < columns.length; i++) {
+        // Check for constant and null columns.
+        for (int i = 0; i < firstColumnValues.length; i++) {
+            isNullColumn[i] = firstColumnValues[i] != null && firstColumnValues[i] == NULLHASH;
+            isConstantColumn[i] = firstColumnValues[i] != null && firstColumnValues[i] != NULLHASH;
+        }
+
+        for (int i = 0; i < columnFiles.length; i++) {
             bb[i].flip();
             channel[i].write(bb[i]);
             out[i].close();
@@ -228,7 +208,7 @@ public final class ColumnStore {
 
     private void writeSample(List<List<String>> rows) {
         try {
-            BufferedWriter writer = com.google.common.io.Files.newWriter(sample, Charsets.UTF_8);
+            BufferedWriter writer = com.google.common.io.Files.newWriter(sampleFile, Charsets.UTF_8);
             for (List<String> row : rows) {
                 Long[] hashes = new Long[row.size()];
                 for (int i = 0; i < row.size(); i++) {
@@ -246,10 +226,10 @@ public final class ColumnStore {
     private List<long[]> readSample() {
         List<long[]> result = new ArrayList<>();
         try {
-            BufferedReader reader = com.google.common.io.Files.newReader(sample, Charsets.UTF_8);
+            BufferedReader reader = com.google.common.io.Files.newReader(sampleFile, Charsets.UTF_8);
 
             List<long[]> hashSample = reader.lines().map(row -> {
-                long[] hashes = new long[columns.length];
+                long[] hashes = new long[columnFiles.length];
                 int i = 0;
                 for (String hash : Splitter.on(',').split(row)) {
                     hashes[i++] = Long.parseLong(hash);
@@ -309,21 +289,16 @@ public final class ColumnStore {
         return stores;
     }
 
-    public Set<SimpleColumnCombination> getNullColumns() {
-        return nullColumns;
-    }
-
     public int getNumberOfColumns() {
-        return columns.length;
+        return columnFiles.length;
     }
 
-    public boolean[] getIsConstantColumn() {
-        return isConstantColumn;
+    public boolean isConstantColumn(int columnIndex) {
+        return isConstantColumn[columnIndex];
     }
 
-    public Long[] getConstantColumnValues() {
-        return constantColumnValues;
+    public boolean isNullColumn(int columnIndex) {
+        return isConstantColumn[columnIndex];
     }
-
 }
 
