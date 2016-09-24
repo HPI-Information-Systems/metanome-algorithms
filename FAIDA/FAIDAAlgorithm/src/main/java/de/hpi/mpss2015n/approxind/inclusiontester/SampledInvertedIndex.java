@@ -3,9 +3,7 @@ package de.hpi.mpss2015n.approxind.inclusiontester;
 import de.hpi.mpss2015n.approxind.utils.HLL.HLLData;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import de.hpi.mpss2015n.approxind.utils.SimpleInd;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntCollection;
-import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.util.*;
@@ -17,7 +15,7 @@ import java.util.stream.Stream;
  */
 public class SampledInvertedIndex {
 
-    private final Long2ObjectOpenHashMap<BitSet> invertedIndex;
+    private final Long2ObjectOpenHashMap<IntSet> invertedIndex;
 
     private final Set<SimpleInd> discoveredInds;
     /**
@@ -44,14 +42,16 @@ public class SampledInvertedIndex {
         }
 
         // Apply DeMarchi et al. criterion on all candidate IND simultaneously while iterating over the inverted index.
-        for (BitSet valueGroup : invertedIndex.values()) {
-            for (int depColumnCombo = valueGroup.nextSetBit(0); depColumnCombo != -1; depColumnCombo = valueGroup.nextSetBit(depColumnCombo + 1)) {
+        for (IntSet valueGroup : invertedIndex.values()) {
+            for (IntIterator depIterator = valueGroup.iterator(); depIterator.hasNext(); ) {
+                int depColumnCombo = depIterator.nextInt();
                 IntCollection refColumnCombos = refByDepColumnCombos.get(columnCombinations[depColumnCombo]);
 
                 if (refColumnCombos == null) {
                     // If value is unseen, initialize the referenced column combinations.
-                    refColumnCombos = new IntArrayList(valueGroup.cardinality() - 1);
-                    for (int refColumnCombo = valueGroup.nextSetBit(0); refColumnCombo != -1; refColumnCombo = valueGroup.nextSetBit(refColumnCombo + 1)) {
+                    refColumnCombos = new IntArrayList(valueGroup.size() - 1);
+                    for (IntIterator refIterator = valueGroup.iterator(); refIterator.hasNext(); ) {
+                        int refColumnCombo = refIterator.nextInt();
                         if (depColumnCombo == refColumnCombo) continue;
                         refColumnCombos.add(refColumnCombo);
                     }
@@ -59,10 +59,7 @@ public class SampledInvertedIndex {
 
                 } else if (!refColumnCombos.isEmpty()) {
                     // Otherwise, intersect referenced values with the values from the inverted index.
-                    for (IntIterator refIter = refColumnCombos.iterator(); refIter.hasNext();) {
-                        final int refColumnCombo = refIter.nextInt();
-                        if (!valueGroup.get(refColumnCombo)) refIter.remove();
-                    }
+                    refColumnCombos.retainAll(valueGroup);
                 }
             }
         }
@@ -87,8 +84,7 @@ public class SampledInvertedIndex {
     public void initialize(List<Long> sampledHashes) {
         // Initialize the inverted index for the given hash values.
         for (Long longHash : sampledHashes) {
-            BitSet set = new BitSet(maxIndex + 1);
-            invertedIndex.put(longHash, set);
+            invertedIndex.put(longHash, new IntOpenHashSet(4));
         }
         discoveredInds.clear();
     }
@@ -99,14 +95,14 @@ public class SampledInvertedIndex {
      * @return true if the mapping was successful, which is the case if the {@code longHash} is a valid key in this instance
      */
     public boolean update(SimpleColumnCombination combination, HLLData hllData, long longHash) {
-        BitSet set = invertedIndex.get(longHash);
+        IntSet set = invertedIndex.get(longHash);
 
         if (set == null) {
             hllData.setBig(true);
             return false;
         }
 
-        set.set(combination.getIndex());
+        set.add(combination.getIndex());
         return true;
 
     }
