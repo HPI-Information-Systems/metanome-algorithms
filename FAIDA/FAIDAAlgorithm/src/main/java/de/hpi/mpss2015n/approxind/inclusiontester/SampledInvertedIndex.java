@@ -71,7 +71,9 @@ public class SampledInvertedIndex {
         // Materialize the INDs.
         for (Map.Entry<SimpleColumnCombination, IntCollection> entry : refByDepColumnCombos.entrySet()) {
             SimpleColumnCombination lhs = entry.getKey();
-            for (IntIterator refIter = entry.getValue().iterator(); refIter.hasNext();) {
+            final IntCollection rhss = entry.getValue();
+            if (rhss == null) continue; // How can this be? If the value is in the sample, we should observe it at least once.
+            for (IntIterator refIter = rhss.iterator(); refIter.hasNext();) {
                 final int rhs = refIter.nextInt();
                 discoveredInds.add(new SimpleInd(lhs, columnCombinations[rhs]));
             }

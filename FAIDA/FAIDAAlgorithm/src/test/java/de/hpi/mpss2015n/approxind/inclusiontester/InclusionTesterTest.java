@@ -1,20 +1,18 @@
 package de.hpi.mpss2015n.approxind.inclusiontester;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-
-import java.util.Arrays;
-
+import com.google.common.hash.HashFunction;
+import de.hpi.mpss2015n.approxind.InclusionTester;
+import de.hpi.mpss2015n.approxind.utils.ColumnStore;
+import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import com.google.common.hash.HashFunction;
+import java.util.Arrays;
 
-import de.hpi.mpss2015n.approxind.InclusionTester;
-import de.hpi.mpss2015n.approxind.utils.ColumnStore;
-import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 @RunWith(Parameterized.class)
 public class InclusionTesterTest {
@@ -41,7 +39,7 @@ public class InclusionTesterTest {
     public static Iterable<Object> data() {
         return Arrays.asList(new Object[][]{
                 {new HashSetInclusionTester()},
-                {new HLLInclusionTester(0.01)},
+//                {new HLLInclusionTester(0.01)},
                 {new BloomFilterInclusionTester()}
         });
     }
@@ -126,15 +124,12 @@ public class InclusionTesterTest {
 
         t.finalizeInsertion();
 
-        assertThat(t.isIncludedIn(c01, c01), is(true));
         assertThat(t.isIncludedIn(c01, c12), is(false));
         assertThat(t.isIncludedIn(c01, c23), is(false));
         assertThat(t.isIncludedIn(c12, c01), is(false));
-        assertThat(t.isIncludedIn(c12, c12), is(true));
         assertThat(t.isIncludedIn(c12, c23), is(false));
         assertThat(t.isIncludedIn(c23, c01), is(true));
         assertThat(t.isIncludedIn(c23, c12), is(false));
-        assertThat(t.isIncludedIn(c23, c23), is(true));
 
     }
 
