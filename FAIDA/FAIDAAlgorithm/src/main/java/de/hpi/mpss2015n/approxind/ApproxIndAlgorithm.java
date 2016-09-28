@@ -5,7 +5,6 @@ import de.hpi.mpss2015n.approxind.utils.*;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
-import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.results.InclusionDependency;
 import org.slf4j.Logger;
@@ -80,11 +79,11 @@ public final class ApproxIndAlgorithm {
         logger.info("Detected {} null columns and {} constant columns.", nullColumnCounter, constantColumnCounter);
 
         logger.info("Creating initial column combinations.");
-        List<SimpleColumnCombination> combinations = createInitialCombinations(stores);
+        List<SimpleColumnCombination> combinations = createUnaryColumnCombinations(stores);
         logger.info("Created {} column combinations.", combinations.size());
 
         logger.info("Creating unary IND candidates.");
-        List<SimpleInd> candidates = createInitialCandidates(combinations);
+        List<SimpleInd> candidates = createUnaryIndCandidates(combinations);
         logger.info("Created {} IND candidates.", candidates.size());
 
         logger.info("Feeding input rows to IND test.");
@@ -93,6 +92,7 @@ public final class ApproxIndAlgorithm {
 
         logger.info("Checking unary IND candidates.");
         List<SimpleInd> result = checkCandidates(candidates);
+
         List<SimpleInd> lastResult = result;
         if (detectNary) {
             while (lastResult.size() > 0) {
@@ -106,7 +106,7 @@ public final class ApproxIndAlgorithm {
                 logger.info("Created {} {}-ary IND candidates.", candidates.size(), arity);
 
                 logger.info("Extracting {}-ary column combinations.", arity);
-                combinations = getCombinations(candidates);
+                combinations = extractColumnCombinations(candidates);
 
                 logger.info("Inserting rows to check {} {}-ary IND candidates with {} column combinations", candidates.size(), arity,
                         combinations.size());
@@ -174,7 +174,33 @@ public final class ApproxIndAlgorithm {
         return result;
     }
 
-    private List<SimpleInd> createInitialCandidates(List<SimpleColumnCombination> combinations) {
+    /**
+     * Creates unary column combinations, thereby removing null columns and constant columns if requested.
+     */
+    public List<SimpleColumnCombination> createUnaryColumnCombinations(ColumnStore[] stores) {
+        List<SimpleColumnCombination> combinations = new ArrayList<>();
+        for (int i = 0; i < stores.length; i++) {
+            final ColumnStore store = stores[i];
+            int numColumns = store.getNumberOfColumns();
+
+            for (int j = 0; j < numColumns; j++) {
+                if (ignoreAllConstantColumns && store.isConstantColumn(j)) {
+                    continue;
+                }
+                if (ignoreNullValueColumns && store.isNullColumn(j)) {
+                    continue;
+                }
+
+                combinations.add(SimpleColumnCombination.create(i, j));
+            }
+        }
+        return combinations;
+    }
+
+    /**
+     * Create all possible IND candidates from the given column combinations.
+     */
+    private List<SimpleInd> createUnaryIndCandidates(List<SimpleColumnCombination> combinations) {
         List<SimpleInd> candidates = new ArrayList<>();
         for (SimpleColumnCombination left : combinations) {
             for (SimpleColumnCombination right : combinations) {
@@ -186,28 +212,10 @@ public final class ApproxIndAlgorithm {
         return candidates;
     }
 
-    public List<SimpleColumnCombination> createInitialCombinations(
-            ColumnStore[] stores) throws InputGenerationException {
-        List<SimpleColumnCombination> combinations = new ArrayList<>();
-        for (int i = 0; i < stores.length; i++) {
-            int columns = stores[i].getNumberOfColumns();
-
-            for (int j = 0; j < columns; j++) {
-                if (ignoreAllConstantColumns && stores[i].isConstantColumn(j)) {
-                    continue;
-                }
-                if (ignoreNullValueColumns && stores[i].isNullColumn(j)) {
-                    continue;
-                }
-
-                combinations.add(SimpleColumnCombination.create(i, j));
-            }
-        }
-        return combinations;
-    }
-
-
-    private List<SimpleColumnCombination> getCombinations(List<SimpleInd> candidates) {
+    /**
+     * Extract all column combinations from the given IND (candidates).
+     */
+    private List<SimpleColumnCombination> extractColumnCombinations(List<SimpleInd> candidates) {
         Set<SimpleColumnCombination> combinations = new HashSet<>();
         for (SimpleInd candidate : candidates) {
             combinations.add(candidate.left);

@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -39,7 +40,7 @@ public class InclusionTesterTest {
     public static Iterable<Object> data() {
         return Arrays.asList(new Object[][]{
                 {new HashSetInclusionTester()},
-//                {new HLLInclusionTester(0.01)},
+                {new HLLInclusionTester(0.01)},
                 {new BloomFilterInclusionTester()}
         });
     }
@@ -90,23 +91,55 @@ public class InclusionTesterTest {
     }
 
     @Test
-    @Ignore
     public void testIsIncludedInWithNullValues() throws Exception {
         SimpleColumnCombination c0 = SimpleColumnCombination.create(TABLE0, 0);
         SimpleColumnCombination c1 = SimpleColumnCombination.create(TABLE0, 1);
+        SimpleColumnCombination c2 = SimpleColumnCombination.create(TABLE0, 2);
+        SimpleColumnCombination c3 = SimpleColumnCombination.create(TABLE0, 3);
+        SimpleColumnCombination c01 = SimpleColumnCombination.create(TABLE0, 0, 1);
+        SimpleColumnCombination c02 = SimpleColumnCombination.create(TABLE0, 0, 2);
+        SimpleColumnCombination c03 = SimpleColumnCombination.create(TABLE0, 0, 3);
+        SimpleColumnCombination c10 = SimpleColumnCombination.create(TABLE0, 1, 0);
+        SimpleColumnCombination c12 = SimpleColumnCombination.create(TABLE0, 1, 2);
+        SimpleColumnCombination c13 = SimpleColumnCombination.create(TABLE0, 1, 3);
+        SimpleColumnCombination c20 = SimpleColumnCombination.create(TABLE0, 2, 0);
+        SimpleColumnCombination c21 = SimpleColumnCombination.create(TABLE0, 2, 1);
+        SimpleColumnCombination c23 = SimpleColumnCombination.create(TABLE0, 2, 3);
+        SimpleColumnCombination c30 = SimpleColumnCombination.create(TABLE0, 3, 0);
+        SimpleColumnCombination c31 = SimpleColumnCombination.create(TABLE0, 3, 1);
+        SimpleColumnCombination c32 = SimpleColumnCombination.create(TABLE0, 3, 2);
 
-        t.setColumnCombinations(Arrays.asList(c0, c1));
 
+        t.setColumnCombinations(Arrays.asList(c0, c1, c2, c3));
+        t.initialize(Collections.singletonList(Collections.singletonList(new long[]{aHash, bHash, cHash, nullHash})));
         t.startInsertRow(TABLE0);
-        t.insertRow(new long[]{aHash, nullHash}, 0);
-        t.insertRow(new long[]{bHash, nullHash}, 1);
-
+        t.insertRow(new long[]{aHash, bHash, cHash, nullHash}, 0);
+        t.insertRow(new long[]{bHash, nullHash, cHash, nullHash}, 1);
+        t.insertRow(new long[]{cHash, bHash, cHash, nullHash}, 2);
         t.finalizeInsertion();
 
-        assertThat(t.isIncludedIn(c0, c0), is(true));
         assertThat(t.isIncludedIn(c0, c1), is(false));
+        assertThat(t.isIncludedIn(c0, c2), is(false));
+        assertThat(t.isIncludedIn(c0, c3), is(false));
         assertThat(t.isIncludedIn(c1, c0), is(true));
-        assertThat(t.isIncludedIn(c1, c1), is(true));
+        assertThat(t.isIncludedIn(c1, c2), is(false));
+        assertThat(t.isIncludedIn(c1, c3), is(false));
+        assertThat(t.isIncludedIn(c2, c0), is(true));
+        assertThat(t.isIncludedIn(c2, c1), is(false));
+        assertThat(t.isIncludedIn(c2, c3), is(false));
+        assertThat(t.isIncludedIn(c3, c0), is(true));
+        assertThat(t.isIncludedIn(c3, c1), is(true));
+        assertThat(t.isIncludedIn(c3, c2), is(true));
+
+        t.setColumnCombinations(Arrays.asList(c01, c02, c03, c10, c12, c13, c20, c21, c23, c30, c31, c32));
+        t.initialize(Collections.singletonList(Collections.singletonList(new long[]{aHash, bHash, cHash, nullHash})));
+        t.startInsertRow(TABLE0);
+        t.insertRow(new long[]{aHash, bHash, cHash, nullHash}, 0);
+        t.insertRow(new long[]{bHash, nullHash, cHash, nullHash}, 1);
+        t.insertRow(new long[]{cHash, bHash, cHash, nullHash}, 2);
+        t.finalizeInsertion();
+
+        assertThat(t.isIncludedIn(c03, c01), is(true));
     }
 
     @Test
@@ -152,4 +185,5 @@ public class InclusionTesterTest {
         assertThat(t.isIncludedIn(c0, c1), is(false));
         assertThat(t.isIncludedIn(c1, c0), is(true));
     }
+
 }

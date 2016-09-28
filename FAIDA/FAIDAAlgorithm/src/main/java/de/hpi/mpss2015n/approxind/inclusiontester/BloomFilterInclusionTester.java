@@ -72,19 +72,19 @@ public final class BloomFilterInclusionTester implements InclusionTester {
         for (Map.Entry<SimpleColumnCombination, BloomFilter<Long>> entry : currentTable.entrySet()) {
 
             // Prepare loop variables
-            boolean allNull = true;
+            boolean anyNull = true;
             int[] columns = entry.getKey().getColumns();
             long combinedHash = 0;
 
             // Loop to concatenate all hashes!
             for (int i = 0; i < columns.length; i++) {
                 long hash = values[columns[i]];
-                allNull &= hash == ColumnStore.NULLHASH;
+                if (anyNull = hash == ColumnStore.NULLHASH) break;
                 combinedHash = combinedHash*37 ^ hash;
             }
 
             // Insert into bloom filter
-            if (!allNull) {
+            if (!anyNull) {
                 entry.getValue().add(combinedHash);
             }
         }

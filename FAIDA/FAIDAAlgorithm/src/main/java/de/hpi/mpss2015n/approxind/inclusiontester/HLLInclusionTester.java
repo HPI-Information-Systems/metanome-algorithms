@@ -9,6 +9,8 @@ import de.hpi.mpss2015n.approxind.utils.HLL.HLLData;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.slf4j.Logger;
@@ -45,9 +47,9 @@ public final class HLLInclusionTester implements InclusionTester {
     private final SampledInvertedIndex sampledInvertedIndex;
 
     /**
-     * ???
+     * {@link #hllsByTable} as array (for performance reasons).
      */
-    private Map.Entry<SimpleColumnCombination, HLLData>[] insertHelper;
+    private Map.Entry<SimpleColumnCombination, HLLData>[] hllsByTableAsArray;
 
     public HLLInclusionTester(double error) {
         this.error = error;
@@ -69,7 +71,7 @@ public final class HLLInclusionTester implements InclusionTester {
         sampledInvertedIndex.setMaxIndex(combinations.size() - 1);
 
         // Now create according hashes from the table samples and initialize the inverted index with them.
-        List<Long> samples = new ArrayList<>();
+        LongList samples = new LongArrayList();
         for (int table = 0; table < tableSamplesList.size(); table++) {
             Map<SimpleColumnCombination, HLLData> hllsByColumnCombo = hllsByTable.get(table);
             if (hllsByColumnCombo != null) {
@@ -77,11 +79,19 @@ public final class HLLInclusionTester implements InclusionTester {
                 for (long[] sampleRow : tableSamples) {
                     for (Map.Entry<SimpleColumnCombination, HLLData> entry : hllsByColumnCombo.entrySet()) {
                         SimpleColumnCombination combination = entry.getKey();
-                        Long combinedHash = getHash(combination, sampleRow);
-                        if (combinedHash != null) {
+                        long combinedHash = 0;
+                        int[] columns = combination.getColumns();
+                        boolean anyNull = false;
+                        for (int i = 0; i < columns.length; i++) {
+                            long hash = sampleRow[columns[i]];
+                            if (anyNull = hash == ColumnStore.NULLHASH) break;
+                            combinedHash = Long.rotateLeft(combinedHash, 1) ^ hash;
+                        }
+                        if (!anyNull) {
                             samples.add(combinedHash);
                         }
                     }
+
                 }
             }
         }
@@ -118,32 +128,30 @@ public final class HLLInclusionTester implements InclusionTester {
 
     @Override
     public void insertRow(long[] values, int rowCount) {
+        ColumnCombinations: for (Map.Entry<SimpleColumnCombination, HLLData> entry : hllsByTableAsArray) {
 
-        for (Map.Entry<SimpleColumnCombination, HLLData> entry : insertHelper) {
+            // Combine the hash values.
             SimpleColumnCombination combination = entry.getKey();
-            HLLData hllData = entry.getValue();
-            Long combinedHash = getHash(combination, values);
-            if (combinedHash != null) {
-                processHash(combination, hllData, combinedHash);
+            long combinedHash = 0;
+            int[] columns = combination.getColumns();
+            for (int i = 0; i < columns.length; i++) {
+                long hash = values[columns[i]];
+                if (hash == ColumnStore.NULLHASH) continue ColumnCombinations;
+                combinedHash = Long.rotateLeft(combinedHash, 1) ^ hash;
+            }
+
+            // Update the data summaries.
+            final HLLData hllData = entry.getValue();
+            if (!sampledInvertedIndex.update(combination, hllData, combinedHash)) {
+                HyperLogLog hll = hllData.getHll();
+                if (hll == null) {
+                    hll = new HyperLogLog(error);
+                    hllData.setHll(hll);
+                }
+                hll.offerHashed(combinedHash);
             }
         }
 
-    }
-
-    /**
-     * Creates a combined hash from the existing {@code values} according to the {@link SimpleColumnCombination}.
-     *
-     * @return the hash value or {@code null} if any of the input {@code values} is the {@link ColumnStore#NULLHASH}
-     */
-    public Long getHash(SimpleColumnCombination combination, long[] values) {
-        long combinedHash = 0;
-        int[] columns = combination.getColumns();
-        for (int i = 0; i < columns.length; i++) {
-            long hash = values[columns[i]];
-            if (hash == ColumnStore.NULLHASH) return null;
-            combinedHash = combinedHash * 37 ^ hash;
-        }
-        return combinedHash;
     }
 
     @Override
@@ -209,23 +217,12 @@ public final class HLLInclusionTester implements InclusionTester {
         return MoreObjects.toStringHelper(getClass()).add("error", error).toString();
     }
 
-    private void processHash(SimpleColumnCombination combination, HLLData hllData, long longHash) {
-        if (!sampledInvertedIndex.update(combination, hllData, longHash)) {
-            HyperLogLog hll = hllData.getHll();
-            if (hll == null) {
-                hll = new HyperLogLog(error);
-                hllData.setHll(hll);
-            }
-            hll.offerHashed(longHash);
-        }
-
-    }
 
     @SuppressWarnings("unchecked")
     @Override
     public void startInsertRow(int table) {
         Set<Entry<SimpleColumnCombination, HLLData>> set = hllsByTable.get(table).entrySet();
-        insertHelper = set.toArray(new Entry[set.size()]);
+        hllsByTableAsArray = set.toArray(new Entry[set.size()]);
     }
 
 }

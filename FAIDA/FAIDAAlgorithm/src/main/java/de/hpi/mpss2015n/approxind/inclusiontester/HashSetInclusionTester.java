@@ -37,13 +37,13 @@ public final class HashSetInclusionTester implements InclusionTester {
         for (Map.Entry<SimpleColumnCombination, HashSet<List<Long>>> entry : currentTable.entrySet()) {
             SimpleColumnCombination combination = entry.getKey();
             List<Long> combinationValues = new ArrayList<>(combination.getColumns().length);
-            boolean allNull = true;
+            boolean anyNull = false;
             for (int c : combination.getColumns()) {
                 long value = values[c];
-                allNull &= value == ColumnStore.NULLHASH;
+                anyNull |= value == ColumnStore.NULLHASH;
                 combinationValues.add(value);
             }
-            if (!allNull) {
+            if (!anyNull) {
                 entry.getValue().add(combinationValues);
             }
         }

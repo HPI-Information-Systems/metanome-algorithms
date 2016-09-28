@@ -1,6 +1,5 @@
 package de.hpi.mpss2015n.approxind;
 
-import de.hpi.mpss2015n.approxind.utils.ColumnStore;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 
 import java.util.List;
@@ -41,9 +40,9 @@ public interface InclusionTester {
     /**
      * If data structures are depending on global properties (size, volume, ...) of the tables, these properties can be extracted here.
      * This method should be called directly after InclusionTester construction, before any other operation.
-     * @param stores File input generators for all tables (in order of table indexes).
+     * @param samples for each table: a list of hashed sample tuples
      */
-    default void initialize(List<List<long[]>> stores){
+    default void initialize(List<List<long[]>> samples){
       // pass
     }
 
