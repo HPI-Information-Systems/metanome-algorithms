@@ -1452,15 +1452,14 @@ public class BINDER {
 					for (int attributeCombinationNumber : table2attributeCombinationNumbers.get(tableIndex)) {
 						AttributeCombination attributeCombination = attributeCombinations.get(attributeCombinationNumber);
 						
-						boolean allNull = true;
+						boolean anyNull = false;
 						List<String> attributeCombinationValues = new ArrayList<String>(attributeCombination.getAttributes().length);
 						for (int attribute : attributeCombination.getAttributes()) {
 							String attributeValue = values.get(attribute - startTableColumnIndex);
-							allNull = allNull && (attributeValue == null);
+							if (anyNull = attributeValue == null) break;
 							attributeCombinationValues.add(attributeValue);
 						}
-						if (allNull)
-							continue;
+						if (anyNull) continue;
 						
 						String value = CollectionUtils.concat(attributeCombinationValues, this.valueSeparator);
 						
