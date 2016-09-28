@@ -26,7 +26,7 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
 
     private String[] tableNames;
 
-    private int inputRowLimit;
+    private boolean isIgnoreNullColumns, isIgnoreConstantColumns;
 
     private boolean detectNary;
 
@@ -36,7 +36,7 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
 
 
     public enum Identifier {
-        INPUT_FILES, INPUT_ROW_LIMIT, DETECT_NARY, HLL_REL_STD_DEV, SAMPLE_GOAL
+        INPUT_FILES, DETECT_NARY, HLL_REL_STD_DEV, SAMPLE_GOAL, IGNORE_NULL, IGNORE_CONSTANT
     }
 
     @Override
@@ -45,9 +45,15 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
 
         configs.add(new ConfigurationRequirementFileInput(Identifier.INPUT_FILES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
 
-        ConfigurationRequirementInteger inputRowlimit = new ConfigurationRequirementInteger(Identifier.INPUT_ROW_LIMIT.name());
-        inputRowlimit.setRequired(false);
-        configs.add(inputRowlimit);
+        ConfigurationRequirementBoolean ignoreNullRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_NULL.name());
+        ignoreNullRequirement.setDefaultValues(new Boolean[] { true });
+        ignoreNullRequirement.setRequired(true);
+        configs.add(ignoreNullRequirement);
+
+        ConfigurationRequirementBoolean ignoreConstantRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_CONSTANT.name());
+        ignoreConstantRequirement.setDefaultValues(new Boolean[] { true });
+        ignoreConstantRequirement.setRequired(true);
+        configs.add(ignoreConstantRequirement);
 
         ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(Identifier.DETECT_NARY.name());
         detectNary.setDefaultValues(new Boolean[]{false});
@@ -74,7 +80,9 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
                 detectNary ? Arity.N_ARY : Arity.UNARY,
                 new IdentityRowSampler(),
                 new HLLInclusionTester(this.hllRelativeStddev),
-                sampleGoal
+                sampleGoal,
+                isIgnoreNullColumns,
+                isIgnoreConstantColumns
         );
         List<InclusionDependency> result = algorithm.execute(fileInputGenerator);
 
@@ -104,11 +112,7 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
 
     @Override
     public void setIntegerConfigurationValue(String identifier, Integer... values) throws AlgorithmConfigurationException {
-        if (Identifier.INPUT_ROW_LIMIT.name().equals(identifier)) {
-            if (values.length > 0)
-                this.inputRowLimit = values[0];
-
-        } else if (Identifier.SAMPLE_GOAL.name().equals(identifier)) {
+        if (Identifier.SAMPLE_GOAL.name().equals(identifier)) {
             Validate.inclusiveBetween(1, 1, values.length);
             this.sampleGoal = values[0];
 
@@ -121,6 +125,10 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
     public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
         if (Identifier.DETECT_NARY.name().equals(identifier)) {
             this.detectNary = values[0];
+        } else if (Identifier.IGNORE_NULL.name().equals(identifier)) {
+            this.isIgnoreNullColumns = values[0];
+        } else if (Identifier.IGNORE_CONSTANT.name().equals(identifier)) {
+            this.isIgnoreConstantColumns = values[0];
         } else {
             this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
         }
