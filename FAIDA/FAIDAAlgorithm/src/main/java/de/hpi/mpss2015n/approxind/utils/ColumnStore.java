@@ -224,7 +224,6 @@ public final class ColumnStore {
     }
 
     private List<long[]> readSample() {
-        List<long[]> result = new ArrayList<>();
         try {
             BufferedReader reader = com.google.common.io.Files.newReader(sampleFile, Charsets.UTF_8);
 
@@ -298,7 +297,7 @@ public final class ColumnStore {
     }
 
     public boolean isNullColumn(int columnIndex) {
-        return isConstantColumn[columnIndex];
+        return isNullColumn[columnIndex];
     }
 }
 
