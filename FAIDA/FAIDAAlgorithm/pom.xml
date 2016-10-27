@@ -25,7 +25,7 @@
                     <archive>
                         <manifestEntries>
                             <Algorithm-Bootstrap-Class>
-                                de.hpi.mpss2015n.approxind.ApproxIndMetanomeFile
+                                de.hpi.mpss2015n.approxind.FAIDAFile
                             </Algorithm-Bootstrap-Class>
                         </manifestEntries>
                     </archive>

@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
-public final class ApproxIndAlgorithm {
+public final class FAIDA {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -29,13 +29,13 @@ public final class ApproxIndAlgorithm {
     private final boolean ignoreAllConstantColumns;
     private final int sampleGoal;
 
-    public ApproxIndAlgorithm(Arity arity, RowSampler sampler, InclusionTester inclusionTester,
-                              int sampleGoal) {
+    public FAIDA(Arity arity, RowSampler sampler, InclusionTester inclusionTester,
+                 int sampleGoal) {
         this(arity, sampler, inclusionTester, sampleGoal, true, true);
     }
 
-    public ApproxIndAlgorithm(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal,
-                              boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns) {
+    public FAIDA(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal,
+                 boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns) {
         this.detectNary = arity == Arity.N_ARY;
         this.sampler = sampler;
         this.inclusionTester = inclusionTester;

@@ -17,7 +17,7 @@ import org.apache.commons.lang3.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm, FileInputParameterAlgorithm,
+public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputParameterAlgorithm,
         BooleanParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm {
 
     private InclusionDependencyResultReceiver resultReceiver;
@@ -76,7 +76,7 @@ public final class ApproxIndMetanomeFile implements InclusionDependencyAlgorithm
     @Override
     public void execute() throws AlgorithmExecutionException {
 
-        ApproxIndAlgorithm algorithm = new ApproxIndAlgorithm(
+        FAIDA algorithm = new FAIDA(
                 detectNary ? Arity.N_ARY : Arity.UNARY,
                 new IdentityRowSampler(),
                 new HLLInclusionTester(this.hllRelativeStddev),

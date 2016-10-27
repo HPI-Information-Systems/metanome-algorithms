@@ -11,7 +11,6 @@ import de.hpi.mpss2015n.approxind.inclusiontester.HLLInclusionTester;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.hpi.mpss2015n.approxind.inclusiontester.HashSetInclusionTester;
 import de.hpi.mpss2015n.approxind.mocks.RelationalInputBuilder;
 import de.hpi.mpss2015n.approxind.sampler.IdentityRowSampler;
 import de.hpi.mpss2015n.approxind.utils.Arity;
@@ -20,10 +19,10 @@ import de.hpi.mpss2015n.approxind.utils.SimpleInd;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 
 //@RunWith(Parameterized.class)
-public class ApproxIndAlgorithmTest {
+public class FAIDATest {
 
     private static final int TABLE = 0;
-    ApproxIndAlgorithm algo;
+    FAIDA algo;
     private static String level;
 
     private InclusionTester t = new HLLInclusionTester(0.001);
@@ -31,7 +30,7 @@ public class ApproxIndAlgorithmTest {
     //private InclusionTester t = new BloomFilterInclusionTester();
 
     // data() Parameters map to these constructor parameter
-//    public ApproxIndAlgorithmTest(InclusionTester t) {
+//    public FAIDATest(InclusionTester t) {
 //        this.t = t;
 //    }
 //
@@ -48,7 +47,7 @@ public class ApproxIndAlgorithmTest {
     @Ignore
     @Test
     public void testExecuteSingleLine() throws Exception {
-        algo = new ApproxIndAlgorithm(Arity.UNARY, new IdentityRowSampler(), t, sampleGoal);
+        algo = new FAIDA(Arity.UNARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
         inputs[0] = new RelationalInputBuilder("testTable")
                 .setHeader("c0", "c1", "c2")
@@ -65,7 +64,7 @@ public class ApproxIndAlgorithmTest {
     @Ignore
     @Test
     public void testExecute() throws Exception {
-        algo = new ApproxIndAlgorithm(Arity.UNARY, new IdentityRowSampler(), t, sampleGoal);
+        algo = new FAIDA(Arity.UNARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
         inputs[0] = new RelationalInputBuilder("testTable")
                 .setHeader("c0", "c1", "c2")
@@ -81,7 +80,7 @@ public class ApproxIndAlgorithmTest {
 
     @Test
     public void testExecuteBinary() throws Exception {
-        algo = new ApproxIndAlgorithm(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
+        algo = new FAIDA(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
         inputs[0] = new RelationalInputBuilder("testTable")
                 .setHeader("c0", "c1", "c2", "c3")
@@ -102,7 +101,7 @@ public class ApproxIndAlgorithmTest {
 
     @Test
     public void testExecuteTrinary() throws Exception {
-        algo = new ApproxIndAlgorithm(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
+        algo = new FAIDA(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
         inputs[0] = new RelationalInputBuilder("testTable")
                 .setHeader("c0", "c1", "c2", "c3", "c4", "c5")
@@ -123,7 +122,7 @@ public class ApproxIndAlgorithmTest {
 
     @Test
     public void testExecuteWdcPlanets() throws Exception {
-        algo = new ApproxIndAlgorithm(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
+        algo = new FAIDA(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
         inputs[0] = new RelationalInputBuilder("planets")
                 .setHeader("Domicile", "Detriment", "Exaltation",   "Fall")
@@ -175,7 +174,7 @@ public class ApproxIndAlgorithmTest {
 
     @Test
     public void testExecuteWdcPlanets2Col() throws Exception {
-        algo = new ApproxIndAlgorithm(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
+        algo = new FAIDA(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
         inputs[0] = new RelationalInputBuilder("planets_2col")
                 .setHeader("Exaltation",   "Fall")
@@ -207,7 +206,7 @@ public class ApproxIndAlgorithmTest {
 
     @Test
     public void testExecuteWdcPlanetsSmall() throws Exception {
-        algo = new ApproxIndAlgorithm(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
+        algo = new FAIDA(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
         inputs[0] = new RelationalInputBuilder("planets_4row")
                 .setHeader("Domicile", "Detriment", "Exaltation",   "Fall")
