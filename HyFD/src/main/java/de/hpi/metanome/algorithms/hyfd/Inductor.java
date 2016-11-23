@@ -55,7 +55,7 @@ public class Inductor {
 	protected int specializePositiveCover(OpenBitSet lhs, int rhs, FDList nonFds) {
 		int numAttributes = this.posCover.getChildren().length;
 		int newFDs = 0;
-		List<OpenBitSet> specLhss = this.posCover.getFdAndGeneralizations(lhs, rhs);
+		List<OpenBitSet> specLhss;
 		
 		if (!(specLhss = this.posCover.getFdAndGeneralizations(lhs, rhs)).isEmpty()) { // TODO: May be "while" instead of "if"?
 			for (OpenBitSet specLhs : specLhss) {
