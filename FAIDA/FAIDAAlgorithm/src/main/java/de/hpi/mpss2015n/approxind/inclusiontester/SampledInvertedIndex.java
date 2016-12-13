@@ -3,13 +3,12 @@ package de.hpi.mpss2015n.approxind.inclusiontester;
 import de.hpi.mpss2015n.approxind.utils.HLL.HLLData;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import de.hpi.mpss2015n.approxind.utils.SimpleInd;
-import de.metanome.algorithm_helper.data_structures.ColumnCombinationBitset;
-import de.metanome.algorithm_integration.ColumnCombination;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * This is an inverted index that maps hash values to the {@link SimpleColumnCombination}s that contain it. However,
@@ -22,6 +21,9 @@ public class SampledInvertedIndex {
     private final Set<SimpleInd> discoveredInds;
 
     private final BitSet seenColumnComboIndices = new BitSet();
+
+    private final Object2BooleanMap<SimpleColumnCombination> isCovered;
+
     /**
      * Indices refer to column combinations that appear in INDs. This field keeps track of the maximum possible
      * column combination index (inclusive).
@@ -31,14 +33,16 @@ public class SampledInvertedIndex {
     public SampledInvertedIndex() {
         invertedIndex = new Long2ObjectOpenHashMap<>();
         discoveredInds = new HashSet<>();
+        isCovered = new Object2BooleanOpenHashMap<>();
+        isCovered.defaultReturnValue(true);
     }
 
-    public void finalizeInsertion(Collection<Map<SimpleColumnCombination, HLLData>> hllsByTable) {
+    public void finalizeInsertion(Collection<? extends Map<SimpleColumnCombination, ?>> hllsByTable) {
         // Initialize a mapping from dependent to referenced column combinations and ind the column combinations.
         Map<SimpleColumnCombination, IntCollection> refByDepColumnCombos = new HashMap<>();
         SimpleColumnCombination[] columnCombinations = new SimpleColumnCombination[maxIndex + 1];
         // Collect all column combinations.
-        for (Map<SimpleColumnCombination, HLLData> hllsByColumnCombo : hllsByTable) {
+        for (Map<SimpleColumnCombination, ?> hllsByColumnCombo : hllsByTable) {
             for (SimpleColumnCombination scc : hllsByColumnCombo.keySet()) {
                 columnCombinations[scc.getIndex()] = scc;
                 refByDepColumnCombos.put(scc, null);
@@ -75,8 +79,9 @@ public class SampledInvertedIndex {
         for (Map.Entry<SimpleColumnCombination, IntCollection> entry : refByDepColumnCombos.entrySet()) {
             SimpleColumnCombination lhs = entry.getKey();
             final IntCollection rhss = entry.getValue();
-            if (rhss == null) continue; // How can this be? If the value is in the sample, we should observe it at least once.
-            for (IntIterator refIter = rhss.iterator(); refIter.hasNext();) {
+            if (rhss == null)
+                continue; // How can this be? If the value is in the sample, we should observe it at least once.
+            for (IntIterator refIter = rhss.iterator(); refIter.hasNext(); ) {
                 final int rhs = refIter.nextInt();
                 discoveredInds.add(new SimpleInd(lhs, columnCombinations[rhs]));
             }
@@ -101,17 +106,20 @@ public class SampledInvertedIndex {
      *
      * @return true if the mapping was successful, which is the case if the {@code longHash} is a valid key in this instance
      */
-    public boolean update(SimpleColumnCombination combination, HLLData hllData, long longHash) {
+    public boolean update(SimpleColumnCombination combination, long longHash) {
         IntSet set = invertedIndex.get(longHash);
 
         if (set == null) {
-            hllData.setBig(true);
+            this.isCovered.put(combination, false);
             return false;
         }
 
         set.add(combination.getIndex());
         return true;
+    }
 
+    public boolean isCovered(SimpleColumnCombination combination) {
+        return this.isCovered.get(combination);
     }
 
     public void setMaxIndex(int maxIndex) {

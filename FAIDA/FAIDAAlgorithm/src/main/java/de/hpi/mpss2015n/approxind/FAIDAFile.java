@@ -2,7 +2,6 @@
 package de.hpi.mpss2015n.approxind;
 
 import com.google.common.base.Joiner;
-import de.hpi.mpss2015n.approxind.inclusiontester.HLLInclusionTester;
 import de.hpi.mpss2015n.approxind.sampler.IdentityRowSampler;
 import de.hpi.mpss2015n.approxind.utils.Arity;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
