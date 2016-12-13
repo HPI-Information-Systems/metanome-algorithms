@@ -1,12 +1,9 @@
-package de.hpi.mpss2015n.approxind.inclusiontester;
+package de.hpi.mpss2015n.approxind.datastructures;
 
-import de.hpi.mpss2015n.approxind.utils.HLL.HLLData;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import de.hpi.mpss2015n.approxind.utils.SimpleInd;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
-import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 
 import java.util.*;
 
@@ -22,7 +19,7 @@ public class SampledInvertedIndex {
 
     private final BitSet seenColumnComboIndices = new BitSet();
 
-    private final Object2BooleanMap<SimpleColumnCombination> isCovered;
+    private final BitSet nonCoveredColumnComboIndices = new BitSet();
 
     /**
      * Indices refer to column combinations that appear in INDs. This field keeps track of the maximum possible
@@ -33,8 +30,6 @@ public class SampledInvertedIndex {
     public SampledInvertedIndex() {
         invertedIndex = new Long2ObjectOpenHashMap<>();
         discoveredInds = new HashSet<>();
-        isCovered = new Object2BooleanOpenHashMap<>();
-        isCovered.defaultReturnValue(true);
     }
 
     public void finalizeInsertion(Collection<? extends Map<SimpleColumnCombination, ?>> hllsByTable) {
@@ -110,7 +105,7 @@ public class SampledInvertedIndex {
         IntSet set = invertedIndex.get(longHash);
 
         if (set == null) {
-            this.isCovered.put(combination, false);
+            this.nonCoveredColumnComboIndices.set(combination.getIndex());
             return false;
         }
 
@@ -119,7 +114,7 @@ public class SampledInvertedIndex {
     }
 
     public boolean isCovered(SimpleColumnCombination combination) {
-        return this.isCovered.get(combination);
+        return !this.nonCoveredColumnComboIndices.get(combination.getIndex());
     }
 
     public void setMaxIndex(int maxIndex) {

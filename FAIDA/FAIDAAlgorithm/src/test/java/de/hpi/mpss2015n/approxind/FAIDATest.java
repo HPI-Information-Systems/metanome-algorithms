@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
+import de.hpi.mpss2015n.approxind.inclusiontester.HLLInclusionTester;
 import org.junit.Ignore;
 import org.junit.Test;
 

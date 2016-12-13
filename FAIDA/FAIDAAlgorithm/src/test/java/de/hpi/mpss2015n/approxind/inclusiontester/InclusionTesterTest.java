@@ -4,7 +4,6 @@ import com.google.common.hash.HashFunction;
 import de.hpi.mpss2015n.approxind.InclusionTester;
 import de.hpi.mpss2015n.approxind.utils.ColumnStore;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -41,7 +40,8 @@ public class InclusionTesterTest {
         return Arrays.asList(new Object[][]{
                 {new HashSetInclusionTester()},
                 {new HLLInclusionTester(0.01)},
-                {new BloomFilterInclusionTester()}
+                {new BloomFilterInclusionTester()},
+                {new BottomKSketchTester(32)}
         });
     }
 
@@ -108,7 +108,6 @@ public class InclusionTesterTest {
         SimpleColumnCombination c30 = SimpleColumnCombination.create(TABLE0, 3, 0);
         SimpleColumnCombination c31 = SimpleColumnCombination.create(TABLE0, 3, 1);
         SimpleColumnCombination c32 = SimpleColumnCombination.create(TABLE0, 3, 2);
-
 
         t.setColumnCombinations(Arrays.asList(c0, c1, c2, c3));
         t.initialize(Collections.singletonList(Collections.singletonList(new long[]{aHash, bHash, cHash, nullHash})));

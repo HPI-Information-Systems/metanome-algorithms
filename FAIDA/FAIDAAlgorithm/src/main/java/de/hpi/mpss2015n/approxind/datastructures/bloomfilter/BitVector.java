@@ -23,4 +23,5 @@ public interface BitVector<T> {
     int next(int i);
 
     int count();
+
 }

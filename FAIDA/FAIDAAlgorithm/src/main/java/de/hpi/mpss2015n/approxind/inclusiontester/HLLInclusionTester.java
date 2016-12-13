@@ -74,6 +74,7 @@ public final class HLLInclusionTester extends CombinedInclusionTester<HLLData> {
 
     //tested to be 25% faster than merging the registerSets
     private boolean isIncluded(HyperLogLog a, HyperLogLog b) {
+        if (a == null) return true; else if (b == null) return false;
         int[] aBits = getRegisterSetBits(a);
         int[] bBits = getRegisterSetBits(b);
         for (int bucket = 0; bucket < bBits.length; ++bucket) {

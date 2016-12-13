@@ -2,6 +2,9 @@
 package de.hpi.mpss2015n.approxind;
 
 import com.google.common.base.Joiner;
+import de.hpi.mpss2015n.approxind.inclusiontester.BloomFilterInclusionTester;
+import de.hpi.mpss2015n.approxind.inclusiontester.BottomKSketchTester;
+import de.hpi.mpss2015n.approxind.inclusiontester.HLLInclusionTester;
 import de.hpi.mpss2015n.approxind.sampler.IdentityRowSampler;
 import de.hpi.mpss2015n.approxind.utils.Arity;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
@@ -14,6 +17,7 @@ import de.metanome.algorithm_integration.results.InclusionDependency;
 import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputParameterAlgorithm,
@@ -29,13 +33,19 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
 
     private boolean detectNary;
 
-    private double hllRelativeStddev;
+    private String approximateTester = APPROXIMATE_TESTERS.get(0);
+
+    private int approximateTesterBytes = 32 * 1024; // 32 KiB
+
+    private static final List<String> APPROXIMATE_TESTERS = Arrays.asList("HLL", "Bloom filter", "Bottom-k sketch");
+
+    private double hllRelativeStddev = 0.01;
 
     private int sampleGoal;
 
 
     public enum Identifier {
-        INPUT_FILES, DETECT_NARY, HLL_REL_STD_DEV, SAMPLE_GOAL, IGNORE_NULL, IGNORE_CONSTANT
+        INPUT_FILES, DETECT_NARY, APPROXIMATE_TESTER, APPROXIMATE_TESTER_BYTES, HLL_REL_STD_DEV, SAMPLE_GOAL, IGNORE_NULL, IGNORE_CONSTANT
     }
 
     @Override
@@ -44,13 +54,27 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
 
         configs.add(new ConfigurationRequirementFileInput(Identifier.INPUT_FILES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
 
+        ConfigurationRequirementString approximateTesterRequirement = new ConfigurationRequirementString(
+                Identifier.APPROXIMATE_TESTER.name()
+        );
+        approximateTesterRequirement.setDefaultValues(new String[]{this.approximateTester});
+        approximateTesterRequirement.setRequired(true);
+        configs.add(approximateTesterRequirement);
+
+        ConfigurationRequirementInteger approximateTesterBytesRequirement = new ConfigurationRequirementInteger(
+                Identifier.APPROXIMATE_TESTER_BYTES.name()
+        );
+        approximateTesterBytesRequirement.setDefaultValues(new Integer[]{this.approximateTesterBytes});
+        approximateTesterBytesRequirement.setRequired(false);
+        configs.add(approximateTesterBytesRequirement);
+
         ConfigurationRequirementBoolean ignoreNullRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_NULL.name());
-        ignoreNullRequirement.setDefaultValues(new Boolean[] { true });
+        ignoreNullRequirement.setDefaultValues(new Boolean[]{true});
         ignoreNullRequirement.setRequired(true);
         configs.add(ignoreNullRequirement);
 
         ConfigurationRequirementBoolean ignoreConstantRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_CONSTANT.name());
-        ignoreConstantRequirement.setDefaultValues(new Boolean[] { true });
+        ignoreConstantRequirement.setDefaultValues(new Boolean[]{true});
         ignoreConstantRequirement.setRequired(true);
         configs.add(ignoreConstantRequirement);
 
@@ -61,7 +85,7 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
 
         ConfigurationRequirementString hllRelativeStandardDeviation = new ConfigurationRequirementString(Identifier.HLL_REL_STD_DEV.name());
         hllRelativeStandardDeviation.setDefaultValues(new String[]{"0.001"});
-        hllRelativeStandardDeviation.setRequired(true);
+        hllRelativeStandardDeviation.setRequired(false);
         configs.add(hllRelativeStandardDeviation);
 
         ConfigurationRequirementInteger sampleGoal = new ConfigurationRequirementInteger(Identifier.SAMPLE_GOAL.name());
@@ -74,11 +98,21 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
 
     @Override
     public void execute() throws AlgorithmExecutionException {
+        InclusionTester inclusionTester;
+        if ("HLL".equalsIgnoreCase(this.approximateTester)) {
+            inclusionTester = new HLLInclusionTester(this.hllRelativeStddev);
+        } else if ("Bloom filter".equalsIgnoreCase(this.approximateTester)) {
+            inclusionTester = new BloomFilterInclusionTester();
+        } else if ("Bottom-k sketch".equalsIgnoreCase(this.approximateTester)) {
+            inclusionTester = new BottomKSketchTester(this.approximateTesterBytes);
+        } else {
+            throw new AlgorithmConfigurationException(String.format("Unknown tester: %s", this.approximateTester));
+        }
 
         FAIDA algorithm = new FAIDA(
                 detectNary ? Arity.N_ARY : Arity.UNARY,
                 new IdentityRowSampler(),
-                new HLLInclusionTester(this.hllRelativeStddev),
+                inclusionTester,
                 sampleGoal,
                 isIgnoreNullColumns,
                 isIgnoreConstantColumns
@@ -114,11 +148,14 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
         if (Identifier.SAMPLE_GOAL.name().equals(identifier)) {
             Validate.inclusiveBetween(1, 1, values.length);
             this.sampleGoal = values[0];
-
+        } else if (Identifier.APPROXIMATE_TESTER_BYTES.name().equals(identifier)) {
+            Validate.inclusiveBetween(1, 1, values.length);
+            this.approximateTesterBytes = values[0];
         } else {
             this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
         }
     }
+
 
     @Override
     public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
@@ -138,6 +175,14 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
         if (Identifier.HLL_REL_STD_DEV.name().equals(identifier)) {
             Validate.inclusiveBetween(1, 1, values.length);
             this.hllRelativeStddev = Double.parseDouble(values[0]);
+        } else if (Identifier.APPROXIMATE_TESTER.name().equals(identifier)) {
+            Validate.inclusiveBetween(1, 1, values.length);
+            this.approximateTester = values[0];
+            if (!APPROXIMATE_TESTERS.contains(this.approximateTester)) {
+                throw new AlgorithmConfigurationException(
+                        String.format("Unknown tester: %s. Choose from %s.", this.approximateTester, APPROXIMATE_TESTERS)
+                );
+            }
         } else {
             this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
         }

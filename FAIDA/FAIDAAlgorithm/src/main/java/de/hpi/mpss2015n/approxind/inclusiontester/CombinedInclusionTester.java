@@ -3,6 +3,7 @@ package de.hpi.mpss2015n.approxind.inclusiontester;
 import de.hpi.mpss2015n.approxind.InclusionTester;
 import de.hpi.mpss2015n.approxind.datastructures.HyperLogLog;
 import de.hpi.mpss2015n.approxind.datastructures.RegisterSet;
+import de.hpi.mpss2015n.approxind.datastructures.SampledInvertedIndex;
 import de.hpi.mpss2015n.approxind.utils.ColumnStore;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;

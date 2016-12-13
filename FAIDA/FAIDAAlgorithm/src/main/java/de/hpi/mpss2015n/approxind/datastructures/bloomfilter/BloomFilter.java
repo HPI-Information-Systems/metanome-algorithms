@@ -4,9 +4,7 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 
 /**
- *
- * @param <E>
- *        Object type that is to be inserted into the Bloom filter.
+ * @param <E> Object type that is to be inserted into the Bloom filter.
  * @author Fabian Tschirschnitz <fatschi@googlemail.com>
  */
 
@@ -43,7 +41,7 @@ public class BloomFilter<E> {
     static final Charset charset = Charset.forName("UTF-8");
 
     public BloomFilter(double falsePositiveProbability, int expectedNumberOfElements, BitVectorFactory factory,
-            byte salt) {
+                       byte salt) {
         int m = getM(falsePositiveProbability, expectedNumberOfElements);
         int k = getK(falsePositiveProbability, expectedNumberOfElements);
         this.bits = factory.createBitVector(m);
@@ -76,7 +74,7 @@ public class BloomFilter<E> {
         this.salt = salt;
     }
 
-    private void add(byte[] bytes) {
+    public void add(byte[] bytes) {
         final int[] hashes = createHashes(bytes, this.k);
         for (final int hash : hashes) {
             this.bits.set(Math.abs(hash % this.bits.size()));
