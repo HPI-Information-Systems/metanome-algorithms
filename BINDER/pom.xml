@@ -23,4 +23,18 @@
     <module>BINDERDatabase</module>
     <module>BINDERFile</module>
   </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>de.metanome</groupId>
+      <artifactId>algorithm_integration</artifactId>
+      <version>1.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>17.0</version>
+    </dependency>
+  </dependencies>
 </project>
