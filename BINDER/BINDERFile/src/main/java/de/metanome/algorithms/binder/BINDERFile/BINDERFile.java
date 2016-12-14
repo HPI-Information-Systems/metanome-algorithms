@@ -105,6 +105,11 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 				this.maxNaryLevel = values[0].intValue();
 			}
 		}
+		else if (Identifier.HASH_CACHE_CAPACITY.name().equals(identifier)) {
+			if (values.length > 0) {
+				this.hashCacheCapacity = values[0].intValue();
+			}
+		}
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}
