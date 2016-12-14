@@ -17,11 +17,13 @@ import de.metanome.algorithms.binder.io.InputIterator;
 import de.metanome.algorithms.binder.io.SqlInputIterator;
 import de.metanome.algorithms.binder.structures.*;
 import de.metanome.algorithms.binder.structures.IntSingleLinkedList.ElementIterator;
+import de.metanome.algorithms.binder.util.LruCache;
 import de.uni_potsdam.hpi.dao.DataAccessObject;
 import de.uni_potsdam.hpi.utils.*;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.apache.lucene.util.OpenBitSet;
+import sun.misc.LRUCache;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -57,6 +59,7 @@ public class BINDER {
     protected long maxMemoryUsage;
     protected Int2ObjectOpenHashMap<List<List<String>>> attribute2subBucketsCache = null;
     protected boolean isUseHashes = false;
+    protected int hashCacheCapacity = 0;
 
     protected int numColumns;
 
@@ -93,7 +96,8 @@ public class BINDER {
 
     protected PruningStatistics pruningStatistics = null;
 
-    HashFunction hashFunction = Hashing.murmur3_128();
+    protected HashFunction hashFunction = Hashing.murmur3_128();
+    protected LruCache<String, String> hashCache;
 
     @Override
     public String toString() {
@@ -323,6 +327,11 @@ public class BINDER {
         for (int column = 0; column < this.numColumns; column++)
             this.columnSizes.add(0);
 
+        // Initialize the hash cache if required.
+        if (this.isUseHashes && this.hashCacheCapacity > 0) {
+            this.hashCache = new LruCache<>(this.hashCacheCapacity);
+        }
+
         for (int tableIndex = 0; tableIndex < this.tableNames.length; tableIndex++) {
             String tableName = this.tableNames[tableIndex];
             int numTableColumns = (this.tableColumnStartIndexes.length > tableIndex + 1) ? this.tableColumnStartIndexes[tableIndex + 1] - this.tableColumnStartIndexes[tableIndex] : this.numColumns - this.tableColumnStartIndexes[tableIndex];
@@ -466,18 +475,25 @@ public class BINDER {
      * @return the hash
      */
     private String hashToAscii(String value) {
-        long hashCode = this.hashFunction.hashString(value, Charsets.UTF_8).asLong();
-        byte[] hashChars = new byte[]{
-                (byte) ((hashCode >> 56) & 0x7f),
-                (byte) ((hashCode >> 48) & 0x7f),
-                (byte) ((hashCode >> 40) & 0x7f),
-                (byte) ((hashCode >> 32) & 0x7f),
-                (byte) ((hashCode >> 24) & 0x7f),
-                (byte) ((hashCode >> 16) & 0x7f),
-                (byte) ((hashCode >> 8) & 0x7f),
-                (byte) (hashCode & 0x7f)
-        };
-        return new String(hashChars, Charsets.UTF_8);
+        // Optimization: Only create the hash value if the hash is "smaller" (in terms of chars) as the
+        // actual value.
+        if (value.length() <= 8) return value;
+        String hash = this.hashCache == null ? null : this.hashCache.get(value);
+        if (hash == null) {
+            long hashCode = this.hashFunction.hashString(value, Charsets.UTF_8).asLong();
+            char[] hashChars = new char[]{
+                    (char) ((hashCode >> 56) & 0x7f),
+                    (char) ((hashCode >> 48) & 0x7f),
+                    (char) ((hashCode >> 40) & 0x7f),
+                    (char) ((hashCode >> 32) & 0x7f),
+                    (char) ((hashCode >> 24) & 0x7f),
+                    (char) ((hashCode >> 16) & 0x7f),
+                    (char) ((hashCode >> 8) & 0x7f),
+                    (char) (hashCode & 0x7f)
+            };
+            if (this.hashCache != null) this.hashCache.put(value, hash = new String(hashChars));
+        }
+        return hash;
     }
 
     /**

@@ -1,6 +1,5 @@
 package de.metanome.algorithms.binder.BINDERFile;
 
-import com.google.common.hash.Hashing;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.algorithm_types.*;
@@ -17,7 +16,8 @@ import java.util.ArrayList;
 public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, FileInputParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
 
 	public enum Identifier {
-		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL, FILTER_KEY_FOREIGNKEYS, USE_HASHES
+		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL, FILTER_KEY_FOREIGNKEYS,
+		USE_HASHES, HASH_CACHE_CAPACITY
 	}
 
 	@Override
@@ -64,9 +64,14 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		configs.add(filterKeyForeignkeys);
 
 		ConfigurationRequirementBoolean useHashes = new ConfigurationRequirementBoolean(Identifier.USE_HASHES.name());
-        useHashes.setDefaultValues(new Boolean[]{this.isUseHashes});
-        useHashes.setRequired(false);
-        configs.add(useHashes);
+		useHashes.setDefaultValues(new Boolean[]{this.isUseHashes});
+		useHashes.setRequired(false);
+		configs.add(useHashes);
+
+		ConfigurationRequirementInteger hashCacheCapacity = new ConfigurationRequirementInteger(Identifier.HASH_CACHE_CAPACITY.name());
+		hashCacheCapacity.setDefaultValues(new Integer[]{this.hashCacheCapacity});
+		hashCacheCapacity.setRequired(false);
+		configs.add(hashCacheCapacity);
 
         return configs;
 	}
