@@ -2,8 +2,10 @@
 package de.hpi.mpss2015n.approxind;
 
 import com.google.common.base.Joiner;
+import de.hpi.mpss2015n.approxind.datastructures.HyperLogLog;
 import de.hpi.mpss2015n.approxind.inclusiontester.BloomFilterInclusionTester;
 import de.hpi.mpss2015n.approxind.inclusiontester.BottomKSketchTester;
+import de.hpi.mpss2015n.approxind.inclusiontester.CombinedHashSetInclusionTester;
 import de.hpi.mpss2015n.approxind.inclusiontester.HLLInclusionTester;
 import de.hpi.mpss2015n.approxind.sampler.IdentityRowSampler;
 import de.hpi.mpss2015n.approxind.utils.Arity;
@@ -29,23 +31,26 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
 
     private String[] tableNames;
 
-    private boolean isIgnoreNullColumns, isIgnoreConstantColumns;
+    private boolean isIgnoreNullColumns = true, isIgnoreConstantColumns = true;
 
-    private boolean detectNary;
+    private boolean detectNary = true;
 
     private String approximateTester = APPROXIMATE_TESTERS.get(0);
 
     private int approximateTesterBytes = 32 * 1024; // 32 KiB
 
-    private static final List<String> APPROXIMATE_TESTERS = Arrays.asList("HLL", "Bloom filter", "Bottom-k sketch");
+    private static final List<String> APPROXIMATE_TESTERS = Arrays.asList(
+            "HLL", "Bloom filter", "Bottom-k sketch", "Hash set"
+    );
 
     private double hllRelativeStddev = 0.01;
 
-    private int sampleGoal;
+    private int sampleGoal = 500;
 
 
     public enum Identifier {
-        INPUT_FILES, DETECT_NARY, APPROXIMATE_TESTER, APPROXIMATE_TESTER_BYTES, HLL_REL_STD_DEV, SAMPLE_GOAL, IGNORE_NULL, IGNORE_CONSTANT
+        INPUT_FILES, DETECT_NARY, APPROXIMATE_TESTER, APPROXIMATE_TESTER_BYTES, HLL_REL_STD_DEV, SAMPLE_GOAL,
+        IGNORE_NULL, IGNORE_CONSTANT
     }
 
     @Override
@@ -69,27 +74,27 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
         configs.add(approximateTesterBytesRequirement);
 
         ConfigurationRequirementBoolean ignoreNullRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_NULL.name());
-        ignoreNullRequirement.setDefaultValues(new Boolean[]{true});
+        ignoreNullRequirement.setDefaultValues(new Boolean[]{this.isIgnoreNullColumns});
         ignoreNullRequirement.setRequired(true);
         configs.add(ignoreNullRequirement);
 
         ConfigurationRequirementBoolean ignoreConstantRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_CONSTANT.name());
-        ignoreConstantRequirement.setDefaultValues(new Boolean[]{true});
+        ignoreConstantRequirement.setDefaultValues(new Boolean[]{this.isIgnoreConstantColumns});
         ignoreConstantRequirement.setRequired(true);
         configs.add(ignoreConstantRequirement);
 
         ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(Identifier.DETECT_NARY.name());
-        detectNary.setDefaultValues(new Boolean[]{false});
+        detectNary.setDefaultValues(new Boolean[]{this.detectNary});
         detectNary.setRequired(true);
         configs.add(detectNary);
 
         ConfigurationRequirementString hllRelativeStandardDeviation = new ConfigurationRequirementString(Identifier.HLL_REL_STD_DEV.name());
-        hllRelativeStandardDeviation.setDefaultValues(new String[]{"0.001"});
+        hllRelativeStandardDeviation.setDefaultValues(new String[]{Double.toString(this.hllRelativeStddev)});
         hllRelativeStandardDeviation.setRequired(false);
         configs.add(hllRelativeStandardDeviation);
 
         ConfigurationRequirementInteger sampleGoal = new ConfigurationRequirementInteger(Identifier.SAMPLE_GOAL.name());
-        sampleGoal.setDefaultValues(new Integer[]{500});
+        sampleGoal.setDefaultValues(new Integer[]{this.sampleGoal});
         sampleGoal.setRequired(true);
         configs.add(sampleGoal);
 
@@ -101,10 +106,15 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
         InclusionTester inclusionTester;
         if ("HLL".equalsIgnoreCase(this.approximateTester)) {
             inclusionTester = new HLLInclusionTester(this.hllRelativeStddev);
+            System.out.printf("HLL with relative stddev of %.4f needs %,d bytes.\n",
+                    this.hllRelativeStddev,
+                    HyperLogLog.getRequiredCapacityInBytes(this.hllRelativeStddev));
         } else if ("Bloom filter".equalsIgnoreCase(this.approximateTester)) {
             inclusionTester = new BloomFilterInclusionTester(this.approximateTesterBytes);
         } else if ("Bottom-k sketch".equalsIgnoreCase(this.approximateTester)) {
             inclusionTester = new BottomKSketchTester(this.approximateTesterBytes);
+        } else if ("Hash set".equalsIgnoreCase(this.approximateTester)) {
+            inclusionTester = new CombinedHashSetInclusionTester();
         } else {
             throw new AlgorithmConfigurationException(String.format("Unknown tester: %s", this.approximateTester));
         }

@@ -1,11 +1,11 @@
 package de.hpi.mpss2015n.approxind.utils;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Verify;
 import com.google.common.primitives.Ints;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Objects;
 
 public final class SimpleColumnCombination implements Comparable<SimpleColumnCombination> {
@@ -50,9 +50,9 @@ public final class SimpleColumnCombination implements Comparable<SimpleColumnCom
     }
 
     public SimpleColumnCombination flipOff(int position) {
-        int[] newColumns = new int[columns.length -1];
+        int[] newColumns = new int[columns.length - 1];
         System.arraycopy(columns, 0, newColumns, 0, position);
-        System.arraycopy(columns, position+1, newColumns, position, columns.length-position-1);
+        System.arraycopy(columns, position + 1, newColumns, position, columns.length - position - 1);
         return new SimpleColumnCombination(table, newColumns);
     }
 
@@ -77,9 +77,18 @@ public final class SimpleColumnCombination implements Comparable<SimpleColumnCom
         return true;
     }
 
-    public SimpleColumnCombination combineWith(SimpleColumnCombination other) {
+    public SimpleColumnCombination combineWith(SimpleColumnCombination other, Map<SimpleColumnCombination, SimpleColumnCombination> columnCombinations) {
         Verify.verify(table == other.table, "only merge inside a table");
-        return new SimpleColumnCombination(table, columns, other.lastColumn());
+        SimpleColumnCombination combinedCombination = new SimpleColumnCombination(table, columns, other.lastColumn());
+        if (columnCombinations != null) {
+            SimpleColumnCombination existingCombination = columnCombinations.get(combinedCombination);
+            if (existingCombination == null) {
+                columnCombinations.put(combinedCombination, combinedCombination);
+            } else {
+                combinedCombination = existingCombination;
+            }
+        }
+        return combinedCombination;
     }
 
     public int lastColumn() {
@@ -108,12 +117,10 @@ public final class SimpleColumnCombination implements Comparable<SimpleColumnCom
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("table", table)
-                .add("columns", Arrays.toString(columns)).toString();
+        return String.valueOf(this.table) + "." + Arrays.toString(this.columns);
     }
 
-    public int getIndex() {
+    public int setIndex() {
         return index;
     }
 

@@ -1,9 +1,10 @@
 package de.hpi.mpss2015n.approxind.utils;
 
-import java.util.Objects;
-
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ComparisonChain;
+import de.metanome.algorithm_integration.ColumnCombination;
+
+import java.util.Map;
+import java.util.Objects;
 
 public final class SimpleInd implements Comparable<SimpleInd> {
     public final SimpleColumnCombination left;
@@ -27,8 +28,12 @@ public final class SimpleInd implements Comparable<SimpleInd> {
     }
 
     public SimpleInd combineWith(SimpleInd other) {
-        SimpleColumnCombination newLeft = left.combineWith(other.left);
-        SimpleColumnCombination newRight = right.combineWith(other.right);
+        return combineWith(other, null);
+    }
+
+    public SimpleInd combineWith(SimpleInd other, Map<SimpleColumnCombination, SimpleColumnCombination> columnCombinations) {
+        SimpleColumnCombination newLeft = left.combineWith(other.left, columnCombinations);
+        SimpleColumnCombination newRight = right.combineWith(other.right, columnCombinations);
         return new SimpleInd(newLeft, newRight);
     }
 
@@ -47,16 +52,14 @@ public final class SimpleInd implements Comparable<SimpleInd> {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("left", left)
-                .add("right", right).toString();
+        return String.format("%s < %s", this.left, this.right);
     }
+
 
     @Override
     public int compareTo(SimpleInd o) {
         return ComparisonChain.start().compare(left, o.left).compare(right, o.right).result();
     }
-
 
     /**
      * Create a builder for a new SimpleInd.

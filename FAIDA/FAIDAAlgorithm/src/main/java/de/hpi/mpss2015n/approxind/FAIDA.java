@@ -50,6 +50,10 @@ public final class FAIDA {
         IndConverter converter = new IndConverter(fileInputGenerators);
         List<SimpleInd> result = executeInternal(fileInputGenerators);
         logger.info("Result size: {}", result.size());
+        logger.info("Certain checks: {}, uncertain checks: {}",
+                this.inclusionTester.getNumCertainChecks(),
+                this.inclusionTester.getNumUnertainChecks()
+        );
 
         int i = 0;
         String[] tableNames = new String[fileInputGenerators.length];
@@ -179,19 +183,22 @@ public final class FAIDA {
      */
     public List<SimpleColumnCombination> createUnaryColumnCombinations(ColumnStore[] stores) {
         List<SimpleColumnCombination> combinations = new ArrayList<>();
-        for (int i = 0; i < stores.length; i++) {
-            final ColumnStore store = stores[i];
+        int index = 0;
+        for (int table = 0; table < stores.length; table++) {
+            final ColumnStore store = stores[table];
             int numColumns = store.getNumberOfColumns();
 
-            for (int j = 0; j < numColumns; j++) {
-                if (ignoreAllConstantColumns && store.isConstantColumn(j)) {
+            for (int column = 0; column < numColumns; column++) {
+                if (ignoreAllConstantColumns && store.isConstantColumn(column)) {
                     continue;
                 }
-                if (ignoreNullValueColumns && store.isNullColumn(j)) {
+                if (ignoreNullValueColumns && store.isNullColumn(column)) {
                     continue;
                 }
 
-                combinations.add(SimpleColumnCombination.create(i, j));
+                SimpleColumnCombination combination = SimpleColumnCombination.create(table, column);
+                combination.setIndex(index);
+                combinations.add(combination);
             }
         }
         return combinations;

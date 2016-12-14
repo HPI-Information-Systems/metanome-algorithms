@@ -2,7 +2,6 @@ package de.hpi.mpss2015n.approxind.inclusiontester;
 
 import de.hpi.mpss2015n.approxind.InclusionTester;
 import de.hpi.mpss2015n.approxind.datastructures.HyperLogLog;
-import de.hpi.mpss2015n.approxind.datastructures.RegisterSet;
 import de.hpi.mpss2015n.approxind.datastructures.SampledInvertedIndex;
 import de.hpi.mpss2015n.approxind.utils.ColumnStore;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
@@ -38,6 +37,11 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
      */
     private Map.Entry<SimpleColumnCombination, AD>[] adByTableArray;
 
+    /**
+     * Keeps track of how we answer the various IND queries.
+     */
+    private int numCertainChecks = 0, numUncertainChecks = 0;
+
 
     public CombinedInclusionTester() {
         sampledInvertedIndex = new SampledInvertedIndex();
@@ -70,7 +74,7 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
         for (int i = 0; i < combinations.size(); i++) {
             combinations.get(i).setIndex(i);
         }
-        sampledInvertedIndex.setMaxIndex(combinations.size() - 1);
+        sampledInvertedIndex.setMaxId(combinations.size() - 1);
 
         // Now create according hashes from the table samples and initialize the inverted index with them.
         LongList samples = new LongArrayList();
@@ -116,7 +120,9 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
             int[] columns = combination.getColumns();
             for (int i = 0; i < columns.length; i++) {
                 long hash = values[columns[i]];
-                if (hash == ColumnStore.NULLHASH) continue ColumnCombinations;
+                if (hash == ColumnStore.NULLHASH) {
+                    continue ColumnCombinations;
+                }
                 combinedHash = Long.rotateLeft(combinedHash, 1) ^ hash;
             }
 
@@ -131,13 +137,18 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
 
     @Override
     public boolean isIncludedIn(SimpleColumnCombination a, SimpleColumnCombination b) {
-        //In case combination was removes - Todo: test if ind is valid based on generated ind cover
+        // Test if ind is valid based on the generated IND cover.
         if (!adByTable.get(a.getTable()).containsKey(a) || !adByTable.get(b.getTable()).containsKey(b)) {
-            return false;
+            throw new IllegalArgumentException(String.format("%s < %b is not a candidate.", a, b));
         }
 
         boolean isACovered = this.sampledInvertedIndex.isCovered(a);
         boolean isBCovered = this.sampledInvertedIndex.isCovered(b);
+        if (isACovered || isBCovered) {
+            this.numCertainChecks++;
+        } else {
+            this.numUncertainChecks++;
+        }
 
         if (!isACovered && isBCovered) {
             return false;
@@ -159,24 +170,6 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
         return hll.registerSet().readOnlyBits();
     }
 
-    //tested to be 25% faster than merging the registerSets
-    private boolean isIncluded(HyperLogLog a, HyperLogLog b) {
-        int[] aBits = getRegisterSetBits(a);
-        int[] bBits = getRegisterSetBits(b);
-        for (int bucket = 0; bucket < bBits.length; ++bucket) {
-            int aBit = aBits[bucket];
-            int bBit = bBits[bucket];
-            for (int j = 0; j < RegisterSet.LOG2_BITS_PER_WORD; ++j) {
-                int mask = 31 << (RegisterSet.REGISTER_SIZE * j);
-                int aVal = aBit & mask;
-                int bVal = bBit & mask;
-                if (bVal < aVal) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -185,4 +178,18 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
         adByTableArray = set.toArray(new Map.Entry[set.size()]);
     }
 
+    @Override
+    public int getNumCertainChecks() {
+        return this.numCertainChecks;
+    }
+
+    @Override
+    public int getNumUnertainChecks() {
+        return this.numUncertainChecks;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }

@@ -1,20 +1,11 @@
 package de.hpi.mpss2015n.approxind.inclusiontester;
 
-import com.google.common.base.MoreObjects;
-import de.hpi.mpss2015n.approxind.InclusionTester;
 import de.hpi.mpss2015n.approxind.datastructures.HyperLogLog;
 import de.hpi.mpss2015n.approxind.datastructures.RegisterSet;
-import de.hpi.mpss2015n.approxind.utils.ColumnStore;
 import de.hpi.mpss2015n.approxind.utils.HLL.HLLData;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-import it.unimi.dsi.fastutil.longs.LongList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -74,7 +65,8 @@ public final class HLLInclusionTester extends CombinedInclusionTester<HLLData> {
 
     //tested to be 25% faster than merging the registerSets
     private boolean isIncluded(HyperLogLog a, HyperLogLog b) {
-        if (a == null) return true; else if (b == null) return false;
+        if (a == null) return true;
+        else if (b == null) return false;
         int[] aBits = getRegisterSetBits(a);
         int[] bBits = getRegisterSetBits(b);
         for (int bucket = 0; bucket < bBits.length; ++bucket) {
@@ -90,11 +82,6 @@ public final class HLLInclusionTester extends CombinedInclusionTester<HLLData> {
             }
         }
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(getClass()).add("error", error).toString();
     }
 
 }

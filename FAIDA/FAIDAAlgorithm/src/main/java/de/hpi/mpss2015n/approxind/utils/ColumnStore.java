@@ -146,7 +146,7 @@ public final class ColumnStore {
         List<List<String>> alternativeSamples = new ArrayList<>();
         final List<LongSet> sampledColumnValues = new ArrayList<>();
         for (int i = 0; i < columnFiles.length; i++) {
-            sampledColumnValues.add(new LongOpenHashSet(this.sampleGoal));
+            sampledColumnValues.add(new LongOpenHashSet(this.sampleGoal < 0 ? 1000 : this.sampleGoal));
         }
         Long[] firstColumnValues = new Long[columnFiles.length];
 
@@ -177,7 +177,7 @@ public final class ColumnStore {
                 // Check if the value requests to put the row into the sample.
                 if (hash != NULLHASH) {
                     final LongSet sampledValues = sampledColumnValues.get(i);
-                    if (sampledValues.size() < this.sampleGoal && sampledValues.add(hash)) {
+                    if ((this.sampleGoal < 0 || sampledValues.size() < this.sampleGoal) && sampledValues.add(hash)) {
                         rowHasUnseenValue = true;
                     }
                 }
@@ -246,12 +246,13 @@ public final class ColumnStore {
 
     private long getHash(String string, int column) {
         AOCacheMap<String, Long> hashCache = hashCaches.get(column);
-        if (string == null) {
+        if (string == null || string.isEmpty()) {
             return NULLHASH;
         } else {
             Long hash = hashCache.get(string);
             if (hash == null) {
                 long h = HASH_FUNCTION.hashString(string, Charsets.UTF_8).asLong();
+                if (h == NULLHASH) h = NULLHASH + 1; // avoid this very hash collision as NULLHASH has specific implications
                 if (hashCache.size() < CACHE_THRESHOLD) {
                     hashCache.put(string, h);
                 }
