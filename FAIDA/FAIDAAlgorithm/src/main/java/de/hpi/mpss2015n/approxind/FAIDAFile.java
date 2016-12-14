@@ -102,7 +102,7 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
         if ("HLL".equalsIgnoreCase(this.approximateTester)) {
             inclusionTester = new HLLInclusionTester(this.hllRelativeStddev);
         } else if ("Bloom filter".equalsIgnoreCase(this.approximateTester)) {
-            inclusionTester = new BloomFilterInclusionTester();
+            inclusionTester = new BloomFilterInclusionTester(this.approximateTesterBytes);
         } else if ("Bottom-k sketch".equalsIgnoreCase(this.approximateTester)) {
             inclusionTester = new BottomKSketchTester(this.approximateTesterBytes);
         } else {

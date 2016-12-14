@@ -40,7 +40,7 @@ public class InclusionTesterTest {
         return Arrays.asList(new Object[][]{
                 {new HashSetInclusionTester()},
                 {new HLLInclusionTester(0.01)},
-                {new BloomFilterInclusionTester()},
+                {new BloomFilterInclusionTester(32)},
                 {new BottomKSketchTester(32)}
         });
     }
