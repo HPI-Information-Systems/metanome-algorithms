@@ -136,14 +136,14 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
     protected abstract void insertRowIntoAD(SimpleColumnCombination combination, long hash, AD value);
 
     @Override
-    public boolean isIncludedIn(SimpleColumnCombination a, SimpleColumnCombination b) {
+    public boolean isIncludedIn(SimpleColumnCombination ref, SimpleColumnCombination dep) {
         // Test if ind is valid based on the generated IND cover.
-        if (!adByTable.get(a.getTable()).containsKey(a) || !adByTable.get(b.getTable()).containsKey(b)) {
-            throw new IllegalArgumentException(String.format("%s < %b is not a candidate.", a, b));
+        if (!adByTable.get(ref.getTable()).containsKey(ref) || !adByTable.get(dep.getTable()).containsKey(dep)) {
+            throw new IllegalArgumentException(String.format("%s < %s is not a candidate.", ref, dep));
         }
 
-        boolean isACovered = this.sampledInvertedIndex.isCovered(a);
-        boolean isBCovered = this.sampledInvertedIndex.isCovered(b);
+        boolean isACovered = this.sampledInvertedIndex.isCovered(ref);
+        boolean isBCovered = this.sampledInvertedIndex.isCovered(dep);
         if (isACovered || isBCovered) {
             this.numCertainChecks++;
         } else {
@@ -152,16 +152,18 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
 
         if (!isACovered && isBCovered) {
             return false;
-        } else {
-            AD adA = adByTable.get(a.getTable()).get(a);
-            AD adB = adByTable.get(b.getTable()).get(b);
-
-            if (!this.testWithAds(adA, adB)) {
-                return false;
-            }
+        } else if (!sampledInvertedIndex.isIncludedIn(ref, dep)) {
+            return false;
         }
 
-        return sampledInvertedIndex.isIncludedIn(a, b);
+        return isACovered || this.testWithAds(ref, dep);
+    }
+
+    private boolean testWithAds(SimpleColumnCombination dep, SimpleColumnCombination ref) {
+        return this.testWithAds(
+                adByTable.get(dep.getTable()).get(dep),
+                adByTable.get(ref.getTable()).get(ref)
+        );
     }
 
     protected abstract boolean testWithAds(AD adA, AD adB);

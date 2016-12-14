@@ -24,7 +24,7 @@ public final class BottomKSketchTester extends CombinedInclusionTester<BottomKSk
 
     @Override
     protected boolean testWithAds(BottomKSketch bottomKSketch1, BottomKSketch bottomKSketch2) {
-        return bottomKSketch2.containsAll(bottomKSketch1);
+        return bottomKSketch2.dominates(bottomKSketch1);
     }
 
 }
