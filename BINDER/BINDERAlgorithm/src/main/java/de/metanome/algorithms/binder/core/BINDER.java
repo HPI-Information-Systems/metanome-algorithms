@@ -491,7 +491,8 @@ public class BINDER {
                     (char) ((hashCode >> 8) & 0x7f),
                     (char) (hashCode & 0x7f)
             };
-            if (this.hashCache != null) this.hashCache.put(value, hash = new String(hashChars));
+            hash = new String(hashChars);
+            if (this.hashCache != null) this.hashCache.put(value, hash);
         }
         return hash;
     }
