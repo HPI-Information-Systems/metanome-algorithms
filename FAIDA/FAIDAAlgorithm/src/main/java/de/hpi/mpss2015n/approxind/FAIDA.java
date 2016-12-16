@@ -27,16 +27,17 @@ public final class FAIDA {
     private final CandidateGenerator candidateLogic;
     private final boolean ignoreNullValueColumns;
     private final boolean ignoreAllConstantColumns;
+    private final boolean isCombineNull;
     private final boolean isReuseColumnStore;
     private final int sampleGoal;
 
     public FAIDA(Arity arity, RowSampler sampler, InclusionTester inclusionTester,
                  int sampleGoal) {
-        this(arity, sampler, inclusionTester, sampleGoal, true, true, false);
+        this(arity, sampler, inclusionTester, sampleGoal, true, true, true, false);
     }
 
     public FAIDA(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal,
-                 boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns, boolean isReuseColumnStore) {
+                 boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns, boolean isCombineNull, boolean isReuseColumnStore) {
         this.detectNary = arity == Arity.N_ARY;
         this.sampler = sampler;
         this.inclusionTester = inclusionTester;
@@ -44,6 +45,7 @@ public final class FAIDA {
         this.sampleGoal = sampleGoal;
         this.ignoreNullValueColumns = ignoreNullValueColumns;
         this.ignoreAllConstantColumns = ignoreAllConstantColumns;
+        this.isCombineNull = isCombineNull;
         this.isReuseColumnStore = isReuseColumnStore;
     }
 
@@ -104,7 +106,7 @@ public final class FAIDA {
             while (lastResult.size() > 0) {
                 arity++;
                 logger.info("Creating {}-ary IND candidates.", arity);
-                candidates = candidateLogic.createCombinedCandidates(lastResult);
+                candidates = candidateLogic.createCombinedCandidates(lastResult, isCombineNull, stores);
                 if (candidates.isEmpty()) {
                     logger.info("no more candidates for next level!");
                     break;

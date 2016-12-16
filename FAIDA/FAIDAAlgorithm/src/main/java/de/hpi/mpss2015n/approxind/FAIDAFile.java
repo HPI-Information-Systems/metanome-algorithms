@@ -31,7 +31,7 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
 
     private String[] tableNames;
 
-    private boolean isIgnoreNullColumns = true, isIgnoreConstantColumns = true;
+    private boolean isIgnoreNullColumns = true, isIgnoreConstantColumns = true, isCombineNull = true;
 
     private boolean detectNary = true;
 
@@ -52,7 +52,7 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
 
     public enum Identifier {
         INPUT_FILES, DETECT_NARY, APPROXIMATE_TESTER, APPROXIMATE_TESTER_BYTES, HLL_REL_STD_DEV, SAMPLE_GOAL,
-        IGNORE_NULL, IGNORE_CONSTANT, REUSE_COLUMN_STORE
+        IGNORE_NULL, IGNORE_CONSTANT, REUSE_COLUMN_STORE, COMBINE_NULL
     }
 
     @Override
@@ -79,6 +79,11 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
         ignoreNullRequirement.setDefaultValues(new Boolean[]{this.isIgnoreNullColumns});
         ignoreNullRequirement.setRequired(true);
         configs.add(ignoreNullRequirement);
+
+        ConfigurationRequirementBoolean combineNullRequirement = new ConfigurationRequirementBoolean(Identifier.COMBINE_NULL.name());
+        ignoreNullRequirement.setDefaultValues(new Boolean[]{this.isCombineNull});
+        ignoreNullRequirement.setRequired(true);
+        configs.add(combineNullRequirement);
 
         ConfigurationRequirementBoolean ignoreConstantRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_CONSTANT.name());
         ignoreConstantRequirement.setDefaultValues(new Boolean[]{this.isIgnoreConstantColumns});
@@ -133,6 +138,7 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
                 sampleGoal,
                 isIgnoreNullColumns,
                 isIgnoreConstantColumns,
+                isCombineNull,
                 isReuseColumnStore
         );
         List<InclusionDependency> result = algorithm.execute(fileInputGenerator);
@@ -181,6 +187,8 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
             this.detectNary = values[0];
         } else if (Identifier.IGNORE_NULL.name().equals(identifier)) {
             this.isIgnoreNullColumns = values[0];
+        } else if (Identifier.COMBINE_NULL.name().equals(identifier)) {
+            this.isCombineNull = values[0];
         } else if (Identifier.IGNORE_CONSTANT.name().equals(identifier)) {
             this.isIgnoreConstantColumns = values[0];
         } else if (Identifier.REUSE_COLUMN_STORE.name().equals(identifier)) {

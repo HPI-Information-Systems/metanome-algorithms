@@ -2,16 +2,32 @@ package de.hpi.mpss2015n.approxind.utils;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class CandidateGenerator {
 
 
-    public List<SimpleInd> createCombinedCandidates(List<SimpleInd> inds) {
+    public List<SimpleInd> createCombinedCandidates(List<SimpleInd> inds, boolean isCombineNull, ColumnStore[] stores) {
         Map<SimpleColumnCombination, SimpleColumnCombination> columnCombinations = new HashMap<>();
+
+        // Check that we are not merging NULL columns if this is not desired (cf. BINDER).
+        // The slight difference with ignoring NULL columns is that we still consider them for unary INDs.
+        if (!isCombineNull) {
+            inds = inds.stream()
+                    .filter(ind -> {
+                        ColumnStore store = stores[ind.left.getTable()];
+                        for (int column : ind.left.getColumns()) {
+                            if (store.isNullColumn(column)) return false;
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
+
 
         List<SimpleInd> newIndCandidates = new ArrayList<>();
         HashSet<SimpleInd> lastResults = new HashSet<>(inds);
-        Collections.sort(inds, SimpleInd.prefixBlockComparator);
+        inds.sort(SimpleInd.prefixBlockComparator);
         for (int i = 0; i < inds.size(); i++) {
             SimpleInd a = inds.get(i);
 
@@ -28,14 +44,16 @@ public final class CandidateGenerator {
 
                 // Combine the two INDs and test them.
                 SimpleInd newCandidate = a.combineWith(b, columnCombinations);
-                if (isPotentiallyValid(newCandidate, lastResults)) newIndCandidates.add(newCandidate);
+                if (isPotentiallyValid(newCandidate, lastResults, isCombineNull, stores)) {
+                    newIndCandidates.add(newCandidate);
+                }
 
             }
         }
         return newIndCandidates;
     }
 
-    private boolean isPotentiallyValid(SimpleInd newCandidate, HashSet<SimpleInd> lastResults) {
+    private boolean isPotentiallyValid(SimpleInd newCandidate, HashSet<SimpleInd> lastResults, boolean isCombineNull, ColumnStore[] stores) {
         //only allow each column once in LHS and RHS - comment out in case this is not desired!
         if (newCandidate.left.getTable() == newCandidate.right.getTable()) {
             for (int i : newCandidate.left.getColumns()) {
