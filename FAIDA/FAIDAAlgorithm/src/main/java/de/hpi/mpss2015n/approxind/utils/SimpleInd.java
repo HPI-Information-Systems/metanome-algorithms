@@ -1,12 +1,42 @@
 package de.hpi.mpss2015n.approxind.utils;
 
 import com.google.common.collect.ComparisonChain;
-import de.metanome.algorithm_integration.ColumnCombination;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 
 public final class SimpleInd implements Comparable<SimpleInd> {
+
+    /**
+     * Orders INDs (1) by their prefix, (2) their LHS suffix, and (3) finally by their RHS suffix.
+     */
+    public static Comparator<SimpleInd> prefixBlockComparator = new Comparator<SimpleInd>() {
+        @Override
+        public int compare(SimpleInd ind1, SimpleInd ind2) {
+            // Sort by tables first.
+            int diff = Integer.compare(ind1.left.getTable(), ind2.left.getTable());
+            if (diff != 0) return diff;
+            diff = Integer.compare(ind1.right.getTable(), ind2.right.getTable());
+            if (diff != 0) return diff;
+
+            // Sort alternatingly on the columns of the LHS and RHS.
+            assert ind1.getArity() == ind2.getArity();
+            int prefixLength = ind1.getArity() - 1;
+            for (int i = 0; i < prefixLength; i++) {
+                diff = Integer.compare(ind1.left.getColumn(i), ind2.left.getColumn(i));
+                if (diff != 0) return diff;
+
+                diff = Integer.compare(ind1.right.getColumn(i), ind2.right.getColumn(i));
+                if (diff != 0) return diff;
+            }
+            diff = Integer.compare(ind1.left.getColumn(prefixLength), ind2.left.getColumn(prefixLength));
+            if (diff != 0) return diff;
+
+            return Integer.compare(ind1.right.getColumn(prefixLength), ind2.right.getColumn(prefixLength));
+        }
+    };
+
     public final SimpleColumnCombination left;
     public final SimpleColumnCombination right;
 
@@ -67,6 +97,10 @@ public final class SimpleInd implements Comparable<SimpleInd> {
      */
     public static SimpleIndBuilder left(int ltable, int... lcolumns) {
         return new SimpleIndBuilder(ltable, lcolumns);
+    }
+
+    public int getArity() {
+        return this.left.getColumns().length;
     }
 
     public static class SimpleIndBuilder {

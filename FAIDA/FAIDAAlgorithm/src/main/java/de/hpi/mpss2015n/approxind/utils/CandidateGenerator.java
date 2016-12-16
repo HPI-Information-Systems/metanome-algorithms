@@ -9,24 +9,30 @@ public final class CandidateGenerator {
     public List<SimpleInd> createCombinedCandidates(List<SimpleInd> inds) {
         Map<SimpleColumnCombination, SimpleColumnCombination> columnCombinations = new HashMap<>();
 
-        List<SimpleInd> newInds = new ArrayList<>();
+        List<SimpleInd> newIndCandidates = new ArrayList<>();
         HashSet<SimpleInd> lastResults = new HashSet<>(inds);
-        Collections.sort(inds);
+        Collections.sort(inds, SimpleInd.prefixBlockComparator);
         for (int i = 0; i < inds.size(); i++) {
+            SimpleInd a = inds.get(i);
+
             for (int j = i + 1; j < inds.size(); j++) {
-                SimpleInd a = inds.get(i);
                 SimpleInd b = inds.get(j);
-                if (a.left.lastColumn() == b.left.lastColumn()) {
-                    continue; //otherwise symbol in planets everywhere...
+
+                // Check if LHS(a) and LHS(b) belong to the same prefix block.
+                if (!a.left.startsWith(b.left) || !a.right.startsWith(b.right)) break;
+
+                // Skip over completely equal LHS or RHS.
+                if (a.left.lastColumn() == b.left.lastColumn() || a.right.lastColumn() == b.right.lastColumn()) {
+                    continue;
                 }
-                if (a.startsWith(b) && a.right.lastColumn() != b.right.lastColumn()) {
-                    SimpleInd newCandidate = a.combineWith(b, columnCombinations);
-                    if (isPotentiallyValid(newCandidate, lastResults)) newInds.add(newCandidate);
-                }
-                //Todo: why wrong result when break ... sorting problem?
+
+                // Combine the two INDs and test them.
+                SimpleInd newCandidate = a.combineWith(b, columnCombinations);
+                if (isPotentiallyValid(newCandidate, lastResults)) newIndCandidates.add(newCandidate);
+
             }
         }
-        return newInds;
+        return newIndCandidates;
     }
 
     private boolean isPotentiallyValid(SimpleInd newCandidate, HashSet<SimpleInd> lastResults) {

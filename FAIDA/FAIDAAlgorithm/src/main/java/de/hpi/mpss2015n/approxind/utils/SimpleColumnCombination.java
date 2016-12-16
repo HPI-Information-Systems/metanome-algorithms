@@ -60,6 +60,10 @@ public final class SimpleColumnCombination implements Comparable<SimpleColumnCom
         return table;
     }
 
+    public int getColumn(int index) {
+        return this.columns[index];
+    }
+
     public int[] getColumns() {
         return columns;
     }
