@@ -39,6 +39,7 @@ public class InclusionTesterTest {
     public static Iterable<Object> data() {
         return Arrays.asList(new Object[][]{
                 {new HashSetInclusionTester()},
+                {new CombinedHashSetInclusionTester()},
                 {new HLLInclusionTester(0.01)},
                 {new BloomFilterInclusionTester(32)},
                 {new BottomKSketchTester(32)}

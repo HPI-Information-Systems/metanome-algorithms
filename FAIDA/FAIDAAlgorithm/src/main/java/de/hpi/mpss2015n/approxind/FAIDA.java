@@ -27,15 +27,16 @@ public final class FAIDA {
     private final CandidateGenerator candidateLogic;
     private final boolean ignoreNullValueColumns;
     private final boolean ignoreAllConstantColumns;
+    private final boolean isReuseColumnStore;
     private final int sampleGoal;
 
     public FAIDA(Arity arity, RowSampler sampler, InclusionTester inclusionTester,
                  int sampleGoal) {
-        this(arity, sampler, inclusionTester, sampleGoal, true, true);
+        this(arity, sampler, inclusionTester, sampleGoal, true, true, false);
     }
 
     public FAIDA(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal,
-                 boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns) {
+                 boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns, boolean isReuseColumnStore) {
         this.detectNary = arity == Arity.N_ARY;
         this.sampler = sampler;
         this.inclusionTester = inclusionTester;
@@ -43,6 +44,7 @@ public final class FAIDA {
         this.sampleGoal = sampleGoal;
         this.ignoreNullValueColumns = ignoreNullValueColumns;
         this.ignoreAllConstantColumns = ignoreAllConstantColumns;
+        this.isReuseColumnStore = isReuseColumnStore;
     }
 
     public List<InclusionDependency> execute(RelationalInputGenerator[] fileInputGenerators)
@@ -72,7 +74,7 @@ public final class FAIDA {
         int arity = 1;
 
         logger.info("Creating column stores.");
-        ColumnStore[] stores = ColumnStore.create(fileInputGenerators, this.sampleGoal);
+        ColumnStore[] stores = ColumnStore.create(fileInputGenerators, this.sampleGoal, this.isReuseColumnStore);
         int constantColumnCounter = 0, nullColumnCounter = 0;
         for (ColumnStore store : stores) {
             for (int columnIndex = 0; columnIndex < store.getNumberOfColumns(); columnIndex++) {

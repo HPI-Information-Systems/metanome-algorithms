@@ -47,10 +47,12 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
 
     private int sampleGoal = 500;
 
+    protected boolean isReuseColumnStore;
+
 
     public enum Identifier {
         INPUT_FILES, DETECT_NARY, APPROXIMATE_TESTER, APPROXIMATE_TESTER_BYTES, HLL_REL_STD_DEV, SAMPLE_GOAL,
-        IGNORE_NULL, IGNORE_CONSTANT
+        IGNORE_NULL, IGNORE_CONSTANT, REUSE_COLUMN_STORE
     }
 
     @Override
@@ -87,6 +89,11 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
         detectNary.setDefaultValues(new Boolean[]{this.detectNary});
         detectNary.setRequired(true);
         configs.add(detectNary);
+
+        ConfigurationRequirementBoolean reuseColumnStore = new ConfigurationRequirementBoolean(Identifier.REUSE_COLUMN_STORE.name());
+        reuseColumnStore.setDefaultValues(new Boolean[]{this.isReuseColumnStore});
+        reuseColumnStore.setRequired(false);
+        configs.add(reuseColumnStore);
 
         ConfigurationRequirementString hllRelativeStandardDeviation = new ConfigurationRequirementString(Identifier.HLL_REL_STD_DEV.name());
         hllRelativeStandardDeviation.setDefaultValues(new String[]{Double.toString(this.hllRelativeStddev)});
@@ -125,7 +132,8 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
                 inclusionTester,
                 sampleGoal,
                 isIgnoreNullColumns,
-                isIgnoreConstantColumns
+                isIgnoreConstantColumns,
+                isReuseColumnStore
         );
         List<InclusionDependency> result = algorithm.execute(fileInputGenerator);
 
@@ -175,6 +183,8 @@ public final class FAIDAFile implements InclusionDependencyAlgorithm, FileInputP
             this.isIgnoreNullColumns = values[0];
         } else if (Identifier.IGNORE_CONSTANT.name().equals(identifier)) {
             this.isIgnoreConstantColumns = values[0];
+        } else if (Identifier.REUSE_COLUMN_STORE.name().equals(identifier)) {
+            this.isReuseColumnStore = values[0];
         } else {
             this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
         }

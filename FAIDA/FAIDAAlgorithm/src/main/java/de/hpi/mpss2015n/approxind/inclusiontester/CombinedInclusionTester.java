@@ -136,27 +136,31 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
     protected abstract void insertRowIntoAD(SimpleColumnCombination combination, long hash, AD value);
 
     @Override
-    public boolean isIncludedIn(SimpleColumnCombination ref, SimpleColumnCombination dep) {
+    public boolean isIncludedIn(SimpleColumnCombination dep, SimpleColumnCombination ref) {
         // Test if ind is valid based on the generated IND cover.
         if (!adByTable.get(ref.getTable()).containsKey(ref) || !adByTable.get(dep.getTable()).containsKey(dep)) {
-            throw new IllegalArgumentException(String.format("%s < %s is not a candidate.", ref, dep));
+            throw new IllegalArgumentException(String.format("%s < %s is not a candidate.", dep, ref));
         }
 
-        boolean isACovered = this.sampledInvertedIndex.isCovered(ref);
-        boolean isBCovered = this.sampledInvertedIndex.isCovered(dep);
-        if (isACovered || isBCovered) {
+        boolean isACovered = this.sampledInvertedIndex.isCovered(dep);
+        boolean isBCovered = this.sampledInvertedIndex.isCovered(ref);
+        if (isACovered) {
             this.numCertainChecks++;
+            return this.sampledInvertedIndex.isIncludedIn(dep, ref);
         } else {
-            this.numUncertainChecks++;
+            if (isBCovered) {
+                this.numCertainChecks++;
+                return false;
+            } else {
+                if (!sampledInvertedIndex.isIncludedIn(dep, ref)) {
+                    this.numCertainChecks++;
+                    return false;
+                } else {
+                    this.numUncertainChecks++;
+                    return this.testWithAds(dep, ref);
+                }
+            }
         }
-
-        if (!isACovered && isBCovered) {
-            return false;
-        } else if (!sampledInvertedIndex.isIncludedIn(ref, dep)) {
-            return false;
-        }
-
-        return isACovered || this.testWithAds(ref, dep);
     }
 
     private boolean testWithAds(SimpleColumnCombination dep, SimpleColumnCombination ref) {
