@@ -1,4 +1,4 @@
-package de.hpi.metanome.algorithms.hyfd.depricated;
+package de.hpi.metanome.algorithms.hyfd.deprecated;
 
 import java.util.ArrayList;
 import java.util.Arrays;

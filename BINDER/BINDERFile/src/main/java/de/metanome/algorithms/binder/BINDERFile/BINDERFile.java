@@ -6,22 +6,24 @@ import java.util.ArrayList;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.algorithm_types.BooleanParameterAlgorithm;
-import de.metanome.algorithm_integration.algorithm_types.FileInputParameterAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.InclusionDependencyAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.IntegerParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.RelationalInputParameterAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.StringParameterAlgorithm;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementBoolean;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementFileInput;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementInteger;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementString;
-import de.metanome.algorithm_integration.input.FileInputGenerator;
+import de.metanome.algorithm_integration.input.InputGenerationException;
+import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithms.binder.core.BINDER;
 import de.uni_potsdam.hpi.utils.CollectionUtils;
 import de.uni_potsdam.hpi.utils.FileUtils;
 
-public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, FileInputParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
+public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, RelationalInputParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
 
 	public enum Identifier {
 		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL, FILTER_KEY_FOREIGNKEYS
@@ -29,7 +31,7 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 	
 	@Override
 	public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
-		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<>(5);
+		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<ConfigurationRequirement<?>>(5);
 		configs.add(new ConfigurationRequirementFileInput(BINDERFile.Identifier.INPUT_FILES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
 		
 		ConfigurationRequirementString tempFolder = new ConfigurationRequirementString(BINDERFile.Identifier.TEMP_FOLDER_PATH.name());
@@ -45,14 +47,14 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		
 		ConfigurationRequirementBoolean cleanTemp = new ConfigurationRequirementBoolean(BINDERFile.Identifier.CLEAN_TEMP.name());
 		Boolean[] defaultCleanTemp = new Boolean[1];
-		defaultCleanTemp[0] = true;
+		defaultCleanTemp[0] = Boolean.TRUE;
 		cleanTemp.setDefaultValues(defaultCleanTemp);
 		cleanTemp.setRequired(true);
 		configs.add(cleanTemp);
 		
 		ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(BINDERFile.Identifier.DETECT_NARY.name());
 		Boolean[] defaultDetectNary = new Boolean[1];
-		defaultDetectNary[0] = false;
+		defaultDetectNary[0] = Boolean.FALSE;
 		detectNary.setDefaultValues(defaultDetectNary);
 		detectNary.setRequired(true);
 		configs.add(detectNary);
@@ -65,7 +67,7 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 
 		ConfigurationRequirementBoolean filterKeyForeignkeys = new ConfigurationRequirementBoolean(BINDERFile.Identifier.FILTER_KEY_FOREIGNKEYS.name());
 		Boolean[] defaultFilterKeyForeignkeys = new Boolean[1];
-		defaultFilterKeyForeignkeys[0] = false;
+		defaultFilterKeyForeignkeys[0] = Boolean.FALSE;
 		filterKeyForeignkeys.setDefaultValues(defaultFilterKeyForeignkeys);
 		filterKeyForeignkeys.setRequired(true);
 		configs.add(filterKeyForeignkeys);
@@ -74,13 +76,24 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 	}
 
 	@Override
-	public void setFileInputConfigurationValue(String identifier, FileInputGenerator... values) throws AlgorithmConfigurationException {
+	public void setRelationalInputConfigurationValue(String identifier, RelationalInputGenerator... values) throws AlgorithmConfigurationException {
 		if (BINDERFile.Identifier.INPUT_FILES.name().equals(identifier)) {
 			this.fileInputGenerator = values;
 			
 			this.tableNames = new String[values.length];
-			for (int i = 0; i < values.length; i++)
-				this.tableNames[i] = values[i].getInputFile().getName();
+			RelationalInput input = null;
+			for (int i = 0; i < values.length; i++) {
+				try {
+					input = values[i].generateNewCopy();
+					this.tableNames[i] = input.relationName();
+				}
+				catch (InputGenerationException e) {
+					throw new AlgorithmConfigurationException(e.getMessage());
+				}
+				finally {
+					FileUtils.close(input);
+				}
+			}
 		}
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
@@ -120,11 +133,11 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 	@Override
 	public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
 		if (BINDERFile.Identifier.CLEAN_TEMP.name().equals(identifier))
-			this.cleanTemp = values[0];
+			this.cleanTemp = values[0].booleanValue();
 		else if (BINDERFile.Identifier.DETECT_NARY.name().equals(identifier))
-			this.detectNary = values[0];
+			this.detectNary = values[0].booleanValue();
 		else if (BINDERFile.Identifier.FILTER_KEY_FOREIGNKEYS.name().equals(identifier))
-			this.filterKeyForeignkeys = values[0];
+			this.filterKeyForeignkeys = values[0].booleanValue();
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}
@@ -137,7 +150,7 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 	public void execute() throws AlgorithmExecutionException {
 		super.execute();
 	}
-
+	
 	@Override
 	public String getAuthors() {
 		return this.getAuthorName();

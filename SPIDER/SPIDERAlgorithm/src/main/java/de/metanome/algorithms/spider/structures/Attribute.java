@@ -1,10 +1,5 @@
 package de.metanome.algorithms.spider.structures;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntListIterator;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
@@ -15,11 +10,15 @@ import java.util.List;
 
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.input.DatabaseConnectionGenerator;
-import de.metanome.algorithm_integration.input.FileInputGenerator;
+import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithms.spider.sorting.TPMMS;
 import de.uni_potsdam.hpi.dao.DataAccessObject;
 import de.uni_potsdam.hpi.utils.DatabaseUtils;
 import de.uni_potsdam.hpi.utils.FileUtils;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntListIterator;
 
 public class Attribute implements Comparable<Attribute>, Closeable {
 
@@ -89,7 +88,7 @@ public class Attribute implements Comparable<Attribute>, Closeable {
 		}
 	}
 
-	public Attribute(int attributeId, List<String> attributeTypes, FileInputGenerator inputGenerator, int inputRowLimit, int relativeAttributeIndex, String tempFolderPath, long maxMemoryUsage, int memoryCheckFrequency) throws AlgorithmExecutionException {
+	public Attribute(int attributeId, List<String> attributeTypes, RelationalInputGenerator inputGenerator, int inputRowLimit, int relativeAttributeIndex, String tempFolderPath, long maxMemoryUsage, int memoryCheckFrequency) throws AlgorithmExecutionException {
 		this.attributeId = attributeId;
 		
 		int numAttributes = attributeTypes.size();
@@ -104,7 +103,7 @@ public class Attribute implements Comparable<Attribute>, Closeable {
 		
 		try {
 			// Read, sort and write attribute
-			TPMMS.sortToDisk(inputGenerator, tempFolderPath + attributeId, relativeAttributeIndex, maxMemoryUsage, memoryCheckFrequency);
+			TPMMS.sortToDisk(inputGenerator, inputRowLimit, tempFolderPath + attributeId, relativeAttributeIndex, maxMemoryUsage, memoryCheckFrequency);
 			
 			// Open reader on written values
 			this.valueReader = FileUtils.buildFileReader(tempFolderPath + attributeId); // TODO: Use Metanome temp file functionality here

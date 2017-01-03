@@ -13,30 +13,31 @@ public class PruningStatistics {
 		return this.prunedCombinations;
 	}
 
-	public PruningStatistics(int numColumns, int numBucketsPerColumn) {
-//		this.numColumns = numColumns;
-//		this.numOfExpectedBucketsPerColumn = numBucketsPerColumn;
-//		this.bucketsPerColumn = new int[this.numColumns];
-//		this.minValues = new String[this.numColumns][this.numOfExpectedBucketsPerColumn];
-//		this.maxValues = new String[this.numColumns][this.numOfExpectedBucketsPerColumn];
+/*	public PruningStatistics(int numColumns, int numBucketsPerColumn) {
+		this.numColumns = numColumns;
+		this.numOfExpectedBucketsPerColumn = numBucketsPerColumn;
+		this.bucketsPerColumn = new int[this.numColumns];
+		this.minValues = new String[this.numColumns][this.numOfExpectedBucketsPerColumn];
+		this.maxValues = new String[this.numColumns][this.numOfExpectedBucketsPerColumn];
 	}
-	
-	public void addValue(int column, int bucket, String value) {
-//		if (this.minValues[column][bucket] == null) {
-//			this.minValues[column][bucket] = value;
-//			this.maxValues[column][bucket] = value;
-//			this.bucketsPerColumn[column]++;
-//		}
-//		else if (value.compareTo(this.minValues[column][bucket]) < 0)
-//			this.minValues[column][bucket] = value;
-//		else if (value.compareTo(this.maxValues[column][bucket]) > 0)
-//			this.maxValues[column][bucket] = value;
+*/	
+/*	public void addValue(int column, int bucket, String value) {
+		if (this.minValues[column][bucket] == null) {
+			this.minValues[column][bucket] = value;
+			this.maxValues[column][bucket] = value;
+			this.bucketsPerColumn[column]++;
+		}
+		else if (value.compareTo(this.minValues[column][bucket]) < 0)
+			this.minValues[column][bucket] = value;
+		else if (value.compareTo(this.maxValues[column][bucket]) > 0)
+			this.maxValues[column][bucket] = value;
 	}
-	
+*/	
+	@SuppressWarnings("unused")
 	public boolean isValid(int dep, int ref) {
 //		if (this.checkBucketCounts(dep, ref) && this.checkBucketCharacteristics(dep, ref)) {
 //			this.prunedCombinations++;
-			return true;
+			return true; // TODO: Implement statistical pruning here
 //		}
 //		return false;
 	}

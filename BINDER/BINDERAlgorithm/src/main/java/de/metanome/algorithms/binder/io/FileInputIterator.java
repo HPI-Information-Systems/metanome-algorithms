@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
-import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 
 public class FileInputIterator implements InputIterator {
 
@@ -17,7 +17,7 @@ public class FileInputIterator implements InputIterator {
 	private int rowsRead = 0;
 	private int inputRowLimit;
 	
-	public FileInputIterator(FileInputGenerator inputGenerator, int inputRowLimit) throws InputGenerationException, AlgorithmConfigurationException {
+	public FileInputIterator(RelationalInputGenerator inputGenerator, int inputRowLimit) throws InputGenerationException, AlgorithmConfigurationException {
 		this.inputGenerator = inputGenerator.generateNewCopy();
 		this.inputRowLimit = inputRowLimit;
 	}

@@ -6,22 +6,24 @@ import java.util.ArrayList;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.algorithm_types.BooleanParameterAlgorithm;
-import de.metanome.algorithm_integration.algorithm_types.FileInputParameterAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.InclusionDependencyAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.IntegerParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.RelationalInputParameterAlgorithm;
 import de.metanome.algorithm_integration.algorithm_types.StringParameterAlgorithm;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementBoolean;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementFileInput;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementInteger;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementString;
-import de.metanome.algorithm_integration.input.FileInputGenerator;
+import de.metanome.algorithm_integration.input.InputGenerationException;
+import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithms.spider.core.SPIDER;
 import de.uni_potsdam.hpi.utils.CollectionUtils;
 import de.uni_potsdam.hpi.utils.FileUtils;
 
-public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, FileInputParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
+public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, RelationalInputParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
 
 	public enum Database {
 		MYSQL, DB2, POSTGRESQL, FILE
@@ -33,7 +35,7 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 	
 	@Override
 	public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
-		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<>(4);
+		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<ConfigurationRequirement<?>>(4);
 		configs.add(new ConfigurationRequirementFileInput(SPIDERFile.Identifier.INPUT_FILES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
 
 		ConfigurationRequirementString tempFolder = new ConfigurationRequirementString(SPIDERFile.Identifier.TEMP_FOLDER_PATH.name());
@@ -49,7 +51,7 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 		
 		ConfigurationRequirementBoolean cleanTemp = new ConfigurationRequirementBoolean(SPIDERFile.Identifier.CLEAN_TEMP.name());
 		Boolean[] defaultCleanTemp = new Boolean[1];
-		defaultCleanTemp[0] = true;
+		defaultCleanTemp[0] = Boolean.TRUE;
 		cleanTemp.setDefaultValues(defaultCleanTemp);
 		cleanTemp.setRequired(true);
 		configs.add(cleanTemp);
@@ -58,13 +60,24 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 	}
 
 	@Override
-	public void setFileInputConfigurationValue(String identifier, FileInputGenerator... values) throws AlgorithmConfigurationException {
+	public void setRelationalInputConfigurationValue(String identifier, RelationalInputGenerator... values) throws AlgorithmConfigurationException {
 		if (SPIDERFile.Identifier.INPUT_FILES.name().equals(identifier)) {
 			this.fileInputGenerator = values;
 			
 			this.tableNames = new String[values.length];
-			for (int i = 0; i < values.length; i++)
-				this.tableNames[i] = values[i].getInputFile().getName();
+			RelationalInput input = null;
+			for (int i = 0; i < values.length; i++) {
+				try {
+					input = values[i].generateNewCopy();
+					this.tableNames[i] = input.relationName();
+				}
+				catch (InputGenerationException e) {
+					throw new AlgorithmConfigurationException(e.getMessage());
+				}
+				finally {
+					FileUtils.close(input);
+				}
+			}
 		}
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
@@ -99,7 +112,7 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 	@Override
 	public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
 		if (SPIDERFile.Identifier.CLEAN_TEMP.name().equals(identifier))
-			this.cleanTemp = values[0];
+			this.cleanTemp = values[0].booleanValue();
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}

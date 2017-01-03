@@ -1,12 +1,5 @@
 package de.metanome.algorithms.binder.core;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntIterator;
-import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntListIterator;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -35,10 +28,10 @@ import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.ColumnPermutation;
 import de.metanome.algorithm_integration.input.DatabaseConnectionGenerator;
-import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
@@ -58,12 +51,18 @@ import de.uni_potsdam.hpi.utils.DatabaseUtils;
 import de.uni_potsdam.hpi.utils.FileUtils;
 import de.uni_potsdam.hpi.utils.LoggingUtils;
 import de.uni_potsdam.hpi.utils.MeasurementUtils;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntListIterator;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 // Bucketing IND ExtractoR (BINDER)
 public class BINDER {
 
 	protected DatabaseConnectionGenerator databaseConnectionGenerator = null;
-	protected FileInputGenerator[] fileInputGenerator = null; // one for each file specifying a table instance
+	protected RelationalInputGenerator[] fileInputGenerator = null; // one for each file specifying a table instance
 	protected int inputRowLimit = -1;
 	protected InclusionDependencyResultReceiver resultReceiver = null;
 	protected DataAccessObject dao = null;
@@ -290,7 +289,7 @@ public class BINDER {
 		
 		this.nullValueColumns = new OpenBitSet(this.columnNames.size());
 		
-		this.pruningStatistics = new PruningStatistics(this.numColumns, this.numBucketsPerColumn);
+		this.pruningStatistics = new PruningStatistics();
 		
 		// Build an index that assigns the columns to their tables, because the n-ary detection can only group those attributes that belong to the same table and the foreign key detection also only groups attributes from different tables.
 		this.column2table = new int[this.numColumns];
@@ -327,7 +326,7 @@ public class BINDER {
 		}
 	}
 
-	protected void collectStatisticsFrom(FileInputGenerator inputGenerator) throws InputIterationException, InputGenerationException, AlgorithmConfigurationException {
+	protected void collectStatisticsFrom(RelationalInputGenerator inputGenerator) throws InputIterationException, InputGenerationException, AlgorithmConfigurationException {
 		RelationalInput input = null;
 		try {
 			// Query attribute names and types

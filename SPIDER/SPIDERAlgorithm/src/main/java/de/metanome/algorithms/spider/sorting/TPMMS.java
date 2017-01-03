@@ -9,18 +9,18 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.PriorityQueue;
 
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
-import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.uni_potsdam.hpi.utils.FileUtils;
 
 public class TPMMS {
 	
-	public static void sortToDisk(FileInputGenerator inputGenerator, String filePath, int relativeAttributeIndex, long maxMemoryUsage, int memoryCheckFrequency) throws AlgorithmExecutionException {
+	public static void sortToDisk(RelationalInputGenerator inputGenerator, int inputRowLimit, String filePath, int relativeAttributeIndex, long maxMemoryUsage, int memoryCheckFrequency) throws AlgorithmExecutionException {
 		RelationalInput relationalInput = null;
 		int numValuesSinceLastMemoryCheck = 0;
 		List<String> spilledFiles = new ArrayList<String>();
@@ -30,8 +30,9 @@ public class TPMMS {
 			
 			// Read values sorted
 			Set<String> values = new TreeSet<String>();
-			while (relationalInput.hasNext()) {
+			while (relationalInput.hasNext() && (inputRowLimit != 0)) {
 				String value = relationalInput.next().get(relativeAttributeIndex);
+				inputRowLimit--;
 				
 				if (value == null)
 					continue;

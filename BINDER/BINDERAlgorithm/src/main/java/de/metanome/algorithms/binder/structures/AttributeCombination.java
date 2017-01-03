@@ -35,7 +35,7 @@ public class AttributeCombination implements Comparable<AttributeCombination> {
 			attributesByName[i] = names.get(this.attributes[i]);
 		return attributesByName;
 	}
-
+	
 	public boolean contains(int attribute) {
 		for (int a : this.attributes)
 			if (a == attribute)

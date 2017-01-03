@@ -36,7 +36,7 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 	
 	@Override
 	public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
-		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<>(8);
+		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<ConfigurationRequirement<?>>(8);
 		configs.add(new ConfigurationRequirementDatabaseConnection(BINDERDatabase.Identifier.INPUT_DATABASE.name()));
 		
 		ConfigurationRequirementString databaseName = new ConfigurationRequirementString(BINDERDatabase.Identifier.DATABASE_NAME.name());
@@ -67,14 +67,14 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 		
 		ConfigurationRequirementBoolean cleanTemp = new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.CLEAN_TEMP.name());
 		Boolean[] defaultCleanTemp = new Boolean[1];
-		defaultCleanTemp[0] = true;
+		defaultCleanTemp[0] = Boolean.TRUE;
 		cleanTemp.setDefaultValues(defaultCleanTemp);
 		cleanTemp.setRequired(true);
 		configs.add(cleanTemp);
 		
 		ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.DETECT_NARY.name());
 		Boolean[] defaultDetectNary = new Boolean[1];
-		defaultDetectNary[0] = false;
+		defaultDetectNary[0] = Boolean.FALSE;
 		detectNary.setDefaultValues(defaultDetectNary);
 		detectNary.setRequired(true);
 		configs.add(detectNary);
@@ -87,7 +87,7 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 
 		ConfigurationRequirementBoolean filterKeyForeignkeys = new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.FILTER_KEY_FOREIGNKEYS.name());
 		Boolean[] defaultFilterKeyForeignkeys = new Boolean[1];
-		defaultFilterKeyForeignkeys[0] = false;
+		defaultFilterKeyForeignkeys[0] = Boolean.FALSE;
 		filterKeyForeignkeys.setDefaultValues(defaultFilterKeyForeignkeys);
 		filterKeyForeignkeys.setRequired(true);
 		configs.add(filterKeyForeignkeys);
@@ -151,11 +151,11 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 	@Override
 	public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
 		if (BINDERDatabase.Identifier.CLEAN_TEMP.name().equals(identifier))
-			this.cleanTemp = values[0];
+			this.cleanTemp = values[0].booleanValue();
 		else if (BINDERDatabase.Identifier.DETECT_NARY.name().equals(identifier))
-			this.detectNary = values[0];
+			this.detectNary = values[0].booleanValue();
 		else if (BINDERDatabase.Identifier.FILTER_KEY_FOREIGNKEYS.name().equals(identifier))
-			this.filterKeyForeignkeys = values[0];
+			this.filterKeyForeignkeys = values[0].booleanValue();
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}
@@ -168,7 +168,7 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 	public void execute() throws AlgorithmExecutionException {
 		super.execute();
 	}
-	
+
 	@Override
 	public String getAuthors() {
 		return this.getAuthorName();

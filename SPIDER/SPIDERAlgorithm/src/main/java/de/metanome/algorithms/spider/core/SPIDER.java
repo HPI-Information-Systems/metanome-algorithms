@@ -1,9 +1,5 @@
 package de.metanome.algorithms.spider.core;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -18,9 +14,9 @@ import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.ColumnPermutation;
 import de.metanome.algorithm_integration.input.DatabaseConnectionGenerator;
-import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
+import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
@@ -30,11 +26,14 @@ import de.uni_potsdam.hpi.dao.DataAccessObject;
 import de.uni_potsdam.hpi.utils.CollectionUtils;
 import de.uni_potsdam.hpi.utils.DatabaseUtils;
 import de.uni_potsdam.hpi.utils.FileUtils;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 public class SPIDER {
 
 	protected DatabaseConnectionGenerator databaseConnectionGenerator = null;
-	protected FileInputGenerator[] fileInputGenerator = null; // one for each file specifying a table instance
+	protected RelationalInputGenerator[] fileInputGenerator = null; // one for each file specifying a table instance
 	protected int inputRowLimit = -1;
 	protected InclusionDependencyResultReceiver resultReceiver = null;
 	protected DataAccessObject dao = null;
@@ -197,7 +196,7 @@ public class SPIDER {
 		}
 	}
 
-	protected void collectStatisticsFrom(FileInputGenerator inputGenerator) throws InputGenerationException, AlgorithmConfigurationException {
+	protected void collectStatisticsFrom(RelationalInputGenerator inputGenerator) throws InputGenerationException, AlgorithmConfigurationException {
 		RelationalInput input = null;
 		try {
 			// Query attribute names and types
