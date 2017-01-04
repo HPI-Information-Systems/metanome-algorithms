@@ -3,6 +3,7 @@ package de.metanome.algorithms.spider.structures;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,7 +30,7 @@ public class Attribute implements Comparable<Attribute>, Closeable {
 
 	protected BufferedReader valueReader;
 	
-	public Attribute(int attributeId, List<String> attributeTypes, DatabaseConnectionGenerator inputGenerator, int inputRowLimit, DataAccessObject dao, String tableName, String attributeName, String tempFolderPath) throws AlgorithmExecutionException {
+	public Attribute(int attributeId, List<String> attributeTypes, DatabaseConnectionGenerator inputGenerator, int inputRowLimit, DataAccessObject dao, String tableName, String attributeName, File tempFolder) throws AlgorithmExecutionException {
 		this.attributeId = attributeId;
 		
 		int numAttributes = attributeTypes.size();
@@ -47,7 +48,7 @@ public class Attribute implements Comparable<Attribute>, Closeable {
 		try {
 			// Read values sorted and write them to disk
 			resultSet = inputGenerator.generateResultSetFromSql(dao.buildSelectDistinctSortedColumnQuery(tableName, attributeName, attributeTypes.get(this.attributeId), inputRowLimit));			
-			writer = FileUtils.buildFileWriter(tempFolderPath + attributeId, false); // TODO: Use Metanome temp file functionality here
+			writer = FileUtils.buildFileWriter(tempFolder.getPath() + File.separator + attributeId, false); // TODO: Use Metanome temp file functionality here
 			boolean isFirstValues = true;
 			while (resultSet.next()) {
 				String value = resultSet.getString(1);
@@ -65,7 +66,7 @@ public class Attribute implements Comparable<Attribute>, Closeable {
 			writer.flush();
 			
 			// Open reader on written values
-			this.valueReader = FileUtils.buildFileReader(tempFolderPath + attributeId); // TODO: Use Metanome temp file functionality here
+			this.valueReader = FileUtils.buildFileReader(tempFolder.getPath() + File.separator + attributeId); // TODO: Use Metanome temp file functionality here
 			this.currentValue = ""; // currentValue must not be null, otherwise no nextValue will be read!
 			this.nextValue();
 		}
@@ -88,7 +89,7 @@ public class Attribute implements Comparable<Attribute>, Closeable {
 		}
 	}
 
-	public Attribute(int attributeId, List<String> attributeTypes, RelationalInputGenerator inputGenerator, int inputRowLimit, int relativeAttributeIndex, String tempFolderPath, long maxMemoryUsage, int memoryCheckFrequency) throws AlgorithmExecutionException {
+	public Attribute(int attributeId, List<String> attributeTypes, RelationalInputGenerator inputGenerator, int inputRowLimit, int relativeAttributeIndex, File tempFolder, long maxMemoryUsage, int memoryCheckFrequency) throws AlgorithmExecutionException {
 		this.attributeId = attributeId;
 		
 		int numAttributes = attributeTypes.size();
@@ -103,10 +104,10 @@ public class Attribute implements Comparable<Attribute>, Closeable {
 		
 		try {
 			// Read, sort and write attribute
-			TPMMS.sortToDisk(inputGenerator, inputRowLimit, tempFolderPath + attributeId, relativeAttributeIndex, maxMemoryUsage, memoryCheckFrequency);
+			TPMMS.sortToDisk(inputGenerator, inputRowLimit, tempFolder.getPath() + File.separator + attributeId, relativeAttributeIndex, maxMemoryUsage, memoryCheckFrequency);
 			
 			// Open reader on written values
-			this.valueReader = FileUtils.buildFileReader(tempFolderPath + attributeId); // TODO: Use Metanome temp file functionality here
+			this.valueReader = FileUtils.buildFileReader(tempFolder.getPath() + File.separator + attributeId); // TODO: Use Metanome temp file functionality here
 			this.currentValue = ""; // currentValue must not be null, otherwise no nextValue will be read!
 			this.nextValue();
 		}

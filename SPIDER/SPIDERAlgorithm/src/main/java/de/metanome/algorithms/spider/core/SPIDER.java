@@ -34,18 +34,20 @@ public class SPIDER {
 
 	protected DatabaseConnectionGenerator databaseConnectionGenerator = null;
 	protected RelationalInputGenerator[] fileInputGenerator = null; // one for each file specifying a table instance
-	protected int inputRowLimit = -1;
 	protected InclusionDependencyResultReceiver resultReceiver = null;
 	protected DataAccessObject dao = null;
 	protected String[] tableNames = null;
 	protected String databaseName = null;
-	protected String tempFolderPath = null; // TODO: Use Metanome temp file functionality here (interface TampFileAlgorithm)
+	protected String tempFolderPath = "SPIDER_temp"; // TODO: Use Metanome temp file functionality here (interface TampFileAlgorithm)
 	protected boolean cleanTemp = true;
+	protected int inputRowLimit = -1;
+	protected int memoryCheckFrequency = 100;
+	protected int maxMemoryUsagePercentage = 60;
+
+	protected File tempFolder = null;
 	
 	protected int numColumns = -1;
 
-	protected int memoryCheckFrequency = 100; // TODO: Parameter!
-	protected float maxMemoryUsagePercentage = 0.8f; // TODO: Parameter!
 	protected long availableMemory;
 	protected long maxMemoryUsage;
 	
@@ -78,10 +80,11 @@ public class SPIDER {
 				"tableNames: " + ((this.tableNames != null) ? CollectionUtils.concat(this.tableNames, ", ") : "-") + "\r\n\t" +
 				"numColumns: " + this.numColumns + "\r\n\t" +
 				"databaseName: " + this.databaseName + "\r\n\t" +
-				"tempFolderPath: " + this.tempFolderPath + "\r\n\t" +
+				"tempFolderPath: " + this.tempFolder.getPath() + "\r\n\t" +
 				"memoryCheckFrequency: " + this.memoryCheckFrequency + "\r\n\t" +
-				"maxMemoryUsagePercentage: " + this.maxMemoryUsagePercentage + "\r\n\t" +
+				"maxMemoryUsagePercentage: " + this.maxMemoryUsagePercentage + "%\r\n\t" +
 				"availableMemory: " + this.availableMemory + " byte (spilled when exeeding " + this.maxMemoryUsage + " byte)\r\n\t" +
+				"memoryCheckFrequency: " + this.memoryCheckFrequency + "\r\n\t" +
 				"cleanTemp: " + this.cleanTemp + "\r\n\t" +
 				"numUnaryINDs: " + this.numUnaryINDs + "\r\n" +
 			"statisticTime: " + this.statisticTime + "\r\n" +
@@ -99,8 +102,11 @@ public class SPIDER {
 	}
 	
 	public void execute() throws AlgorithmExecutionException {
+		// Initialize temp folder
+		this.tempFolder = new File(this.tempFolderPath + File.separator + "temp");
+		
 		// Clean temp if there are files from previous runs that may pollute this run
-		FileUtils.cleanDirectory(new File(this.tempFolderPath));
+		FileUtils.cleanDirectory(this.tempFolder);
 		
 		try {
 			//////////////////////////////
@@ -148,11 +154,11 @@ public class SPIDER {
 			
 			// Clean temp
 			if (this.cleanTemp)
-				FileUtils.cleanDirectory(new File(this.tempFolderPath));
+				FileUtils.cleanDirectory(this.tempFolder);
 		}		
 	}
 	
-	protected void collectStatistics() throws InputGenerationException, AlgorithmConfigurationException {
+	private void collectStatistics() throws InputGenerationException, AlgorithmConfigurationException {
 		if ((this.databaseConnectionGenerator == null) && (this.fileInputGenerator == null))
 			throw new InputGenerationException("No input generator specified!");
 		
@@ -171,10 +177,10 @@ public class SPIDER {
 		
 		// Initialize memory management
 		this.availableMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
-		this.maxMemoryUsage = (long)(this.availableMemory * this.maxMemoryUsagePercentage);
+		this.maxMemoryUsage = (long)(this.availableMemory * (this.maxMemoryUsagePercentage / 100.0f));
 	}
 	
-	protected void collectStatisticsFrom(DatabaseConnectionGenerator inputGenerator, int tableIndex) throws InputGenerationException, AlgorithmConfigurationException {
+	private void collectStatisticsFrom(DatabaseConnectionGenerator inputGenerator, int tableIndex) throws InputGenerationException, AlgorithmConfigurationException {
 		ResultSet resultSet = null;
 		try {
 			// Query attribute names and types
@@ -196,7 +202,7 @@ public class SPIDER {
 		}
 	}
 
-	protected void collectStatisticsFrom(RelationalInputGenerator inputGenerator) throws InputGenerationException, AlgorithmConfigurationException {
+	private void collectStatisticsFrom(RelationalInputGenerator inputGenerator) throws InputGenerationException, AlgorithmConfigurationException {
 		RelationalInput input = null;
 		try {
 			// Query attribute names and types
@@ -224,9 +230,9 @@ public class SPIDER {
 			for (int attribute = firstAttribute; attribute < lastAttribute; attribute++) {
 				Attribute spiderAttribute;
 				if (this.databaseConnectionGenerator != null)
-					spiderAttribute = new Attribute(attribute, this.columnTypes, this.databaseConnectionGenerator, this.inputRowLimit, this.dao, this.tableNames[table], this.columnNames.get(attribute), this.tempFolderPath);
+					spiderAttribute = new Attribute(attribute, this.columnTypes, this.databaseConnectionGenerator, this.inputRowLimit, this.dao, this.tableNames[table], this.columnNames.get(attribute), this.tempFolder);
 				else
-					spiderAttribute = new Attribute(attribute, this.columnTypes, this.fileInputGenerator[table], this.inputRowLimit, attribute - firstAttribute, this.tempFolderPath, this.maxMemoryUsage, this.memoryCheckFrequency);
+					spiderAttribute = new Attribute(attribute, this.columnTypes, this.fileInputGenerator[table], this.inputRowLimit, attribute - firstAttribute, this.tempFolder, this.maxMemoryUsage, this.memoryCheckFrequency);
 				this.attributeId2attributeObject.put(attribute, spiderAttribute);
 				
 				if (!spiderAttribute.hasFinished())
@@ -257,7 +263,7 @@ public class SPIDER {
 		}
 	}
 	
-	protected void output() throws CouldNotReceiveResultException, ColumnNameMismatchException {
+	private void output() throws CouldNotReceiveResultException, ColumnNameMismatchException {
 		// Read the discovered INDs from the attributes
 		Int2ObjectOpenHashMap<IntList> dep2ref = new Int2ObjectOpenHashMap<IntList>(this.numColumns);
 		for (Attribute spiderAttribute : this.attributeId2attributeObject.values())
@@ -279,7 +285,7 @@ public class SPIDER {
 		}
 	}
 	
-	protected String getTableNameFor(int column, int[] tableColumnStartIndexes) {
+	private String getTableNameFor(int column, int[] tableColumnStartIndexes) {
 		for (int i = 1; i < tableColumnStartIndexes.length; i++)
 			if (tableColumnStartIndexes[i] > column)
 				return this.tableNames[i - 1];

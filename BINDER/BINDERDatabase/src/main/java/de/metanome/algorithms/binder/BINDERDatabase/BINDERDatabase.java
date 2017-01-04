@@ -31,7 +31,7 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 	}
 	
 	public enum Identifier {
-		INPUT_DATABASE, INPUT_ROW_LIMIT, DATABASE_NAME, DATABASE_TYPE, INPUT_TABLES, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL, FILTER_KEY_FOREIGNKEYS
+		INPUT_DATABASE, INPUT_ROW_LIMIT, DATABASE_NAME, DATABASE_TYPE, INPUT_TABLES, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL, FILTER_KEY_FOREIGNKEYS, NUM_BUCKETS_PER_COLUMN, MEMORY_CHECK_FREQUENCY, MAX_MEMORY_USAGE_PERCENTAGE
 	};
 	
 	@Override
@@ -56,38 +56,58 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 		
 		ConfigurationRequirementString tempFolder = new ConfigurationRequirementString(BINDERDatabase.Identifier.TEMP_FOLDER_PATH.name());
 		String[] defaultTempFolder = new String[1];
-		defaultTempFolder[0] = "BINDER_temp";
+		defaultTempFolder[0] = this.tempFolderPath;
 		tempFolder.setDefaultValues(defaultTempFolder);
 		tempFolder.setRequired(true);
 		configs.add(tempFolder);
 
-		ConfigurationRequirementInteger inputRowlimit = new ConfigurationRequirementInteger(BINDERDatabase.Identifier.INPUT_ROW_LIMIT.name());
-		inputRowlimit.setRequired(false);
-		configs.add(inputRowlimit);
+		ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(BINDERDatabase.Identifier.INPUT_ROW_LIMIT.name());
+		Integer[] defaultInputRowLimit = { Integer.valueOf(this.inputRowLimit) };
+		inputRowLimit.setDefaultValues(defaultInputRowLimit);
+		inputRowLimit.setRequired(false);
+		configs.add(inputRowLimit);
+
+		ConfigurationRequirementInteger maxNaryLevel = new ConfigurationRequirementInteger(BINDERDatabase.Identifier.MAX_NARY_LEVEL.name());
+		Integer[] defaultMaxNaryLevel = { Integer.valueOf(this.maxNaryLevel) };
+		maxNaryLevel.setDefaultValues(defaultMaxNaryLevel);
+		maxNaryLevel.setRequired(false);
+		configs.add(maxNaryLevel);
+
+		ConfigurationRequirementInteger numBucketsPerColumn = new ConfigurationRequirementInteger(BINDERDatabase.Identifier.NUM_BUCKETS_PER_COLUMN.name());
+		Integer[] defaultNumBucketsPerColumn = { Integer.valueOf(this.numBucketsPerColumn) };
+		numBucketsPerColumn.setDefaultValues(defaultNumBucketsPerColumn);
+		numBucketsPerColumn.setRequired(true);
+		configs.add(numBucketsPerColumn);
+
+		ConfigurationRequirementInteger memoryCheckFrequency = new ConfigurationRequirementInteger(BINDERDatabase.Identifier.MEMORY_CHECK_FREQUENCY.name());
+		Integer[] defaultMemoryCheckFrequency = { Integer.valueOf(this.memoryCheckFrequency) };
+		memoryCheckFrequency.setDefaultValues(defaultMemoryCheckFrequency);
+		memoryCheckFrequency.setRequired(true);
+		configs.add(memoryCheckFrequency);
+
+		ConfigurationRequirementInteger maxMemoryUsagePercentage = new ConfigurationRequirementInteger(BINDERDatabase.Identifier.MAX_MEMORY_USAGE_PERCENTAGE.name());
+		Integer[] defaultMaxMemoryUsagePercentage = { Integer.valueOf(this.maxMemoryUsagePercentage) };
+		maxMemoryUsagePercentage.setDefaultValues(defaultMaxMemoryUsagePercentage);
+		maxMemoryUsagePercentage.setRequired(true);
+		configs.add(maxMemoryUsagePercentage);
 		
 		ConfigurationRequirementBoolean cleanTemp = new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.CLEAN_TEMP.name());
 		Boolean[] defaultCleanTemp = new Boolean[1];
-		defaultCleanTemp[0] = Boolean.TRUE;
+		defaultCleanTemp[0] = Boolean.valueOf(this.cleanTemp);
 		cleanTemp.setDefaultValues(defaultCleanTemp);
 		cleanTemp.setRequired(true);
 		configs.add(cleanTemp);
 		
 		ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.DETECT_NARY.name());
 		Boolean[] defaultDetectNary = new Boolean[1];
-		defaultDetectNary[0] = Boolean.FALSE;
+		defaultDetectNary[0] = Boolean.valueOf(this.detectNary);
 		detectNary.setDefaultValues(defaultDetectNary);
 		detectNary.setRequired(true);
 		configs.add(detectNary);
 
-		ConfigurationRequirementInteger maxNaryLevel = new ConfigurationRequirementInteger(BINDERDatabase.Identifier.MAX_NARY_LEVEL.name());
-		Integer[] defaultMaxNaryLevel = { Integer.valueOf(-1), Integer.valueOf(0) };
-		maxNaryLevel.setDefaultValues(defaultMaxNaryLevel);
-		maxNaryLevel.setRequired(false);
-		configs.add(maxNaryLevel);
-
 		ConfigurationRequirementBoolean filterKeyForeignkeys = new ConfigurationRequirementBoolean(BINDERDatabase.Identifier.FILTER_KEY_FOREIGNKEYS.name());
 		Boolean[] defaultFilterKeyForeignkeys = new Boolean[1];
-		defaultFilterKeyForeignkeys[0] = Boolean.FALSE;
+		defaultFilterKeyForeignkeys[0] = Boolean.valueOf(this.filterKeyForeignkeys);
 		filterKeyForeignkeys.setDefaultValues(defaultFilterKeyForeignkeys);
 		filterKeyForeignkeys.setRequired(true);
 		configs.add(filterKeyForeignkeys);
@@ -115,9 +135,23 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 				this.inputRowLimit = values[0].intValue();
 		}
 		else if (BINDERDatabase.Identifier.MAX_NARY_LEVEL.name().equals(identifier)) {
-			if (values.length > 0) {
+			if (values.length > 0)
 				this.maxNaryLevel = values[0].intValue();
-			}
+		}
+		else if (BINDERDatabase.Identifier.NUM_BUCKETS_PER_COLUMN.name().equals(identifier)) {
+			if (values[0].intValue() <= 0)
+				throw new AlgorithmConfigurationException(BINDERDatabase.Identifier.NUM_BUCKETS_PER_COLUMN.name() + " must be greater than 0!");
+			this.numBucketsPerColumn = values[0].intValue();
+		}
+		else if (BINDERDatabase.Identifier.MEMORY_CHECK_FREQUENCY.name().equals(identifier)) {
+			if (values[0].intValue() <= 0)
+				throw new AlgorithmConfigurationException(BINDERDatabase.Identifier.MEMORY_CHECK_FREQUENCY.name() + " must be greater than 0!");
+			this.memoryCheckFrequency = values[0].intValue();
+		}
+		else if (BINDERDatabase.Identifier.MAX_MEMORY_USAGE_PERCENTAGE.name().equals(identifier)) {
+			if (values[0].intValue() <= 0)
+				throw new AlgorithmConfigurationException(BINDERDatabase.Identifier.MAX_MEMORY_USAGE_PERCENTAGE.name() + " must be greater than 0!");
+			this.maxMemoryUsagePercentage = values[0].intValue();
 		}
 		else 
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
@@ -142,7 +176,7 @@ public class BINDERDatabase extends BINDER implements InclusionDependencyAlgorit
 		else if (BINDERDatabase.Identifier.TEMP_FOLDER_PATH.name().equals(identifier)) {
 			if ("".equals(values[0]) || " ".equals(values[0]) || "/".equals(values[0]) || "\\".equals(values[0]) || File.separator.equals(values[0]) || FileUtils.isRoot(new File(values[0])))
 				throw new AlgorithmConfigurationException(BINDERDatabase.Identifier.TEMP_FOLDER_PATH + " must not be \"" + values[0] + "\"");
-			this.tempFolderPath = values[0] + File.separator + "BINDER_temp" + File.separator;
+			this.tempFolderPath = values[0];
 		}
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));

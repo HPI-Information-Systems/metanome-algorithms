@@ -62,60 +62,62 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 public class BINDER {
 
 	protected DatabaseConnectionGenerator databaseConnectionGenerator = null;
-	protected RelationalInputGenerator[] fileInputGenerator = null; // one for each file specifying a table instance
-	protected int inputRowLimit = -1;
+	protected RelationalInputGenerator[] fileInputGenerator = null;
 	protected InclusionDependencyResultReceiver resultReceiver = null;
 	protected DataAccessObject dao = null;
 	protected String[] tableNames = null;
 	protected String databaseName = null;
-	protected String tempFolderPath = null; // TODO: Use Metanome temp file functionality here (interface TempFileAlgorithm)
+	protected String tempFolderPath = "BINDER_temp"; // TODO: Use Metanome temp file functionality here (interface TempFileAlgorithm)
 	protected boolean cleanTemp = true;
 	protected boolean detectNary = false;
 	protected boolean filterKeyForeignkeys = false;
 	protected int maxNaryLevel = -1;
+	protected int inputRowLimit = -1;
+	protected int numBucketsPerColumn = 10; // Initial number of buckets per column
+	protected int memoryCheckFrequency = 100; // Number of new, i.e., so far unseen values during bucketing that trigger a memory consumption check
+	protected int maxMemoryUsagePercentage = 60; // The algorithm spills to disc if memory usage exceeds X% of available memory
 
-	protected int numColumns;
-	protected int numBucketsPerColumn = 10; // TODO: Parameter!
-	protected int memoryCheckFrequency = 100; // TODO: Parameter!
-	protected float maxMemoryUsagePercentage = 0.6f; // TODO: Parameter!
-	protected int overheadPerValueForIndexes = 64; // Bytes that each value requires in the comparison phase for the indexes
-	protected long availableMemory;
-	protected long maxMemoryUsage;
-	
-	protected Int2ObjectOpenHashMap<List<List<String>>> attribute2subBucketsCache = null;
-	
-	protected int[] tableColumnStartIndexes = null;
-	protected List<String> columnNames = null;
-	protected List<String> columnTypes = null;
-	
-	protected Int2ObjectOpenHashMap<IntSingleLinkedList> dep2ref = null;
-	protected int numUnaryINDs = 0;
-	
-	protected Map<AttributeCombination, List<AttributeCombination>> naryDep2ref = null;
-	protected int[] column2table = null;
-	protected String valueSeparator = "#";
-	protected int numNaryINDs = 0;
-	
-	protected OpenBitSet nullValueColumns;
-	
-	protected long unaryStatisticTime = -1;
-	protected long unaryLoadTime = -1;
-	protected long unaryCompareTime = -1;
-	protected LongArrayList naryGenerationTime = null;
-	protected LongArrayList naryLoadTime = null;
-	protected LongArrayList naryCompareTime = null;
-	protected long outputTime = -1;
+	private int overheadPerValueForIndexes = 64; // Bytes that each value requires in the comparison phase for the indexes
+	private int numColumns;
+	private long availableMemory;
+	private long maxMemoryUsage;
 
-	protected IntArrayList activeAttributesPerBucketLevel;
-	protected IntArrayList naryActiveAttributesPerBucketLevel;
-	protected int[] spillCounts = null;
-	protected List<int[]> narySpillCounts = null;
-	protected int[] refinements = null;
-	protected List<int[]> naryRefinements = null;
-	protected int[] bucketComparisonOrder = null;
-	protected LongArrayList columnSizes = null;
+	private File tempFolder = null;
 	
-	protected PruningStatistics pruningStatistics = null;
+	private Int2ObjectOpenHashMap<List<List<String>>> attribute2subBucketsCache = null;
+	
+	private int[] tableColumnStartIndexes = null;
+	private List<String> columnNames = null;
+	private List<String> columnTypes = null;
+	
+	private Int2ObjectOpenHashMap<IntSingleLinkedList> dep2ref = null;
+	private int numUnaryINDs = 0;
+	
+	private Map<AttributeCombination, List<AttributeCombination>> naryDep2ref = null;
+	private int[] column2table = null;
+	private String valueSeparator = "#";
+	private int numNaryINDs = 0;
+	
+	private OpenBitSet nullValueColumns;
+	
+	private long unaryStatisticTime = -1;
+	private long unaryLoadTime = -1;
+	private long unaryCompareTime = -1;
+	private LongArrayList naryGenerationTime = null;
+	private LongArrayList naryLoadTime = null;
+	private LongArrayList naryCompareTime = null;
+	private long outputTime = -1;
+
+	private IntArrayList activeAttributesPerBucketLevel;
+	private IntArrayList naryActiveAttributesPerBucketLevel;
+	private int[] spillCounts = null;
+	private List<int[]> narySpillCounts = null;
+	private int[] refinements = null;
+	private List<int[]> naryRefinements = null;
+	private int[] bucketComparisonOrder = null;
+	private LongArrayList columnSizes = null;
+	
+	private PruningStatistics pruningStatistics = null;
 	
 	@Override
 	public String toString() {
@@ -127,18 +129,20 @@ public class BINDER {
 		 
 		return "BINDER: \r\n\t" +
 				"input: " + input + "\r\n\t" +
-				"inputRowLimit: " + this.inputRowLimit + "\r\n\t" +
-				"resultReceiver: " + ((this.resultReceiver != null) ? this.resultReceiver.getClass().getName() : "-") + "\r\n\t" +
 				"dao: " + ((this.dao != null) ? this.dao.getClass().getName() : "-") + "\r\n\t" +
 				"databaseName: " + this.databaseName + "\r\n\t" +
-				"tempFolderPath: " + this.tempFolderPath + "\r\n\t" +
+				"inputRowLimit: " + this.inputRowLimit + "\r\n\t" +
+				"resultReceiver: " + ((this.resultReceiver != null) ? this.resultReceiver.getClass().getName() : "-") + "\r\n\t" +
+				"tempFolderPath: " + this.tempFolder.getPath() + "\r\n\t" +
 				"tableNames: " + ((this.tableNames != null) ? CollectionUtils.concat(this.tableNames, ", ") : "-") + "\r\n\t" +
 				"numColumns: " + this.numColumns + " (" + ((this.spillCounts != null) ? String.valueOf(CollectionUtils.countNotN(this.spillCounts, 0)) : "-") + " spilled)\r\n\t" +
 				"numBucketsPerColumn: " + this.numBucketsPerColumn + "\r\n\t" +
 				"bucketComparisonOrder: " + ((this.bucketComparisonOrder != null) ? CollectionUtils.concat(this.bucketComparisonOrder, ", ") : "-") + "\r\n\t" +
 				"memoryCheckFrequency: " + this.memoryCheckFrequency + "\r\n\t" +
-				"maxMemoryUsagePercentage: " + this.maxMemoryUsagePercentage + "\r\n\t" +
+				"maxMemoryUsagePercentage: " + this.maxMemoryUsagePercentage + "%\r\n\t" +
 				"availableMemory: " + this.availableMemory + " byte (spilled when exeeding " + this.maxMemoryUsage + " byte)\r\n\t" +
+				"numBucketsPerColumn: " + this.numBucketsPerColumn + "\r\n\t" +
+				"memoryCheckFrequency: " + this.memoryCheckFrequency + "\r\n\t" +
 				"cleanTemp: " + this.cleanTemp + "\r\n\t" +
 				"detectNary: " + this.detectNary + "\r\n\t" +
 				"numUnaryINDs: " + this.numUnaryINDs + "\r\n\t" +
@@ -169,7 +173,7 @@ public class BINDER {
 			"outputTime: " + this.outputTime;
 	}
 	
-	protected String toString(OpenBitSet o) {
+	private String toString(OpenBitSet o) {
 		StringBuilder builder = new StringBuilder("[");
 		for (int i = 0; i < o.length(); i++)
 			builder.append((o.get(i) == true) ? 1 : 0);
@@ -188,9 +192,6 @@ public class BINDER {
 	public void execute() throws AlgorithmExecutionException {
 		// Disable Logging (FastSet sometimes complains about skewed key distributions with lots of WARNINGs)
 		LoggingUtils.disableLogging();
-		
-		// Clean temp if there are files from previous runs that may pollute this run
-		FileUtils.cleanDirectory(new File(this.tempFolderPath));
 		
 		try {
 			////////////////////////////////////////////////////////
@@ -243,23 +244,30 @@ public class BINDER {
 			throw new AlgorithmExecutionException(e.getMessage());
 		}
 		finally {
-			if (this.databaseConnectionGenerator != null)
-				FileUtils.close(this.databaseConnectionGenerator);
+			FileUtils.close(this.databaseConnectionGenerator);
 			
 			// Clean temp
 			if (this.cleanTemp)
-				FileUtils.cleanDirectory(new File(this.tempFolderPath));
+				FileUtils.cleanDirectory(this.tempFolder);
 		}
 	}
 	
-	protected void initialize() throws InputGenerationException, SQLException, InputIterationException, AlgorithmConfigurationException {
+	private void initialize() throws InputGenerationException, SQLException, InputIterationException, AlgorithmConfigurationException {
+		System.out.println("Initializing ...");
+		
 		// Ensure the presence of an input generator
 		if ((this.databaseConnectionGenerator == null) && (this.fileInputGenerator == null))
 			throw new InputGenerationException("No input generator specified!");
-
+		
+		// Initialize temp folder
+		this.tempFolder = new File(this.tempFolderPath + File.separator + "temp");
+		
+		// Clean temp if there are files from previous runs that may pollute this run
+		FileUtils.cleanDirectory(this.tempFolder);
+		
 		// Initialize memory management
 		this.availableMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
-		this.maxMemoryUsage = (long)(this.availableMemory * this.maxMemoryUsagePercentage);
+		this.maxMemoryUsage = (long)(this.availableMemory * (this.maxMemoryUsagePercentage / 100.0f));
 		
 		// Query meta data for input tables
 		this.tableColumnStartIndexes = new int[this.tableNames.length];
@@ -304,7 +312,7 @@ public class BINDER {
 		}
 	}
 	
-	protected void collectStatisticsFrom(DatabaseConnectionGenerator inputGenerator, int tableIndex) throws InputGenerationException, AlgorithmConfigurationException {
+	private void collectStatisticsFrom(DatabaseConnectionGenerator inputGenerator, int tableIndex) throws InputGenerationException, AlgorithmConfigurationException {
 		ResultSet resultSet = null;
 		try {
 			// Query attribute names and types
@@ -326,7 +334,7 @@ public class BINDER {
 		}
 	}
 
-	protected void collectStatisticsFrom(RelationalInputGenerator inputGenerator) throws InputIterationException, InputGenerationException, AlgorithmConfigurationException {
+	private void collectStatisticsFrom(RelationalInputGenerator inputGenerator) throws InputIterationException, InputGenerationException, AlgorithmConfigurationException {
 		RelationalInput input = null;
 		try {
 			// Query attribute names and types
@@ -341,7 +349,9 @@ public class BINDER {
 		}
 	}
 	
-	protected void bucketize() throws InputGenerationException, InputIterationException, IOException, AlgorithmConfigurationException {
+	private void bucketize() throws InputGenerationException, InputIterationException, IOException, AlgorithmConfigurationException {
+		System.out.print("Bucketizing ... ");
+		
 		// Initialize the counters that count the empty buckets per bucket level to identify sparse buckets and promising bucket levels for comparison
 		int[] emptyBuckets = new int[this.numBucketsPerColumn];
 		for (int levelNumber = 0; levelNumber < this.numBucketsPerColumn; levelNumber++)
@@ -354,6 +364,8 @@ public class BINDER {
 		
 		for (int tableIndex = 0; tableIndex < this.tableNames.length; tableIndex++) {
 			String tableName = this.tableNames[tableIndex];
+			System.out.print(tableName + " ");
+			
 			int numTableColumns = (this.tableColumnStartIndexes.length > tableIndex + 1) ? this.tableColumnStartIndexes[tableIndex + 1] - this.tableColumnStartIndexes[tableIndex] : this.numColumns - this.tableColumnStartIndexes[tableIndex];
 			int startTableColumnIndex = this.tableColumnStartIndexes[tableIndex];
 			
@@ -430,20 +442,9 @@ public class BINDER {
 						}
 					}
 				}
-				try {
-					inputIterator.close();
-				}
-				catch (Exception e) {
-				}
 			}
 			finally {
-				if (inputIterator != null) {
-					try {
-						inputIterator.close();
-					}
-					catch (Exception e) {
-					}
-				}
+				FileUtils.close(inputIterator);
 			}
 			
 			// Write buckets to disk
@@ -470,9 +471,11 @@ public class BINDER {
 		
 		// Calculate the bucket comparison order from the emptyBuckets to minimize the influence of sparse-attribute-issue
 		this.calculateBucketComparisonOrder(emptyBuckets);
+		
+		System.out.println();
 	}
 		
-	protected void checkViaHashing() throws IOException {
+	private void checkViaHashing() throws IOException {
 		/////////////////////////////////////////////////////////
 		// Phase 2.1: Pruning (Dismiss first candidates early) //
 		/////////////////////////////////////////////////////////
@@ -556,7 +559,7 @@ public class BINDER {
 		}
 	}
 	
-	protected void checkViaSorting() throws IOException {
+	private void checkViaSorting() throws IOException {
 		/////////////////////////////////////
 		// Phase 2: Pruning and Validation //
 		/////////////////////////////////////
@@ -628,7 +631,7 @@ public class BINDER {
 				this.dep2ref.put(attribute.getAttributeId(), new IntSingleLinkedList(attribute.getReferenced()));
 	}
 	
-	protected void checkViaTwoStageIndexAndBitSets() throws IOException {
+	private void checkViaTwoStageIndexAndBitSets() throws IOException {
 		/////////////////////////////////////////////////////////
 		// Phase 2.1: Pruning (Dismiss first candidates early) //
 		/////////////////////////////////////////////////////////
@@ -734,7 +737,9 @@ public class BINDER {
 		}
 	}
 	
-	protected void checkViaTwoStageIndexAndLists() throws IOException {
+	private void checkViaTwoStageIndexAndLists() throws IOException {
+		System.out.println("Checking ...");
+		
 		/////////////////////////////////////////////////////////
 		// Phase 2.1: Pruning (Dismiss first candidates early) //
 		/////////////////////////////////////////////////////////
@@ -770,7 +775,7 @@ public class BINDER {
 		// Phase 2.2: Validation (Successively check all candidates) //
 		///////////////////////////////////////////////////////////////
 		
-		// The initially active attributes all all non-empty attributes
+		// The initially active attributes are all non-empty attributes
 		BitSet activeAttributes = new BitSet(this.numColumns);
 		for (int column = 0; column < this.numColumns; column++)
 			if (this.columnSizes.getLong(column) > 0)
@@ -834,7 +839,7 @@ public class BINDER {
 		this.dep2ref.putAll(dep2refFinal);
 	}
 	
-	protected void fetchCandidates(IntArrayList columns, Int2ObjectOpenHashMap<IntSingleLinkedList> dep2refToCheck, Int2ObjectOpenHashMap<IntSingleLinkedList> dep2refFinal) {
+	private void fetchCandidates(IntArrayList columns, Int2ObjectOpenHashMap<IntSingleLinkedList> dep2refToCheck, Int2ObjectOpenHashMap<IntSingleLinkedList> dep2refFinal) {
 		IntArrayList nonEmptyColumns = new IntArrayList(columns.size());
 		for (int column : columns)
 			if (this.columnSizes.getLong(column) > 0)
@@ -868,17 +873,17 @@ public class BINDER {
 		}
 	}
 	
-	protected void prune(Int2ObjectOpenHashMap<BitSet> attribute2Refs, BitSet attributeGroup) {
+	private void prune(Int2ObjectOpenHashMap<BitSet> attribute2Refs, BitSet attributeGroup) {
 		for (int attribute = attributeGroup.nextSetBit(0); attribute >= 0; attribute = attributeGroup.nextSetBit(attribute + 1))
 			attribute2Refs.get(attribute).and(attributeGroup);
 	}
 
-	protected void prune(Int2ObjectOpenHashMap<IntSingleLinkedList> attribute2Refs, IntArrayList attributeGroup) {
+	private void prune(Int2ObjectOpenHashMap<IntSingleLinkedList> attribute2Refs, IntArrayList attributeGroup) {
 		for (int attribute : attributeGroup)
 			attribute2Refs.get(attribute).retainAll(attributeGroup);
 	}
 	
-	protected BitSet getActiveAttributesFromBitSets(BitSet previouslyActiveAttributes, Int2ObjectOpenHashMap<BitSet> attribute2Refs) {
+	private BitSet getActiveAttributesFromBitSets(BitSet previouslyActiveAttributes, Int2ObjectOpenHashMap<BitSet> attribute2Refs) {
 		BitSet activeAttributes = new BitSet(this.numColumns);
 		for (int attribute = previouslyActiveAttributes.nextSetBit(0); attribute >= 0; attribute = previouslyActiveAttributes.nextSetBit(attribute + 1)) {
 			// All attributes referenced by this attribute are active
@@ -890,7 +895,7 @@ public class BINDER {
 		return activeAttributes;
 	}
 	
-	protected BitSet getActiveAttributesFromLists(BitSet previouslyActiveAttributes, Int2ObjectOpenHashMap<IntSingleLinkedList> attribute2Refs) {
+	private BitSet getActiveAttributesFromLists(BitSet previouslyActiveAttributes, Int2ObjectOpenHashMap<IntSingleLinkedList> attribute2Refs) {
 		BitSet activeAttributes = new BitSet(this.numColumns);
 		for (int attribute = previouslyActiveAttributes.nextSetBit(0); attribute >= 0; attribute = previouslyActiveAttributes.nextSetBit(attribute + 1)) {
 			// All attributes referenced by this attribute are active
@@ -902,15 +907,15 @@ public class BINDER {
 		return activeAttributes;
 	}
 	
-	protected int calculateBucketFor(String value) {
+	private int calculateBucketFor(String value) {
 		return Math.abs(value.hashCode() % this.numBucketsPerColumn); // range partitioning
 	}
 
-	protected int calculateBucketFor(String value, int bucketNumber, int numSubBuckets) {
+	private int calculateBucketFor(String value, int bucketNumber, int numSubBuckets) {
 		return ((Math.abs(value.hashCode() % (this.numBucketsPerColumn * numSubBuckets)) - bucketNumber) / this.numBucketsPerColumn); // range partitioning
 	}
 	
-	protected void calculateBucketComparisonOrder(int[] emptyBuckets) {
+	private void calculateBucketComparisonOrder(int[] emptyBuckets) {
 		List<Level> levels = new ArrayList<Level>(this.numColumns);
 		for (int level = 0; level < this.numBucketsPerColumn; level++)
 			levels.add(new Level(level, emptyBuckets[level]));
@@ -921,7 +926,7 @@ public class BINDER {
 			this.bucketComparisonOrder[rank] = levels.get(rank).getNumber();
 	}
 	
-	protected void writeBucket(int attributeNumber, int bucketNumber, int subBucketNumber, Collection<String> values) throws IOException {
+	private void writeBucket(int attributeNumber, int bucketNumber, int subBucketNumber, Collection<String> values) throws IOException {
 		// Write the values
 		String bucketFilePath = this.getBucketFilePath(attributeNumber, bucketNumber, subBucketNumber);
 		this.writeToDisk(bucketFilePath, values);
@@ -933,7 +938,7 @@ public class BINDER {
 		this.columnSizes.set(attributeNumber, size);
 	}
 	
-	protected void writeToDisk(String bucketFilePath, Collection<String> values) throws IOException {
+	private void writeToDisk(String bucketFilePath, Collection<String> values) throws IOException {
 		if ((values == null) || (values.isEmpty()))
 			return;
 		
@@ -959,7 +964,7 @@ public class BINDER {
 		}
 	}
 	
-	protected Set<String> readBucketAsSet(int attributeNumber, int bucketNumber, int subBucketNumber) throws IOException {
+	private Set<String> readBucketAsSet(int attributeNumber, int bucketNumber, int subBucketNumber) throws IOException {
 		if ((this.attribute2subBucketsCache != null) && (this.attribute2subBucketsCache.containsKey(attributeNumber)))
 			return new HashSet<String>(this.attribute2subBucketsCache.get(attributeNumber).get(subBucketNumber));
 		
@@ -969,7 +974,7 @@ public class BINDER {
 		return bucket;
 	}
 
-	protected List<String> readBucketAsList(int attributeNumber, int bucketNumber, int subBucketNumber) throws IOException {
+	private List<String> readBucketAsList(int attributeNumber, int bucketNumber, int subBucketNumber) throws IOException {
 		if ((this.attribute2subBucketsCache != null) && (this.attribute2subBucketsCache.containsKey(attributeNumber)))
 			return this.attribute2subBucketsCache.get(attributeNumber).get(subBucketNumber);
 		
@@ -979,7 +984,7 @@ public class BINDER {
 		return bucket;
 	}
 
-	protected void readFromDisk(String bucketFilePath, Collection<String> values) throws IOException {
+	private void readFromDisk(String bucketFilePath, Collection<String> values) throws IOException {
 		File file = new File(bucketFilePath);
 		if (!file.exists())
 			return;
@@ -996,9 +1001,9 @@ public class BINDER {
 		}
 	}
 
-	protected BufferedReader getBucketReader(int attributeNumber, int bucketNumber, int subBucketNumber) throws IOException {
+	private BufferedReader getBucketReader(int attributeNumber, int bucketNumber, int subBucketNumber) throws IOException {
 		String bucketFilePath = this.getBucketFilePath(attributeNumber, bucketNumber, subBucketNumber);
-
+		
 		File file = new File(bucketFilePath);
 		if (!file.exists())
 			return null;
@@ -1006,20 +1011,20 @@ public class BINDER {
 		return FileUtils.buildFileReader(bucketFilePath);
 	}
 	
-	protected String getBucketFilePath(int attributeNumber, int bucketNumber, int subBucketNumber) {
+	private String getBucketFilePath(int attributeNumber, int bucketNumber, int subBucketNumber) {
 		if (subBucketNumber >= 0)
-			return this.tempFolderPath + attributeNumber + File.separator + bucketNumber + "_" + subBucketNumber;
-		return this.tempFolderPath + attributeNumber + File.separator + bucketNumber;
+			return this.tempFolder.getPath() + File.separator + attributeNumber + File.separator + bucketNumber + "_" + subBucketNumber;
+		return this.tempFolder.getPath() + File.separator + attributeNumber + File.separator + bucketNumber;
 	}
 	
-	protected int[] refineBucketLevel(IntArrayList activeAttributes, int level) throws IOException {
+	private int[] refineBucketLevel(IntArrayList activeAttributes, int level) throws IOException {
 		BitSet activeAttributesBits = new BitSet(this.numColumns);
 		for (int attribute : activeAttributes)
 			activeAttributesBits.set(attribute);
 		return this.refineBucketLevel(activeAttributesBits, 0, level);
 	}
 	
-	protected int[] refineBucketLevel(BitSet activeAttributes, int attributeOffset, int level) throws IOException { // The offset is used for n-ary INDs, because their buckets are placed behind the unary buckets on disk, which is important if the unary buckets have not been deleted before
+	private int[] refineBucketLevel(BitSet activeAttributes, int attributeOffset, int level) throws IOException { // The offset is used for n-ary INDs, because their buckets are placed behind the unary buckets on disk, which is important if the unary buckets have not been deleted before
 		// Empty sub bucket cache, because it will be refilled in the following
 		this.attribute2subBucketsCache = null;
 		
@@ -1043,12 +1048,9 @@ public class BINDER {
 			return subBucketNumbers;
 		}
 		
-		// Measure the memory available for storing the current level
-		long currentlyAvailableMemory = (long)(ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax() * this.maxMemoryUsagePercentage);
-		
 		// Define the number of sub buckets
-		long maxBucketSize = currentlyAvailableMemory / numAttributes;
-		int numSubBuckets = (int)(levelSize / currentlyAvailableMemory) + 1;
+		long maxBucketSize = this.maxMemoryUsage / numAttributes;
+		int numSubBuckets = (int)(levelSize / this.maxMemoryUsage) + 1;
 
 		int[] subBucketNumbers = new int[numSubBuckets];
 		
@@ -1125,12 +1127,13 @@ public class BINDER {
 		return subBucketNumbers;
 	}
 	
-	protected void detectNaryViaBucketing() throws InputGenerationException, InputIterationException, IOException, AlgorithmConfigurationException {
+	private void detectNaryViaBucketing() throws InputGenerationException, InputIterationException, IOException, AlgorithmConfigurationException {
+		System.out.print("N-ary IND detection ...");
+		
 		// Clean temp
-		if (this.cleanTemp) {
-			File tempFoder = new File(this.tempFolderPath);
-			FileUtils.cleanDirectory(tempFoder);
-		}
+		if (this.cleanTemp)
+			FileUtils.cleanDirectory(this.tempFolder);
+		
 		// N-ary column combinations are enumerated following the enumeration of the attributes
 		int naryOffset = this.numColumns;
 
@@ -1161,6 +1164,8 @@ public class BINDER {
 		this.naryLoadTime = new LongArrayList();
 		this.naryCompareTime = new LongArrayList();
 		while (++naryLevel <= this.maxNaryLevel || this.maxNaryLevel <= 0) {
+			System.out.print(" L" + naryLevel);
+			
 			// Generate (n+1)-ary IND candidates from the already identified unary and n-ary IND candidates
 			final long naryGenerationTimeCurrent = System.currentTimeMillis();
 			
@@ -1206,19 +1211,18 @@ public class BINDER {
 			naryOffset = naryOffset + attributeCombinations.size();
 
 			this.naryCompareTime.add(System.currentTimeMillis() - naryCompareTimeCurrent);
-			System.out.println("Used " + (System.currentTimeMillis() - naryGenerationTimeCurrent) + " ms on level " + naryLevel);
+			System.out.print("(" + (System.currentTimeMillis() - naryGenerationTimeCurrent) + " ms)");
 		}
+		System.out.println();
 	}
 	
-	protected void detectNaryViaSingleChecks() throws InputGenerationException, AlgorithmConfigurationException {
+	private void detectNaryViaSingleChecks() throws InputGenerationException, AlgorithmConfigurationException {
 		if (this.databaseConnectionGenerator == null)
 			throw new InputGenerationException("n-ary IND detection using De Marchi's MIND algorithm only possible on databases");
 		
 		// Clean temp
-		if (this.cleanTemp) {
-			File tempFoder = new File(this.tempFolderPath);
-			FileUtils.cleanDirectory(tempFoder);
-		}
+		if (this.cleanTemp)
+			FileUtils.cleanDirectory(this.tempFolder);
 		
 		// Initialize nPlusOneAryDep2ref with unary dep2ref
 		Map<AttributeCombination, List<AttributeCombination>> nPlusOneAryDep2ref = new HashMap<AttributeCombination, List<AttributeCombination>>();
@@ -1307,7 +1311,7 @@ public class BINDER {
 		}
 	}
 
-	protected Map<AttributeCombination, List<AttributeCombination>> generateNPlusOneAryCandidates(Map<AttributeCombination, List<AttributeCombination>> naryDep2ref) {
+	private Map<AttributeCombination, List<AttributeCombination>> generateNPlusOneAryCandidates(Map<AttributeCombination, List<AttributeCombination>> naryDep2ref) {
 		Map<AttributeCombination, List<AttributeCombination>> nPlusOneAryDep2ref = new HashMap<AttributeCombination, List<AttributeCombination>>();
 		
 		for (AttributeCombination depAttributeCombination : naryDep2ref.keySet()) {
@@ -1355,7 +1359,7 @@ public class BINDER {
 		return nPlusOneAryDep2ref;
 	}
 	
-	protected boolean validAttributeForNaryCandidates(int attribute) {
+	private boolean validAttributeForNaryCandidates(int attribute) {
 		// Do not use empty attributes
 		if (this.columnSizes.getLong(attribute) == 0)
 			return false;
@@ -1367,7 +1371,7 @@ public class BINDER {
 		return true;
 	}
 	
-	protected boolean validAttributeCombinationForNaryCandidates(AttributeCombination attributeCombination) {
+	private boolean validAttributeCombinationForNaryCandidates(AttributeCombination attributeCombination) {
 		// Attribute combinations of size > 1 are always valid for further extensions; their attributes have been checked before
 		if (attributeCombination.getAttributes().length > 1)
 			return true;
@@ -1376,7 +1380,7 @@ public class BINDER {
 		return this.validAttributeForNaryCandidates(depInCombination);
 	}
 	
-	protected boolean isCombineable(AttributeCombination depAttributeCombination, int dep) {
+	private boolean isCombineable(AttributeCombination depAttributeCombination, int dep) {
 		// Do not combine attributes from different tables
 		if (depAttributeCombination.getTable() != this.column2table[dep])
 			return false;
@@ -1389,7 +1393,7 @@ public class BINDER {
 		return true;
 	}
 	
-	protected boolean isCombineable(AttributeCombination depAttributeCombination, AttributeCombination refAttributeCombination, int ref) {
+	private boolean isCombineable(AttributeCombination depAttributeCombination, AttributeCombination refAttributeCombination, int ref) {
 		// Do not combine attributes from different tables
 		if (refAttributeCombination.getTable() != this.column2table[ref])
 			return false;
@@ -1401,7 +1405,7 @@ public class BINDER {
 		return true;
 	}
 
-	protected void naryBucketize(List<AttributeCombination> attributeCombinations, int naryOffset, int[] narySpillCounts) throws InputGenerationException, InputIterationException, IOException, AlgorithmConfigurationException {
+	private void naryBucketize(List<AttributeCombination> attributeCombinations, int naryOffset, int[] narySpillCounts) throws InputGenerationException, InputIterationException, IOException, AlgorithmConfigurationException {
 		// Identify the relevant attribute combinations for the different tables
 		List<IntArrayList> table2attributeCombinationNumbers = new ArrayList<IntArrayList>(this.tableNames.length);
 		for (int tableNumber = 0; tableNumber < this.tableNames.length; tableNumber++)
@@ -1501,20 +1505,9 @@ public class BINDER {
 						}
 					}
 				}
-				try {
-					inputIterator.close();
-				}
-				catch (Exception e) {
-				}
 			}
 			finally {
-				if (inputIterator != null) {
-					try {
-						inputIterator.close();
-					}
-					catch (Exception e) {
-					}
-				}
+				FileUtils.close(inputIterator);
 			}
 			
 			// Write buckets to disk
@@ -1542,7 +1535,7 @@ public class BINDER {
 		this.calculateBucketComparisonOrder(emptyBuckets);
 	}
 
-	protected void naryCheckViaTwoStageIndexAndLists(Map<AttributeCombination, List<AttributeCombination>> naryDep2ref, List<AttributeCombination> attributeCombinations, int naryOffset) throws IOException {
+	private void naryCheckViaTwoStageIndexAndLists(Map<AttributeCombination, List<AttributeCombination>> naryDep2ref, List<AttributeCombination> attributeCombinations, int naryOffset) throws IOException {
 		////////////////////////////////////////////////////
 		// Validation (Successively check all candidates) //
 		////////////////////////////////////////////////////
@@ -1608,7 +1601,7 @@ public class BINDER {
 		}
 	}
 	
-	protected BitSet getActiveAttributeCombinations(BitSet previouslyActiveAttributeCombinations, Map<AttributeCombination, List<AttributeCombination>> naryDep2ref, List<AttributeCombination> attributeCombinations) {
+	private BitSet getActiveAttributeCombinations(BitSet previouslyActiveAttributeCombinations, Map<AttributeCombination, List<AttributeCombination>> naryDep2ref, List<AttributeCombination> attributeCombinations) {
 		BitSet activeAttributeCombinations = new BitSet(attributeCombinations.size());
 		for (int attribute = previouslyActiveAttributeCombinations.nextSetBit(0); attribute >= 0; attribute = previouslyActiveAttributeCombinations.nextSetBit(attribute + 1)) {
 			AttributeCombination attributeCombination = attributeCombinations.get(attribute);
@@ -1624,7 +1617,7 @@ public class BINDER {
 		return activeAttributeCombinations;
 	}
 	
-	protected void prune(Map<AttributeCombination, List<AttributeCombination>> naryDep2ref, IntArrayList attributeCombinationGroupIndexes, List<AttributeCombination> attributeCombinations) {
+	private void prune(Map<AttributeCombination, List<AttributeCombination>> naryDep2ref, IntArrayList attributeCombinationGroupIndexes, List<AttributeCombination> attributeCombinations) {
 		List<AttributeCombination> attributeCombinationGroup = new ArrayList<AttributeCombination>(attributeCombinationGroupIndexes.size());
 		for (int attributeCombinationIndex : attributeCombinationGroupIndexes)
 			attributeCombinationGroup.add(attributeCombinations.get(attributeCombinationIndex));
@@ -1634,7 +1627,9 @@ public class BINDER {
 				naryDep2ref.get(attributeCombination).retainAll(attributeCombinationGroup);
 	}
 	
-	protected void output() throws CouldNotReceiveResultException, ColumnNameMismatchException {
+	private void output() throws CouldNotReceiveResultException, ColumnNameMismatchException {
+		System.out.println("Generating output ...");
+		
 		// Output unary INDs
 		for (int dep : this.dep2ref.keySet()) {
 			String depTableName = this.getTableNameFor(dep, this.tableColumnStartIndexes);
@@ -1667,14 +1662,14 @@ public class BINDER {
 		}
 	}
 	
-	protected String getTableNameFor(int column, int[] tableColumnStartIndexes) {
+	private String getTableNameFor(int column, int[] tableColumnStartIndexes) {
 		for (int i = 1; i < tableColumnStartIndexes.length; i++)
 			if (tableColumnStartIndexes[i] > column)
 				return this.tableNames[i - 1];
 		return this.tableNames[this.tableNames.length - 1];
 	}
 	
-	protected ColumnPermutation buildColumnPermutationFor(AttributeCombination attributeCombination) {
+	private ColumnPermutation buildColumnPermutationFor(AttributeCombination attributeCombination) {
 		String tableName = this.tableNames[attributeCombination.getTable()];
 		
 		List<ColumnIdentifier> columnIdentifiers = new ArrayList<ColumnIdentifier>(attributeCombination.getAttributes().length);

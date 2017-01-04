@@ -26,7 +26,7 @@ import de.uni_potsdam.hpi.utils.FileUtils;
 public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, RelationalInputParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm {
 
 	public enum Identifier {
-		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL, FILTER_KEY_FOREIGNKEYS
+		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP, DETECT_NARY, MAX_NARY_LEVEL, FILTER_KEY_FOREIGNKEYS, NUM_BUCKETS_PER_COLUMN, MEMORY_CHECK_FREQUENCY, MAX_MEMORY_USAGE_PERCENTAGE
 	};
 	
 	@Override
@@ -36,38 +36,58 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		
 		ConfigurationRequirementString tempFolder = new ConfigurationRequirementString(BINDERFile.Identifier.TEMP_FOLDER_PATH.name());
 		String[] defaultTempFolder = new String[1];
-		defaultTempFolder[0] = "BINDER_temp";
+		defaultTempFolder[0] = this.tempFolderPath;
 		tempFolder.setDefaultValues(defaultTempFolder);
 		tempFolder.setRequired(true);
 		configs.add(tempFolder);
 		
-		ConfigurationRequirementInteger inputRowlimit = new ConfigurationRequirementInteger(BINDERFile.Identifier.INPUT_ROW_LIMIT.name());
-		inputRowlimit.setRequired(false);
-		configs.add(inputRowlimit);
+		ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(BINDERFile.Identifier.INPUT_ROW_LIMIT.name());
+		Integer[] defaultInputRowLimit = { Integer.valueOf(this.inputRowLimit) };
+		inputRowLimit.setDefaultValues(defaultInputRowLimit);
+		inputRowLimit.setRequired(false);
+		configs.add(inputRowLimit);
+		
+		ConfigurationRequirementInteger maxNaryLevel = new ConfigurationRequirementInteger(BINDERFile.Identifier.MAX_NARY_LEVEL.name());
+		Integer[] defaultMaxNaryLevel = { Integer.valueOf(this.maxNaryLevel) };
+		maxNaryLevel.setDefaultValues(defaultMaxNaryLevel);
+		maxNaryLevel.setRequired(false);
+		configs.add(maxNaryLevel);
+		
+		ConfigurationRequirementInteger numBucketsPerColumn = new ConfigurationRequirementInteger(BINDERFile.Identifier.NUM_BUCKETS_PER_COLUMN.name());
+		Integer[] defaultNumBucketsPerColumn = { Integer.valueOf(this.numBucketsPerColumn) };
+		numBucketsPerColumn.setDefaultValues(defaultNumBucketsPerColumn);
+		numBucketsPerColumn.setRequired(true);
+		configs.add(numBucketsPerColumn);
+
+		ConfigurationRequirementInteger memoryCheckFrequency = new ConfigurationRequirementInteger(BINDERFile.Identifier.MEMORY_CHECK_FREQUENCY.name());
+		Integer[] defaultMemoryCheckFrequency = { Integer.valueOf(this.memoryCheckFrequency) };
+		memoryCheckFrequency.setDefaultValues(defaultMemoryCheckFrequency);
+		memoryCheckFrequency.setRequired(true);
+		configs.add(memoryCheckFrequency);
+
+		ConfigurationRequirementInteger maxMemoryUsagePercentage = new ConfigurationRequirementInteger(BINDERFile.Identifier.MAX_MEMORY_USAGE_PERCENTAGE.name());
+		Integer[] defaultMaxMemoryUsagePercentage = { Integer.valueOf(this.maxMemoryUsagePercentage) };
+		maxMemoryUsagePercentage.setDefaultValues(defaultMaxMemoryUsagePercentage);
+		maxMemoryUsagePercentage.setRequired(true);
+		configs.add(maxMemoryUsagePercentage);
 		
 		ConfigurationRequirementBoolean cleanTemp = new ConfigurationRequirementBoolean(BINDERFile.Identifier.CLEAN_TEMP.name());
 		Boolean[] defaultCleanTemp = new Boolean[1];
-		defaultCleanTemp[0] = Boolean.TRUE;
+		defaultCleanTemp[0] = Boolean.valueOf(this.cleanTemp);
 		cleanTemp.setDefaultValues(defaultCleanTemp);
 		cleanTemp.setRequired(true);
 		configs.add(cleanTemp);
 		
 		ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(BINDERFile.Identifier.DETECT_NARY.name());
 		Boolean[] defaultDetectNary = new Boolean[1];
-		defaultDetectNary[0] = Boolean.FALSE;
+		defaultDetectNary[0] = Boolean.valueOf(this.detectNary);
 		detectNary.setDefaultValues(defaultDetectNary);
 		detectNary.setRequired(true);
 		configs.add(detectNary);
 
-		ConfigurationRequirementInteger maxNaryLevel = new ConfigurationRequirementInteger(BINDERFile.Identifier.MAX_NARY_LEVEL.name());
-		Integer[] defaultMaxNaryLevel = { Integer.valueOf(-1), Integer.valueOf(0) };
-		maxNaryLevel.setDefaultValues(defaultMaxNaryLevel);
-		maxNaryLevel.setRequired(false);
-		configs.add(maxNaryLevel);
-
 		ConfigurationRequirementBoolean filterKeyForeignkeys = new ConfigurationRequirementBoolean(BINDERFile.Identifier.FILTER_KEY_FOREIGNKEYS.name());
 		Boolean[] defaultFilterKeyForeignkeys = new Boolean[1];
-		defaultFilterKeyForeignkeys[0] = Boolean.FALSE;
+		defaultFilterKeyForeignkeys[0] = Boolean.valueOf(this.filterKeyForeignkeys);
 		filterKeyForeignkeys.setDefaultValues(defaultFilterKeyForeignkeys);
 		filterKeyForeignkeys.setRequired(true);
 		configs.add(filterKeyForeignkeys);
@@ -111,9 +131,23 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 				this.inputRowLimit = values[0].intValue();
 		}
 		else if (BINDERFile.Identifier.MAX_NARY_LEVEL.name().equals(identifier)) {
-			if (values.length > 0) {
+			if (values.length > 0)
 				this.maxNaryLevel = values[0].intValue();
-			}
+		}
+		else if (BINDERFile.Identifier.NUM_BUCKETS_PER_COLUMN.name().equals(identifier)) {
+			if (values[0].intValue() <= 0)
+				throw new AlgorithmConfigurationException(BINDERFile.Identifier.NUM_BUCKETS_PER_COLUMN.name() + " must be greater than 0!");
+			this.numBucketsPerColumn = values[0].intValue();
+		}
+		else if (BINDERFile.Identifier.MEMORY_CHECK_FREQUENCY.name().equals(identifier)) {
+			if (values[0].intValue() <= 0)
+				throw new AlgorithmConfigurationException(BINDERFile.Identifier.MEMORY_CHECK_FREQUENCY.name() + " must be greater than 0!");
+			this.memoryCheckFrequency = values[0].intValue();
+		}
+		else if (BINDERFile.Identifier.MAX_MEMORY_USAGE_PERCENTAGE.name().equals(identifier)) {
+			if (values[0].intValue() <= 0)
+				throw new AlgorithmConfigurationException(BINDERFile.Identifier.MAX_MEMORY_USAGE_PERCENTAGE.name() + " must be greater than 0!");
+			this.maxMemoryUsagePercentage = values[0].intValue();
 		}
 		else 
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
@@ -124,7 +158,7 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 		if (BINDERFile.Identifier.TEMP_FOLDER_PATH.name().equals(identifier)) {
 			if ("".equals(values[0]) || " ".equals(values[0]) || "/".equals(values[0]) || "\\".equals(values[0]) || File.separator.equals(values[0]) || FileUtils.isRoot(new File(values[0])))
 				throw new AlgorithmConfigurationException(BINDERFile.Identifier.TEMP_FOLDER_PATH + " must not be \"" + values[0] + "\"");
-			this.tempFolderPath = values[0] + File.separator + "BINDER_temp" + File.separator;
+			this.tempFolderPath = values[0];
 		}
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));

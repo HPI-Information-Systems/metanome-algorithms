@@ -30,7 +30,7 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 	}
 	
 	public enum Identifier {
-		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP
+		INPUT_FILES, INPUT_ROW_LIMIT, TEMP_FOLDER_PATH, CLEAN_TEMP, MEMORY_CHECK_FREQUENCY, MAX_MEMORY_USAGE_PERCENTAGE
 	};
 	
 	@Override
@@ -40,18 +40,32 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 
 		ConfigurationRequirementString tempFolder = new ConfigurationRequirementString(SPIDERFile.Identifier.TEMP_FOLDER_PATH.name());
 		String[] defaultTempFolder = new String[1];
-		defaultTempFolder[0] = "SPIDER_temp";
+		defaultTempFolder[0] = this.tempFolderPath;
 		tempFolder.setDefaultValues(defaultTempFolder);
 		tempFolder.setRequired(true);
 		configs.add(tempFolder);
 
-		ConfigurationRequirementInteger inputRowlimit = new ConfigurationRequirementInteger(SPIDERFile.Identifier.INPUT_ROW_LIMIT.name());
-		inputRowlimit.setRequired(false);
-		configs.add(inputRowlimit);
+		ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(SPIDERFile.Identifier.INPUT_ROW_LIMIT.name());
+		Integer[] defaultInputRowLimit = { Integer.valueOf(this.inputRowLimit) };
+		inputRowLimit.setDefaultValues(defaultInputRowLimit);
+		inputRowLimit.setRequired(false);
+		configs.add(inputRowLimit);
+
+		ConfigurationRequirementInteger memoryCheckFrequency = new ConfigurationRequirementInteger(SPIDERFile.Identifier.MEMORY_CHECK_FREQUENCY.name());
+		Integer[] defaultMemoryCheckFrequency = { Integer.valueOf(this.memoryCheckFrequency) };
+		memoryCheckFrequency.setDefaultValues(defaultMemoryCheckFrequency);
+		memoryCheckFrequency.setRequired(true);
+		configs.add(memoryCheckFrequency);
+
+		ConfigurationRequirementInteger maxMemoryUsagePercentage = new ConfigurationRequirementInteger(SPIDERFile.Identifier.MAX_MEMORY_USAGE_PERCENTAGE.name());
+		Integer[] defaultMaxMemoryUsagePercentage = { Integer.valueOf(this.maxMemoryUsagePercentage) };
+		maxMemoryUsagePercentage.setDefaultValues(defaultMaxMemoryUsagePercentage);
+		maxMemoryUsagePercentage.setRequired(true);
+		configs.add(maxMemoryUsagePercentage);
 		
 		ConfigurationRequirementBoolean cleanTemp = new ConfigurationRequirementBoolean(SPIDERFile.Identifier.CLEAN_TEMP.name());
 		Boolean[] defaultCleanTemp = new Boolean[1];
-		defaultCleanTemp[0] = Boolean.TRUE;
+		defaultCleanTemp[0] = Boolean.valueOf(this.cleanTemp);
 		cleanTemp.setDefaultValues(defaultCleanTemp);
 		cleanTemp.setRequired(true);
 		configs.add(cleanTemp);
@@ -94,6 +108,16 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 			if (values.length > 0)
 				this.inputRowLimit = values[0].intValue();
 		}
+		else if (SPIDERFile.Identifier.MEMORY_CHECK_FREQUENCY.name().equals(identifier)) {
+			if (values[0].intValue() <= 0)
+				throw new AlgorithmConfigurationException(SPIDERFile.Identifier.MEMORY_CHECK_FREQUENCY.name() + " must be greater than 0!");
+			this.memoryCheckFrequency = values[0].intValue();
+		}
+		else if (SPIDERFile.Identifier.MAX_MEMORY_USAGE_PERCENTAGE.name().equals(identifier)) {
+			if (values[0].intValue() <= 0)
+				throw new AlgorithmConfigurationException(SPIDERFile.Identifier.MAX_MEMORY_USAGE_PERCENTAGE.name() + " must be greater than 0!");
+			this.maxMemoryUsagePercentage = values[0].intValue();
+		}
 		else 
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}
@@ -103,7 +127,7 @@ public class SPIDERFile extends SPIDER implements InclusionDependencyAlgorithm, 
 		if (SPIDERFile.Identifier.TEMP_FOLDER_PATH.name().equals(identifier)) {
 			if ("".equals(values[0]) || " ".equals(values[0]) || "/".equals(values[0]) || "\\".equals(values[0]) || File.separator.equals(values[0]) || FileUtils.isRoot(new File(values[0])))
 				throw new AlgorithmConfigurationException(SPIDERFile.Identifier.TEMP_FOLDER_PATH + " must not be \"" + values[0] + "\"");
-			this.tempFolderPath = values[0] + File.separator + "SPIDER_temp" + File.separator;
+			this.tempFolderPath = values[0];
 		}
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
