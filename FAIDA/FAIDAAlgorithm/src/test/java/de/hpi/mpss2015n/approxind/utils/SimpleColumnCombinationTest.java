@@ -52,7 +52,7 @@ public class SimpleColumnCombinationTest {
         SimpleColumnCombination b = SimpleColumnCombination.create(TABLE, 2,3,7);
 
         SimpleColumnCombination result = SimpleColumnCombination.create(TABLE, 2, 3, 6, 7);
-        assertThat(a.combineWith(b), equalTo(result));
+        assertThat(a.combineWith(b, null), equalTo(result));
     }
 
     @Test

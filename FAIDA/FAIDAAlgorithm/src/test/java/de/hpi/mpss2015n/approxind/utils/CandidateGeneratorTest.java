@@ -18,7 +18,7 @@ public class CandidateGeneratorTest {
         List<SimpleInd> candidates = gen.createCombinedCandidates(Arrays.asList(
                 SimpleInd.left(TABLE, 0).right(TABLE, 3),
                 SimpleInd.left(TABLE, 1).right(TABLE, 4)
-        ));
+        ), true, null);
 
         assertThat(candidates, contains(SimpleInd.left(TABLE, 0, 1).right(TABLE, 3, 4)));
 
@@ -31,7 +31,7 @@ public class CandidateGeneratorTest {
                 SimpleInd.left(TABLE, 1, 2).right(TABLE, 4, 5),
                 SimpleInd.left(TABLE, 0, 2).right(TABLE, 3, 5)
         );
-        List<SimpleInd> candidates = gen.createCombinedCandidates(inds);
+        List<SimpleInd> candidates = gen.createCombinedCandidates(inds, true, null);
 
         assertThat(candidates, contains(SimpleInd.left(TABLE, 0, 1, 2).right(TABLE, 3, 4, 5)));
     }

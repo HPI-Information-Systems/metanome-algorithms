@@ -1,47 +1,70 @@
 package de.hpi.mpss2015n.approxind.utils;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public final class CandidateGenerator {
 
 
-    public List<SimpleInd> createCombinedCandidates(List<SimpleInd> inds) {
-        List<SimpleInd> newInds = new ArrayList<>();
+    public List<SimpleInd> createCombinedCandidates(List<SimpleInd> inds, boolean isCombineNull, ColumnStore[] stores) {
+        Map<SimpleColumnCombination, SimpleColumnCombination> columnCombinations = new HashMap<>();
+
+        // Check that we are not merging NULL columns if this is not desired (cf. BINDER).
+        // The slight difference with ignoring NULL columns is that we still consider them for unary INDs.
+        if (!isCombineNull) {
+            inds = inds.stream()
+                    .filter(ind -> {
+                        ColumnStore store = stores[ind.left.getTable()];
+                        for (int column : ind.left.getColumns()) {
+                            if (store.isNullColumn(column)) return false;
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+
+        List<SimpleInd> newIndCandidates = new ArrayList<>();
         HashSet<SimpleInd> lastResults = new HashSet<>(inds);
-        Collections.sort(inds);
+        inds.sort(SimpleInd.prefixBlockComparator);
         for (int i = 0; i < inds.size(); i++) {
+            SimpleInd a = inds.get(i);
+
             for (int j = i + 1; j < inds.size(); j++) {
-                SimpleInd a = inds.get(i);
                 SimpleInd b = inds.get(j);
-                if(a.left.lastColumn() == b.left.lastColumn()){
-                    continue; //otherwise symbol in planets everywhere...
+
+                // Check if LHS(a) and LHS(b) belong to the same prefix block.
+                if (!a.left.startsWith(b.left) || !a.right.startsWith(b.right)) break;
+
+                // Skip over completely equal LHS or RHS.
+                if (a.left.lastColumn() == b.left.lastColumn() || a.right.lastColumn() == b.right.lastColumn()) {
+                    continue;
                 }
-                if (a.startsWith(b) && a.right.lastColumn() != b.right.lastColumn()) {
-                    SimpleInd newCandidate = a.combineWith(b);
-                    if(isPotentiallyValid(newCandidate, lastResults)) newInds.add(newCandidate);
+
+                // Combine the two INDs and test them.
+                SimpleInd newCandidate = a.combineWith(b, columnCombinations);
+                if (isPotentiallyValid(newCandidate, lastResults, isCombineNull, stores)) {
+                    newIndCandidates.add(newCandidate);
                 }
-                //Todo: why wrong result when break ... sorting problem?
+
             }
         }
-        return newInds;
+        return newIndCandidates;
     }
 
-    private boolean isPotentiallyValid(SimpleInd newCandidate, HashSet<SimpleInd> lastResults){
+    private boolean isPotentiallyValid(SimpleInd newCandidate, HashSet<SimpleInd> lastResults, boolean isCombineNull, ColumnStore[] stores) {
         //only allow each column once in LHS and RHS - comment out in case this is not desired!
-        if(newCandidate.left.getTable() == newCandidate.right.getTable()) {
-          for (int i : newCandidate.left.getColumns()) {
-            for (int j : newCandidate.right.getColumns()) {
-              if (i == j) {
-                return false;
-              }
+        if (newCandidate.left.getTable() == newCandidate.right.getTable()) {
+            for (int i : newCandidate.left.getColumns()) {
+                for (int j : newCandidate.right.getColumns()) {
+                    if (i == j) {
+                        return false;
+                    }
+                }
             }
-          }
         }
-        if (newCandidate.size() <= 2){
+        if (newCandidate.size() <= 2) {
             return true;
         }
         List<SimpleInd> toBeTested = new ArrayList<>();

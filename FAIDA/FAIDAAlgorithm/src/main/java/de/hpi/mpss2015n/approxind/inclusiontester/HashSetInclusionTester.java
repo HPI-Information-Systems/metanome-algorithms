@@ -13,7 +13,10 @@ import java.util.Map;
 public final class HashSetInclusionTester implements InclusionTester {
 
     private final Map<Integer, Map<SimpleColumnCombination, HashSet<List<Long>>>> sets;
+
     private Map<SimpleColumnCombination, HashSet<List<Long>>> currentTable;
+
+    private int numChecks = 0;
 
     public HashSetInclusionTester() {
         this.sets = new HashMap<>();
@@ -54,6 +57,7 @@ public final class HashSetInclusionTester implements InclusionTester {
     public boolean isIncludedIn(SimpleColumnCombination a, SimpleColumnCombination b) {
         HashSet<List<Long>> setA = sets.get(a.getTable()).get(a);
         HashSet<List<Long>> setB = sets.get(b.getTable()).get(b);
+        this.numChecks++;
         return setB.containsAll(setA);
     }
 
@@ -62,5 +66,13 @@ public final class HashSetInclusionTester implements InclusionTester {
 		currentTable=sets.get(table);
 	}
 
+    @Override
+    public int getNumCertainChecks() {
+        return this.numChecks;
+    }
 
+    @Override
+    public int getNumUnertainChecks() {
+        return 0;
+    }
 }

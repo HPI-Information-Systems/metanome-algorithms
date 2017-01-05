@@ -16,10 +16,6 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 
 import de.hpi.mpss2015n.approxind.mocks.RelationalInputBuilder;
-import de.metanome.algorithm_integration.input.RelationalInput;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class ColumnStoreTest {
 
@@ -31,7 +27,7 @@ public class ColumnStoreTest {
         rb.setHeader("col1", "col2", "col3")
             .addRow("a", "a", "b")
             .addRow("1", "2", "2");
-        ColumnStore cs = new ColumnStore("testDataset", 0, rb.build().generateNewCopy(), 10);
+        ColumnStore cs = new ColumnStore("testDataset", 0, rb.build().generateNewCopy(), 10, false);
         ColumnIterator rows = cs.getRows();
 
         long[] row = rows.next();
@@ -48,7 +44,7 @@ public class ColumnStoreTest {
     @Test
     public void testGetRowsWithScc() throws Exception {
         rb.setHeader("col1", "col2", "col3").addRow("a", "a", "b");
-        ColumnStore cs = new ColumnStore("testDataset", 0, rb.build().generateNewCopy(), 10);
+        ColumnStore cs = new ColumnStore("testDataset", 0, rb.build().generateNewCopy(), 10, false);
         ColumnIterator rows = cs.getRows(SimpleColumnCombination.create(0, 0, 2));
 
         long[] row = rows.next();
@@ -62,7 +58,7 @@ public class ColumnStoreTest {
     @Test
     public void testHasNextTwice() throws Exception {
         rb.setHeader("col1", "col2").addRow("a", "a");
-        ColumnStore cs = new ColumnStore("testDataset", 0, rb.build().generateNewCopy(), 10);
+        ColumnStore cs = new ColumnStore("testDataset", 0, rb.build().generateNewCopy(), 10, false);
         ColumnIterator rows = cs.getRows();
 
         assertThat(rows.hasNext(), is(true));
@@ -79,7 +75,7 @@ public class ColumnStoreTest {
     @Test
     public void testHashCache() throws Exception {
         rb.setHeader("col1").addRow("a").addRow("a");
-        ColumnStore cs = new ColumnStore("testDataset", 0, rb.build().generateNewCopy(), 10);
+        ColumnStore cs = new ColumnStore("testDataset", 0, rb.build().generateNewCopy(), 10, false);
         ColumnIterator rows = cs.getRows();
 
         assertThat(rows.hasNext(), is(true));
@@ -98,7 +94,7 @@ public class ColumnStoreTest {
         for (int i = 0; i < count; i++) {
             rb.addRow(Integer.toString(i));
         }
-        ColumnStore cs = new ColumnStore("testDataset", 0, rb.build().generateNewCopy(), SAMPLE_SIZE);
+        ColumnStore cs = new ColumnStore("testDataset", 0, rb.build().generateNewCopy(), SAMPLE_SIZE, false);
         ColumnIterator rows = cs.getRows();
         HashFunction hashFunction = Hashing.murmur3_128();
         int i = 0;
