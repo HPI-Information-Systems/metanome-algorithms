@@ -96,7 +96,7 @@ public class HyperLogLog implements ICardinality, Serializable {
         this(log2m(rsd));
     }
 
-    private static int log2m(double rsd) {
+    public static int log2m(double rsd) {
         return (int) (Math.log((1.106 / rsd) * (1.106 / rsd)) / Math.log(2));
     }
 
@@ -274,6 +274,10 @@ public class HyperLogLog implements ICardinality, Serializable {
 
     private Object writeReplace() {
         return new SerializationHolder(this);
+    }
+
+    public static int getRequiredCapacityInBytes(double rsd) {
+        return 4 * RegisterSet.getSizeForCount(1 << HyperLogLog.log2m(rsd));
     }
 
 

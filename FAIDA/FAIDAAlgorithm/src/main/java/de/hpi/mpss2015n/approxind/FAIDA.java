@@ -27,15 +27,17 @@ public final class FAIDA {
     private final CandidateGenerator candidateLogic;
     private final boolean ignoreNullValueColumns;
     private final boolean ignoreAllConstantColumns;
+    private final boolean isCombineNull;
+    private final boolean isReuseColumnStore;
     private final int sampleGoal;
 
     public FAIDA(Arity arity, RowSampler sampler, InclusionTester inclusionTester,
                  int sampleGoal) {
-        this(arity, sampler, inclusionTester, sampleGoal, true, true);
+        this(arity, sampler, inclusionTester, sampleGoal, true, true, true, false);
     }
 
     public FAIDA(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal,
-                 boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns) {
+                 boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns, boolean isCombineNull, boolean isReuseColumnStore) {
         this.detectNary = arity == Arity.N_ARY;
         this.sampler = sampler;
         this.inclusionTester = inclusionTester;
@@ -43,6 +45,8 @@ public final class FAIDA {
         this.sampleGoal = sampleGoal;
         this.ignoreNullValueColumns = ignoreNullValueColumns;
         this.ignoreAllConstantColumns = ignoreAllConstantColumns;
+        this.isCombineNull = isCombineNull;
+        this.isReuseColumnStore = isReuseColumnStore;
     }
 
     public List<InclusionDependency> execute(RelationalInputGenerator[] fileInputGenerators)
@@ -50,6 +54,10 @@ public final class FAIDA {
         IndConverter converter = new IndConverter(fileInputGenerators);
         List<SimpleInd> result = executeInternal(fileInputGenerators);
         logger.info("Result size: {}", result.size());
+        logger.info("Certain checks: {}, uncertain checks: {}",
+                this.inclusionTester.getNumCertainChecks(),
+                this.inclusionTester.getNumUnertainChecks()
+        );
 
         int i = 0;
         String[] tableNames = new String[fileInputGenerators.length];
@@ -68,7 +76,7 @@ public final class FAIDA {
         int arity = 1;
 
         logger.info("Creating column stores.");
-        ColumnStore[] stores = ColumnStore.create(fileInputGenerators, this.sampleGoal);
+        ColumnStore[] stores = ColumnStore.create(fileInputGenerators, this.sampleGoal, this.isReuseColumnStore);
         int constantColumnCounter = 0, nullColumnCounter = 0;
         for (ColumnStore store : stores) {
             for (int columnIndex = 0; columnIndex < store.getNumberOfColumns(); columnIndex++) {
@@ -98,7 +106,7 @@ public final class FAIDA {
             while (lastResult.size() > 0) {
                 arity++;
                 logger.info("Creating {}-ary IND candidates.", arity);
-                candidates = candidateLogic.createCombinedCandidates(lastResult);
+                candidates = candidateLogic.createCombinedCandidates(lastResult, isCombineNull, stores);
                 if (candidates.isEmpty()) {
                     logger.info("no more candidates for next level!");
                     break;
@@ -179,19 +187,22 @@ public final class FAIDA {
      */
     public List<SimpleColumnCombination> createUnaryColumnCombinations(ColumnStore[] stores) {
         List<SimpleColumnCombination> combinations = new ArrayList<>();
-        for (int i = 0; i < stores.length; i++) {
-            final ColumnStore store = stores[i];
+        int index = 0;
+        for (int table = 0; table < stores.length; table++) {
+            final ColumnStore store = stores[table];
             int numColumns = store.getNumberOfColumns();
 
-            for (int j = 0; j < numColumns; j++) {
-                if (ignoreAllConstantColumns && store.isConstantColumn(j)) {
+            for (int column = 0; column < numColumns; column++) {
+                if (ignoreAllConstantColumns && store.isConstantColumn(column)) {
                     continue;
                 }
-                if (ignoreNullValueColumns && store.isNullColumn(j)) {
+                if (ignoreNullValueColumns && store.isNullColumn(column)) {
                     continue;
                 }
 
-                combinations.add(SimpleColumnCombination.create(i, j));
+                SimpleColumnCombination combination = SimpleColumnCombination.create(table, column);
+                combination.setIndex(index);
+                combinations.add(combination);
             }
         }
         return combinations;
