@@ -1,4 +1,4 @@
-package de.hpi.metanome.algorithms.hyfd;
+package de.hpi.metanome.algorithms.hyucc;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,19 +9,19 @@ import java.util.PriorityQueue;
 
 import org.apache.lucene.util.OpenBitSet;
 
-import de.hpi.metanome.algorithms.hyfd.structures.FDList;
-import de.hpi.metanome.algorithms.hyfd.structures.FDSet;
-import de.hpi.metanome.algorithms.hyfd.structures.FDTree;
-import de.hpi.metanome.algorithms.hyfd.structures.IntegerPair;
-import de.hpi.metanome.algorithms.hyfd.structures.PositionListIndex;
-import de.hpi.metanome.algorithms.hyfd.utils.Logger;
-import de.hpi.metanome.algorithms.hyfd.utils.ValueComparator;
+import de.hpi.metanome.algorithms.hyucc.structures.IntegerPair;
+import de.hpi.metanome.algorithms.hyucc.structures.PositionListIndex;
+import de.hpi.metanome.algorithms.hyucc.structures.UCCList;
+import de.hpi.metanome.algorithms.hyucc.structures.UCCSet;
+import de.hpi.metanome.algorithms.hyucc.structures.UCCTree;
+import de.hpi.metanome.algorithms.hyucc.utils.Logger;
+import de.hpi.metanome.algorithms.hyucc.utils.ValueComparator;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 public class Sampler {
 
-	private FDSet negCover;
-	private FDTree posCover;
+	private UCCSet negCover;
+	private UCCTree posCover;
 	private int[][] compressedRecords;
 	private List<PositionListIndex> plis;
 	private float efficiencyThreshold;
@@ -29,7 +29,7 @@ public class Sampler {
 	private List<AttributeRepresentant> attributeRepresentants = null;
 	private MemoryGuardian memoryGuardian;
 
-	public Sampler(FDSet negCover, FDTree posCover, int[][] compressedRecords, List<PositionListIndex> plis, float efficiencyThreshold, ValueComparator valueComparator, MemoryGuardian memoryGuardian) {
+	public Sampler(UCCSet negCover, UCCTree posCover, int[][] compressedRecords, List<PositionListIndex> plis, float efficiencyThreshold, ValueComparator valueComparator, MemoryGuardian memoryGuardian) {
 		this.negCover = negCover;
 		this.posCover = posCover;
 		this.compressedRecords = compressedRecords;
@@ -39,11 +39,11 @@ public class Sampler {
 		this.memoryGuardian = memoryGuardian;
 	}
 
-	public FDList enrichNegativeCover(List<IntegerPair> comparisonSuggestions) {
+	public UCCList enrichNegativeCover(List<IntegerPair> comparisonSuggestions) {
 		int numAttributes = this.compressedRecords[0].length;
 		
 		Logger.getInstance().writeln("Investigating comparison suggestions ... ");
-		FDList newNonFds = new FDList(numAttributes, this.negCover.getMaxDepth());
+		UCCList newNonUCCs = new UCCList(numAttributes, this.negCover.getMaxDepth());
 		OpenBitSet equalAttrs = new OpenBitSet(this.posCover.getNumAttributes());
 		for (IntegerPair comparisonSuggestion : comparisonSuggestions) {
 			this.match(equalAttrs, comparisonSuggestion.a(), comparisonSuggestion.b());
@@ -51,10 +51,10 @@ public class Sampler {
 			if (!this.negCover.contains(equalAttrs)) {
 				OpenBitSet equalAttrsCopy = equalAttrs.clone();
 				this.negCover.add(equalAttrsCopy);
-				newNonFds.add(equalAttrsCopy);
+				newNonUCCs.add(equalAttrsCopy);
 				
 				this.memoryGuardian.memoryChanged(1);
-				this.memoryGuardian.match(this.negCover, this.posCover, newNonFds);
+				this.memoryGuardian.match(this.negCover, this.posCover, newNonUCCs);
 			}
 		}
 		
@@ -76,7 +76,7 @@ public class Sampler {
 			float efficiencyFactor = (int)Math.ceil(1 / this.efficiencyThreshold);
 			for (int i = 0; i < numAttributes; i++) {
 				AttributeRepresentant attributeRepresentant = new AttributeRepresentant(this.plis.get(i).getClusters(), efficiencyFactor, this.negCover, this.posCover, this, this.memoryGuardian);
-				attributeRepresentant.runNext(newNonFds, this.compressedRecords);
+				attributeRepresentant.runNext(newNonUCCs, this.compressedRecords);
 				if (attributeRepresentant.getEfficiency() != 0)
 					this.attributeRepresentants.add(attributeRepresentant);
 			}
@@ -93,14 +93,14 @@ public class Sampler {
 		PriorityQueue<AttributeRepresentant> queue = new PriorityQueue<AttributeRepresentant>(this.attributeRepresentants);
 		while (!queue.isEmpty()) {
 			AttributeRepresentant attributeRepresentant = queue.remove();
-			if (!attributeRepresentant.runNext(newNonFds, this.compressedRecords))
+			if (!attributeRepresentant.runNext(newNonUCCs, this.compressedRecords))
 				continue;
 			
 			if (attributeRepresentant.getEfficiency() != 0)
 				queue.add(attributeRepresentant);
 		}
 		
-		return newNonFds;
+		return newNonUCCs;
 	}
 
 	private class ClusterComparator implements Comparator<Integer> {
@@ -123,16 +123,6 @@ public class Sampler {
 		
 		@Override
 		public int compare(Integer o1, Integer o2) {
-			// Next
-		/*	int value1 = this.sortKeys[o1.intValue()][this.activeKey2];
-			int value2 = this.sortKeys[o2.intValue()][this.activeKey2];
-			return value2 - value1;
-		*/	
-			// Previous
-		/*	int value1 = this.sortKeys[o1.intValue()][this.activeKey1];
-			int value2 = this.sortKeys[o2.intValue()][this.activeKey1];
-			return value2 - value1;
-		*/	
 			// Previous -> Next
 			int value1 = this.sortKeys[o1.intValue()][this.activeKey1];
 			int value2 = this.sortKeys[o2.intValue()][this.activeKey1];
@@ -142,17 +132,6 @@ public class Sampler {
 				value2 = this.sortKeys[o2.intValue()][this.activeKey2];
 			}
 			return value2 - value1;
-			
-			// Next -> Previous
-		/*	int value1 = this.sortKeys[o1.intValue()][this.activeKey2];
-			int value2 = this.sortKeys[o2.intValue()][this.activeKey2];
-			int result = value2 - value1;
-			if (result == 0) {
-				value1 = this.sortKeys[o1.intValue()][this.activeKey1];
-				value2 = this.sortKeys[o2.intValue()][this.activeKey1];
-			}
-			return value2 - value1;
-		*/	
 		}
 		
 		private int increment(int number) {
@@ -162,13 +141,13 @@ public class Sampler {
 
 	private class AttributeRepresentant implements Comparable<AttributeRepresentant> {
 		
-		private int windowDistance;
+		private int windowDistance = 0;
 		private IntArrayList numNewNonFds = new IntArrayList();
 		private IntArrayList numComparisons = new IntArrayList();
 		private float efficiencyFactor;
 		private List<IntArrayList> clusters;
-		private FDSet negCover;
-		private FDTree posCover;
+		private UCCSet negCover;
+		private UCCTree posCover;
 		private Sampler sampler;
 		private MemoryGuardian memoryGuardian;
 		
@@ -194,28 +173,27 @@ public class Sampler {
 			return (int)(sumNonFds * (this.efficiencyFactor / sumComparisons));
 		}
 		
-		public AttributeRepresentant(List<IntArrayList> clusters, float efficiencyFactor, FDSet negCover, FDTree posCover, Sampler sampler, MemoryGuardian memoryGuardian) {
+		public AttributeRepresentant(List<IntArrayList> clusters, float efficiencyFactor, UCCSet negCover, UCCTree posCover, Sampler sampler, MemoryGuardian memoryGuardian) {
 			this.clusters = new ArrayList<IntArrayList>(clusters);
 			this.efficiencyFactor = efficiencyFactor;
 			this.negCover = negCover;
 			this.posCover = posCover;
 			this.sampler = sampler;
-			this.memoryGuardian = memoryGuardian;
+			this.memoryGuardian =  memoryGuardian;
 		}
 		
 		@Override
-		public int compareTo(AttributeRepresentant o) {
-//			return o.getNumNewNonFds() - this.getNumNewNonFds();		
+		public int compareTo(AttributeRepresentant o) {		
 			return (int)Math.signum(o.getEfficiency() - this.getEfficiency());
 		}
 		
-		public boolean runNext(FDList newNonFds, int[][] compressedRecords) {
+		public boolean runNext(UCCList newNonUCCs, int[][] compressedRecords) {
 			this.windowDistance++;
 			int numNewNonFds = 0;
 			int numComparisons = 0;
 			OpenBitSet equalAttrs = new OpenBitSet(this.posCover.getNumAttributes());
 			
-			int previousNegCoverSize = newNonFds.size();
+			int previousNewNonFdsSize = newNonUCCs.size();
 			Iterator<IntArrayList> clusterIterator = this.clusters.iterator();
 			while (clusterIterator.hasNext()) {
 				IntArrayList cluster = clusterIterator.next();
@@ -234,15 +212,15 @@ public class Sampler {
 					if (!this.negCover.contains(equalAttrs)) {
 						OpenBitSet equalAttrsCopy = equalAttrs.clone();
 						this.negCover.add(equalAttrsCopy);
-						newNonFds.add(equalAttrsCopy);
+						newNonUCCs.add(equalAttrsCopy);
 						
 						this.memoryGuardian.memoryChanged(1);
-						this.memoryGuardian.match(this.negCover, this.posCover, newNonFds);
+						this.memoryGuardian.match(this.negCover, this.posCover, newNonUCCs);
 					}
 					numComparisons++;
 				}
 			}
-			numNewNonFds = newNonFds.size() - previousNegCoverSize;
+			numNewNonFds = newNonUCCs.size() - previousNewNonFdsSize;
 			
 			this.numNewNonFds.add(numNewNonFds);
 			this.numComparisons.add(numComparisons);
@@ -263,4 +241,5 @@ public class Sampler {
 			if (this.valueComparator.isEqual(t1[i], t2[i]))
 				equalAttrs.set(i);
 	}
+	
 }

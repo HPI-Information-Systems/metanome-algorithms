@@ -64,6 +64,7 @@
         <module>SPIDER</module>
         <module>BINDER</module>
         <module>HyFD</module>
+        <module>HyUCC</module>
         <module>tane</module>
         <module>fun</module>
         <module>fdmine</module>

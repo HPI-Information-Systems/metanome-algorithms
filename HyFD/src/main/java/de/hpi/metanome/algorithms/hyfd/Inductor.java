@@ -7,6 +7,7 @@ import org.apache.lucene.util.OpenBitSet;
 import de.hpi.metanome.algorithms.hyfd.structures.FDList;
 import de.hpi.metanome.algorithms.hyfd.structures.FDSet;
 import de.hpi.metanome.algorithms.hyfd.structures.FDTree;
+import de.hpi.metanome.algorithms.hyfd.utils.Logger;
 
 public class Inductor {
 
@@ -25,7 +26,7 @@ public class Inductor {
 			return;
 		
 		// Sort the negative cover
-		System.out.println("Sorting FD-violations ...");
+		Logger.getInstance().writeln("Sorting FD-violations ...");
 		Collections.sort(nonFds, new Comparator<OpenBitSet>() {
 			@Override
 			public int compare(OpenBitSet o1, OpenBitSet o2) {
@@ -34,7 +35,7 @@ public class Inductor {
 		});
 */		// THE SORTING IS NOT NEEDED AS THE UCCSet SORTS THE NONUCCS BY LEVEL ALREADY
 		
-		System.out.println("Inducing FD candidates ...");
+		Logger.getInstance().writeln("Inducing FD candidates ...");
 		for (int i = nonFds.getFdLevels().size() - 1; i >= 0; i--) {
 			if (i >= nonFds.getFdLevels().size()) // If this level has been trimmed during iteration
 				continue;

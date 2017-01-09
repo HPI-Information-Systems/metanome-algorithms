@@ -1,10 +1,11 @@
-package de.hpi.metanome.algorithms.hyfd;
+package de.hpi.metanome.algorithms.hyucc;
 
 import java.lang.management.ManagementFactory;
 
-import de.hpi.metanome.algorithms.hyfd.structures.FDList;
-import de.hpi.metanome.algorithms.hyfd.structures.FDSet;
-import de.hpi.metanome.algorithms.hyfd.structures.FDTree;
+import de.hpi.metanome.algorithms.hyucc.structures.UCCList;
+import de.hpi.metanome.algorithms.hyucc.structures.UCCSet;
+import de.hpi.metanome.algorithms.hyucc.structures.UCCTree;
+import de.hpi.metanome.algorithms.hyucc.utils.Logger;
 
 public class MemoryGuardian {
 	
@@ -16,7 +17,7 @@ public class MemoryGuardian {
 	private long trimMemoryUsage;
 	private long availableMemory;
 	private int allocationEventsSinceLastCheck = 0;
-
+	
 	public void setActive(boolean active) {
 		this.active = active;
 	}
@@ -42,25 +43,25 @@ public class MemoryGuardian {
 		return memoryUsage > memory;
 	}
 	
-	public void match(FDSet negCover, FDTree posCover, FDList newNonFDs) {
+	public void match(UCCSet negCover, UCCTree posCover, UCCList newNonUCCs) {
 		if ((!this.active) || (this.allocationEventsSinceLastCheck < this.memoryCheckFrequency))
 			return;
 		
 		if (this.memoryExhausted(this.maxMemoryUsage)) {
-//			Logger.getInstance().writeln("Memory exhausted (" + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() + "/" + this.maxMemoryUsage + ") ");
+			Logger.getInstance().write("Memory exhausted (" + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() + "/" + this.maxMemoryUsage + ") ");
 			Runtime.getRuntime().gc();
-//			Logger.getInstance().writeln("GC reduced to " + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed());
+			Logger.getInstance().writeln("GC reduced to " + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed());
 			
 			while (this.memoryExhausted(this.trimMemoryUsage)) {
 				int depth = Math.max(posCover.getDepth(), negCover.getDepth()) - 1;
 				if (depth < 1)
 					throw new RuntimeException("Insufficient memory to calculate any result!");
 				
-				System.out.print(" (trim to " + depth + ")");
+				Logger.getInstance().writeln(" (trim to " + depth + ")");
 				posCover.trim(depth);
 				negCover.trim(depth);
-				if (newNonFDs != null)
-					newNonFDs.trim(depth);
+				if (newNonUCCs != null)
+					newNonUCCs.trim(depth);
 				Runtime.getRuntime().gc();
 			}
 		}

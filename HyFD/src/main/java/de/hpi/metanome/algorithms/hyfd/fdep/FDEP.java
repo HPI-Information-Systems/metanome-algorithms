@@ -29,7 +29,7 @@ public class FDEP {
 		//long t = System.currentTimeMillis();
 		FDTree posCoverTree = this.calculatePositiveCover(negCoverTree);
 		negCoverTree = null;
-		//System.out.println("t = " + (System.currentTimeMillis() - t));
+		//Logger.getInstance().writeln("t = " + (System.currentTimeMillis() - t));
 		
 		//posCoverTree.filterDeadElements();
 		

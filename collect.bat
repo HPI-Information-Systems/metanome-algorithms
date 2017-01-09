@@ -12,6 +12,8 @@ copy MANY\target\*.jar _COLLECTION_
 
 copy HyFD\target\*.jar _COLLECTION_
 
+copy HyUCC\target\*.jar _COLLECTION_
+
 copy tane\tane_algorithm\target\*.jar _COLLECTION_
 ::copy tane\tane_tree_dir_algorithm\target\*.jar _COLLECTION_
 ::copy tane\tane_tree_end_algorithm\target\*.jar _COLLECTION_

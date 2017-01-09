@@ -14,15 +14,7 @@
  * limitations under the License.
  */
 
-package de.hpi.metanome.algorithms.hyfd.structures;
-
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+package de.hpi.metanome.algorithms.hyucc.structures;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +26,13 @@ import java.util.List;
 import org.apache.lucene.util.OpenBitSet;
 
 import de.uni_potsdam.hpi.utils.CollectionUtils;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 /**
  * Position list indices (or stripped partitions) are an index structure that
@@ -88,6 +87,25 @@ public class PositionListIndex {
 	public boolean isUnique() {
 		return this.size() == 0;
 	}
+
+	public boolean isUniqueWith(int[][] compressedRecords, OpenBitSet otherAttrs, List<IntegerPair> comparisonSuggestions) {
+		int attrsSize = (int) otherAttrs.cardinality();
+		
+		for (IntArrayList cluster : this.clusters) {
+			Object2IntOpenHashMap<ClusterIdentifier> value2record = new Object2IntOpenHashMap<>(cluster.size());
+			for (int recordId : cluster) {
+				ClusterIdentifier value = this.buildClusterIdentifier(otherAttrs, attrsSize, compressedRecords[recordId]);
+				if (value == null)
+					continue;
+				if (value2record.containsKey(value)) {
+					comparisonSuggestions.add(new IntegerPair(recordId, value2record.getInt(value)));
+					return false;
+				}
+				value2record.put(value, recordId);
+			}
+		}
+		return true;
+	}
 	
 	public boolean isConstant(int numRecords) {
 		if (numRecords <= 1)
@@ -97,6 +115,12 @@ public class PositionListIndex {
 		return false;
 	}
 
+	/**
+	 * Intersects the given PositionListIndex with this PositionListIndex returning a new PositionListIndex.
+	 *
+	 * @param otherPLI the other {@link de.uni_potsdam.hpi.metanome.algorithm_helper.data_structures.PositionListIndex} to intersect
+	 * @return the intersected {@link de.uni_potsdam.hpi.metanome.algorithm_helper.data_structures.PositionListIndex}
+	 */
 /*	public PositionListIndex intersect(PositionListIndex otherPLI) {
 		Int2IntOpenHashMap hashedPLI = otherPLI.asHashMap();		
 		Int2ObjectMap<Int2ObjectMap<IntArrayList>> intersectMap = this.buildIntersectMap(this, hashedPLI);
@@ -110,7 +134,14 @@ public class PositionListIndex {
 		return new PositionListIndex(clusters);
 	}
 */
-	
+	/**
+	 * Returns the position list index in a map representation. Every row index
+	 * maps to a value reconstruction. As the original values are unknown they
+	 * are represented by a counter. The position list index ((0, 1), (2, 4),
+	 * (3, 5)) would be represented by {0=0, 1=0, 2=1, 3=2, 4=1, 5=2}.
+	 *
+	 * @return the pli as hash map
+	 */
 /*	public Int2IntOpenHashMap asHashMap() {
 		Int2IntOpenHashMap hashedPLI = new Int2IntOpenHashMap(this.clusters.size());		
 		int clusterId = 0;
@@ -153,27 +184,24 @@ public class PositionListIndex {
 	
 	public PositionListIndex intersect(int[]... plis) {
 		List<IntArrayList> clusters = new ArrayList<>();
-		for (IntArrayList pivotCluster : this.clusters) {
+		for (int cluster1Id = 0; cluster1Id < this.clusters.size(); cluster1Id++) {
+			IntArrayList pivotCluster = this.clusters.get(cluster1Id);
 			HashMap<IntArrayList, IntArrayList> clustersMap = new HashMap<IntArrayList, IntArrayList>(pivotCluster.size());
 			
 			for (int recordId : pivotCluster) {
 				IntArrayList subClusters = new IntArrayList(plis.length);
 				
-				boolean isUnique = false;
-				for (int i = 0; i < plis.length; i++) {
-					if (plis[i][recordId] == -1) {
-						isUnique = true;
-						break;
-					}	
+				for (int i = 0; i < plis.length; i++)
 					subClusters.add(plis[i][recordId]);
+				
+				if (clustersMap.containsKey(subClusters)) {
+					clustersMap.get(subClusters).add(recordId);
 				}
-				if (isUnique)
-					continue;
-				
-				if (!clustersMap.containsKey(subClusters))
-					clustersMap.put(subClusters, new IntArrayList());
-				
-				clustersMap.get(subClusters).add(recordId);
+				else {
+					IntArrayList cluster = new IntArrayList();
+					cluster.add(recordId);
+					clustersMap.put(subClusters, cluster);
+				}
 			}
 			
 			for (IntArrayList cluster : clustersMap.values())
@@ -222,6 +250,11 @@ public class PositionListIndex {
 		return intersectMap;
 	}
 
+	/**
+	 * Returns the number of columns to remove in order to make column unique. (raw key error)
+	 *
+	 * @return raw key error
+	 */
 /*	public long getRawKeyError() {
 		if (this.rawKeyError == -1) {
 			this.rawKeyError = this.calculateRawKeyError();
@@ -487,7 +520,7 @@ public class PositionListIndex {
 		
 		return new ClusterIdentifier(cluster);
 	}
-
+	
 	protected ClusterIdentifier buildClusterIdentifier(int recordId, int[][] invertedPlis, OpenBitSet lhs, int lhsSize) { 
 		int[] cluster = new int[lhsSize];
 		
