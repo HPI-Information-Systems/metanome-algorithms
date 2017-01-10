@@ -42,3 +42,5 @@ cp AIDFD/target/*.jar _COLLECTION_
 cp FAIDA/FAIDAAlgorithm/target/*.jar _COLLECTION_
 
 cp SCDP/target/*.jar _COLLECTION_
+
+cp MvdDet/target/*.jar _COLLECTION_

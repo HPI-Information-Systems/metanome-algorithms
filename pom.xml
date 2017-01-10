@@ -77,5 +77,6 @@
         <module>MANY</module>
         <module>dfd</module>
         <module>ORDER</module>
+        <module>MvdDet</module>
     </modules>
 </project>
