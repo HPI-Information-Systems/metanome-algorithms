@@ -40,3 +40,5 @@ copy AIDFD\target\*.jar _COLLECTION_
 copy FAIDA\FAIDAAlgorithm\target\*.jar _COLLECTION_
 
 copy SCDP\target\*.jar _COLLECTION_
+
+copy MvdDet\target\*.jar _COLLECTION_
