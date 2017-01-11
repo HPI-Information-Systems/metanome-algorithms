@@ -34,6 +34,20 @@
       <version>${metanome.version}</version>
       <scope>compile</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>de.metanome</groupId>
+      <artifactId>algorithm_helper</artifactId>
+      <version>${metanome.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>de.metanome</groupId>
+      <artifactId>backend</artifactId>
+      <version>${metanome.version}</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <build>
