@@ -12,8 +12,8 @@ import de.metanome.algorithm_integration.algorithm_types.RelationalInputParamete
 import de.metanome.algorithm_integration.algorithm_types.StringParameterAlgorithm;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementBoolean;
-import de.metanome.algorithm_integration.configuration.ConfigurationRequirementFileInput;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementInteger;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirementRelationalInput;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementString;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
@@ -32,7 +32,7 @@ public class BINDERFile extends BINDER implements InclusionDependencyAlgorithm, 
 	@Override
 	public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
 		ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<ConfigurationRequirement<?>>(5);
-		configs.add(new ConfigurationRequirementFileInput(BINDERFile.Identifier.INPUT_FILES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
+		configs.add(new ConfigurationRequirementRelationalInput(BINDERFile.Identifier.INPUT_FILES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
 		
 		ConfigurationRequirementString tempFolder = new ConfigurationRequirementString(BINDERFile.Identifier.TEMP_FOLDER_PATH.name());
 		String[] defaultTempFolder = new String[1];
