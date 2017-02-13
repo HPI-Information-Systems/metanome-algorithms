@@ -107,7 +107,7 @@ public abstract class AbstractColumnStore {
      * Prepare the directory to host the column store.
      */
     protected Path prepareDirectory(String dataset, int table, RelationalInput input) {
-        String tableName = com.google.common.io.Files.getNameWithoutExtension(input.relationName());
+        String tableName = makeFileName(input.relationName());
         Path dir = Paths.get(DIRECTORY, dataset, tableName);
         logger.info("writing table {} to {}", table, dir.toAbsolutePath());
         try {
@@ -119,6 +119,25 @@ public abstract class AbstractColumnStore {
         this.sampleFile = new File(dir.toFile(), "" + table + "-sample.csv");
 
         return dir;
+    }
+
+    /**
+     * Replace any unusual characters with underscores.
+     *
+     * @param relationName the name to be freed from suspicious characters
+     * @return the cleansed file name
+     */
+    private static String makeFileName(String relationName) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < relationName.length(); i++) {
+            char c = relationName.charAt(i);
+            if (!Character.isLetterOrDigit(c) && c != '-' && c != '.') {
+                sb.append('_');
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     /**
