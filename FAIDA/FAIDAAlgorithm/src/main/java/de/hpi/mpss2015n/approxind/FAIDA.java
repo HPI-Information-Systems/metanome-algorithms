@@ -30,7 +30,10 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
     private RelationalInputGenerator[] inputGenerators;
 
 
-    private boolean isIgnoreNullColumns = true, isIgnoreConstantColumns = true, isCombineNull = true;
+    private boolean isIgnoreNullColumns = true,
+            isIgnoreConstantColumns = true,
+            isCombineNull = true,
+            isUseVirtualColumnStore = false;
 
     private boolean detectNary = true;
 
@@ -51,7 +54,7 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
 
     public enum Identifier {
         INPUT_FILES, DETECT_NARY, APPROXIMATE_TESTER, APPROXIMATE_TESTER_BYTES, HLL_REL_STD_DEV, SAMPLE_GOAL,
-        IGNORE_NULL, IGNORE_CONSTANT, REUSE_COLUMN_STORE, COMBINE_NULL
+        IGNORE_NULL, IGNORE_CONSTANT, REUSE_COLUMN_STORE, COMBINE_NULL, VIRTUAL_COLUMN_STORE
     }
 
     @Override
@@ -99,6 +102,11 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
         reuseColumnStore.setRequired(false);
         configs.add(reuseColumnStore);
 
+        ConfigurationRequirementBoolean virtualColumnStore = new ConfigurationRequirementBoolean(Identifier.VIRTUAL_COLUMN_STORE.name());
+        virtualColumnStore.setDefaultValues(new Boolean[]{this.isUseVirtualColumnStore});
+        virtualColumnStore.setRequired(false);
+        configs.add(virtualColumnStore);
+
         ConfigurationRequirementString hllRelativeStandardDeviation = new ConfigurationRequirementString(Identifier.HLL_REL_STD_DEV.name());
         hllRelativeStandardDeviation.setDefaultValues(new String[]{Double.toString(this.hllRelativeStddev)});
         hllRelativeStandardDeviation.setRequired(false);
@@ -138,6 +146,7 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
                 isIgnoreNullColumns,
                 isIgnoreConstantColumns,
                 isCombineNull,
+                isUseVirtualColumnStore,
                 isReuseColumnStore
         );
         List<InclusionDependency> result = algorithm.execute(inputGenerators);
@@ -189,6 +198,8 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
             this.isCombineNull = values[0];
         } else if (Identifier.IGNORE_CONSTANT.name().equals(identifier)) {
             this.isIgnoreConstantColumns = values[0];
+        } else if (Identifier.VIRTUAL_COLUMN_STORE.name().equals(identifier)) {
+            this.isUseVirtualColumnStore = values[0];
         } else if (Identifier.REUSE_COLUMN_STORE.name().equals(identifier)) {
             this.isReuseColumnStore = values[0];
         } else {
@@ -220,7 +231,7 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
 
     @Override
     public String getAuthors() {
-        return "Moritz Finke, Christian Dullweber, Martin Zabel, Manuel Hegner, Christian Zöllner";
+        return "Moritz Finke, Christian Dullweber, Martin Zabel, Manuel Hegner, Christian Zöllner, Sebastian Kruse, Thorsten Papenbrock";
     }
 
     @Override

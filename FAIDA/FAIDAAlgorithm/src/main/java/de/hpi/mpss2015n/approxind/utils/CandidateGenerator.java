@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 public final class CandidateGenerator {
 
 
-    public List<SimpleInd> createCombinedCandidates(List<SimpleInd> inds, boolean isCombineNull, ColumnStore[] stores) {
+    public List<SimpleInd> createCombinedCandidates(List<SimpleInd> inds, boolean isCombineNull, AbstractColumnStore[] stores) {
         Map<SimpleColumnCombination, SimpleColumnCombination> columnCombinations = new HashMap<>();
 
         // Check that we are not merging NULL columns if this is not desired (cf. BINDER).
@@ -15,7 +15,7 @@ public final class CandidateGenerator {
         if (!isCombineNull) {
             inds = inds.stream()
                     .filter(ind -> {
-                        ColumnStore store = stores[ind.left.getTable()];
+                        AbstractColumnStore store = stores[ind.left.getTable()];
                         for (int column : ind.left.getColumns()) {
                             if (store.isNullColumn(column)) return false;
                         }
@@ -53,7 +53,7 @@ public final class CandidateGenerator {
         return newIndCandidates;
     }
 
-    private boolean isPotentiallyValid(SimpleInd newCandidate, HashSet<SimpleInd> lastResults, boolean isCombineNull, ColumnStore[] stores) {
+    private boolean isPotentiallyValid(SimpleInd newCandidate, HashSet<SimpleInd> lastResults, boolean isCombineNull, AbstractColumnStore[] stores) {
         //only allow each column once in LHS and RHS - comment out in case this is not desired!
         if (newCandidate.left.getTable() == newCandidate.right.getTable()) {
             for (int i : newCandidate.left.getColumns()) {

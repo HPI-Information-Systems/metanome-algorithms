@@ -28,16 +28,17 @@ public final class FAIDACore {
     private final boolean ignoreNullValueColumns;
     private final boolean ignoreAllConstantColumns;
     private final boolean isCombineNull;
+    private final boolean isUseVirtualColumnStore;
     private final boolean isReuseColumnStore;
     private final int sampleGoal;
 
-    public FAIDACore(Arity arity, RowSampler sampler, InclusionTester inclusionTester,
-                     int sampleGoal) {
-        this(arity, sampler, inclusionTester, sampleGoal, true, true, true, false);
+    public FAIDACore(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal) {
+        this(arity, sampler, inclusionTester, sampleGoal, true, true, true, false, false);
     }
 
     public FAIDACore(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal,
-                     boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns, boolean isCombineNull, boolean isReuseColumnStore) {
+                     boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns, boolean isCombineNull,
+                     boolean isUseVirtualColumnStore, boolean isReuseColumnStore) {
         this.detectNary = arity == Arity.N_ARY;
         this.sampler = sampler;
         this.inclusionTester = inclusionTester;
@@ -46,6 +47,7 @@ public final class FAIDACore {
         this.ignoreNullValueColumns = ignoreNullValueColumns;
         this.ignoreAllConstantColumns = ignoreAllConstantColumns;
         this.isCombineNull = isCombineNull;
+        this.isUseVirtualColumnStore = isUseVirtualColumnStore;
         this.isReuseColumnStore = isReuseColumnStore;
     }
 
@@ -76,9 +78,11 @@ public final class FAIDACore {
         int arity = 1;
 
         logger.info("Creating column stores.");
-        ColumnStore[] stores = ColumnStore.create(fileInputGenerators, this.sampleGoal, this.isReuseColumnStore);
+        AbstractColumnStore[] stores = this.isUseVirtualColumnStore ?
+                VirtualColumnStore.create(fileInputGenerators, this.sampleGoal, this.isReuseColumnStore) :
+                HashedColumnStore.create(fileInputGenerators, this.sampleGoal, this.isReuseColumnStore);
         int constantColumnCounter = 0, nullColumnCounter = 0;
-        for (ColumnStore store : stores) {
+        for (AbstractColumnStore store : stores) {
             for (int columnIndex = 0; columnIndex < store.getNumberOfColumns(); columnIndex++) {
                 if (store.isConstantColumn(columnIndex)) constantColumnCounter++;
                 else if (store.isNullColumn(columnIndex)) nullColumnCounter++;
@@ -130,19 +134,19 @@ public final class FAIDACore {
         return result;
     }
 
-    private void insertRows(int[] activeTables, ColumnStore[] stores)
+    private void insertRows(int[] activeTables, AbstractColumnStore[] stores)
             throws InputGenerationException, InputIterationException {
         Stopwatch sw = Stopwatch.createStarted();
 
         List<List<long[]>> samples = new ArrayList<>();
-        for (ColumnStore store : stores) {
+        for (AbstractColumnStore store : stores) {
             samples.add(store.getSampleFile());
         }
         inclusionTester.initialize(samples);
 
         for (int table : activeTables) {
             int rowCount = 0;
-            ColumnStore inputGenerator = stores[table];
+            AbstractColumnStore inputGenerator = stores[table];
             ColumnIterator input = inputGenerator.getRows();
             logger.info("Inserting rows for table {}", table);
             DebugCounter counter = new DebugCounter();
@@ -185,11 +189,11 @@ public final class FAIDACore {
     /**
      * Creates unary column combinations, thereby removing null columns and constant columns if requested.
      */
-    public List<SimpleColumnCombination> createUnaryColumnCombinations(ColumnStore[] stores) {
+    public List<SimpleColumnCombination> createUnaryColumnCombinations(AbstractColumnStore[] stores) {
         List<SimpleColumnCombination> combinations = new ArrayList<>();
         int index = 0;
         for (int table = 0; table < stores.length; table++) {
-            final ColumnStore store = stores[table];
+            final AbstractColumnStore store = stores[table];
             int numColumns = store.getNumberOfColumns();
 
             for (int column = 0; column < numColumns; column++) {
