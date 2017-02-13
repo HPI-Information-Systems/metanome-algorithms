@@ -1,237 +1,231 @@
+
 package de.hpi.mpss2015n.approxind;
 
-import com.google.common.base.Stopwatch;
-import de.hpi.mpss2015n.approxind.utils.*;
+import com.google.common.base.Joiner;
+import de.hpi.mpss2015n.approxind.datastructures.HyperLogLog;
+import de.hpi.mpss2015n.approxind.inclusiontester.BloomFilterInclusionTester;
+import de.hpi.mpss2015n.approxind.inclusiontester.BottomKSketchTester;
+import de.hpi.mpss2015n.approxind.inclusiontester.CombinedHashSetInclusionTester;
+import de.hpi.mpss2015n.approxind.inclusiontester.HLLInclusionTester;
+import de.hpi.mpss2015n.approxind.sampler.IdentityRowSampler;
+import de.hpi.mpss2015n.approxind.utils.Arity;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
-import de.metanome.algorithm_integration.input.InputGenerationException;
-import de.metanome.algorithm_integration.input.InputIterationException;
+import de.metanome.algorithm_integration.AlgorithmExecutionException;
+import de.metanome.algorithm_integration.algorithm_types.*;
+import de.metanome.algorithm_integration.configuration.*;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.InclusionDependency;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+
+public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInputParameterAlgorithm,
+        BooleanParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm {
+
+    private InclusionDependencyResultReceiver resultReceiver;
+
+    private RelationalInputGenerator[] inputGenerators;
 
 
-public final class FAIDA {
+    private boolean isIgnoreNullColumns = true, isIgnoreConstantColumns = true, isCombineNull = true;
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private boolean detectNary = true;
 
-    private final boolean detectNary;
-    private final RowSampler sampler;
-    private final InclusionTester inclusionTester;
-    private final CandidateGenerator candidateLogic;
-    private final boolean ignoreNullValueColumns;
-    private final boolean ignoreAllConstantColumns;
-    private final boolean isCombineNull;
-    private final boolean isReuseColumnStore;
-    private final int sampleGoal;
+    private String approximateTester = APPROXIMATE_TESTERS.get(0);
 
-    public FAIDA(Arity arity, RowSampler sampler, InclusionTester inclusionTester,
-                 int sampleGoal) {
-        this(arity, sampler, inclusionTester, sampleGoal, true, true, true, false);
+    private int approximateTesterBytes = 32 * 1024; // 32 KiB
+
+    private static final List<String> APPROXIMATE_TESTERS = Arrays.asList(
+            "HLL", "Bloom filter", "Bottom-k sketch", "Hash set"
+    );
+
+    private double hllRelativeStddev = 0.01;
+
+    private int sampleGoal = 500;
+
+    protected boolean isReuseColumnStore;
+
+
+    public enum Identifier {
+        INPUT_FILES, DETECT_NARY, APPROXIMATE_TESTER, APPROXIMATE_TESTER_BYTES, HLL_REL_STD_DEV, SAMPLE_GOAL,
+        IGNORE_NULL, IGNORE_CONSTANT, REUSE_COLUMN_STORE, COMBINE_NULL
     }
 
-    public FAIDA(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal,
-                 boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns, boolean isCombineNull, boolean isReuseColumnStore) {
-        this.detectNary = arity == Arity.N_ARY;
-        this.sampler = sampler;
-        this.inclusionTester = inclusionTester;
-        this.candidateLogic = new CandidateGenerator();
-        this.sampleGoal = sampleGoal;
-        this.ignoreNullValueColumns = ignoreNullValueColumns;
-        this.ignoreAllConstantColumns = ignoreAllConstantColumns;
-        this.isCombineNull = isCombineNull;
-        this.isReuseColumnStore = isReuseColumnStore;
-    }
+    @Override
+    public ArrayList<ConfigurationRequirement<?>> getConfigurationRequirements() {
+        ArrayList<ConfigurationRequirement<?>> configs = new ArrayList<>();
 
-    public List<InclusionDependency> execute(RelationalInputGenerator[] fileInputGenerators)
-            throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
-        IndConverter converter = new IndConverter(fileInputGenerators);
-        List<SimpleInd> result = executeInternal(fileInputGenerators);
-        logger.info("Result size: {}", result.size());
-        logger.info("Certain checks: {}, uncertain checks: {}",
-                this.inclusionTester.getNumCertainChecks(),
-                this.inclusionTester.getNumUnertainChecks()
+        configs.add(new ConfigurationRequirementRelationalInput(Identifier.INPUT_FILES.name(), ConfigurationRequirement.ARBITRARY_NUMBER_OF_VALUES));
+
+        ConfigurationRequirementString approximateTesterRequirement = new ConfigurationRequirementString(
+                Identifier.APPROXIMATE_TESTER.name()
         );
+        approximateTesterRequirement.setDefaultValues(new String[]{this.approximateTester});
+        approximateTesterRequirement.setRequired(true);
+        configs.add(approximateTesterRequirement);
 
-        int i = 0;
-        String[] tableNames = new String[fileInputGenerators.length];
-        for (RelationalInputGenerator input : fileInputGenerators) {
-            tableNames[i] = input.generateNewCopy().relationName();
-            i++;
+        ConfigurationRequirementInteger approximateTesterBytesRequirement = new ConfigurationRequirementInteger(
+                Identifier.APPROXIMATE_TESTER_BYTES.name()
+        );
+        approximateTesterBytesRequirement.setDefaultValues(new Integer[]{this.approximateTesterBytes});
+        approximateTesterBytesRequirement.setRequired(false);
+        configs.add(approximateTesterBytesRequirement);
+
+        ConfigurationRequirementBoolean ignoreNullRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_NULL.name());
+        ignoreNullRequirement.setDefaultValues(new Boolean[]{this.isIgnoreNullColumns});
+        ignoreNullRequirement.setRequired(true);
+        configs.add(ignoreNullRequirement);
+
+        ConfigurationRequirementBoolean combineNullRequirement = new ConfigurationRequirementBoolean(Identifier.COMBINE_NULL.name());
+        ignoreNullRequirement.setDefaultValues(new Boolean[]{this.isCombineNull});
+        ignoreNullRequirement.setRequired(true);
+        configs.add(combineNullRequirement);
+
+        ConfigurationRequirementBoolean ignoreConstantRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_CONSTANT.name());
+        ignoreConstantRequirement.setDefaultValues(new Boolean[]{this.isIgnoreConstantColumns});
+        ignoreConstantRequirement.setRequired(true);
+        configs.add(ignoreConstantRequirement);
+
+        ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(Identifier.DETECT_NARY.name());
+        detectNary.setDefaultValues(new Boolean[]{this.detectNary});
+        detectNary.setRequired(true);
+        configs.add(detectNary);
+
+        ConfigurationRequirementBoolean reuseColumnStore = new ConfigurationRequirementBoolean(Identifier.REUSE_COLUMN_STORE.name());
+        reuseColumnStore.setDefaultValues(new Boolean[]{this.isReuseColumnStore});
+        reuseColumnStore.setRequired(false);
+        configs.add(reuseColumnStore);
+
+        ConfigurationRequirementString hllRelativeStandardDeviation = new ConfigurationRequirementString(Identifier.HLL_REL_STD_DEV.name());
+        hllRelativeStandardDeviation.setDefaultValues(new String[]{Double.toString(this.hllRelativeStddev)});
+        hllRelativeStandardDeviation.setRequired(false);
+        configs.add(hllRelativeStandardDeviation);
+
+        ConfigurationRequirementInteger sampleGoal = new ConfigurationRequirementInteger(Identifier.SAMPLE_GOAL.name());
+        sampleGoal.setDefaultValues(new Integer[]{this.sampleGoal});
+        sampleGoal.setRequired(true);
+        configs.add(sampleGoal);
+
+        return configs;
+    }
+
+    @Override
+    public void execute() throws AlgorithmExecutionException {
+        InclusionTester inclusionTester;
+        if ("HLL".equalsIgnoreCase(this.approximateTester)) {
+            inclusionTester = new HLLInclusionTester(this.hllRelativeStddev);
+            System.out.printf("HLL with relative stddev of %.4f needs %,d bytes.\n",
+                    this.hllRelativeStddev,
+                    HyperLogLog.getRequiredCapacityInBytes(this.hllRelativeStddev));
+        } else if ("Bloom filter".equalsIgnoreCase(this.approximateTester)) {
+            inclusionTester = new BloomFilterInclusionTester(this.approximateTesterBytes);
+        } else if ("Bottom-k sketch".equalsIgnoreCase(this.approximateTester)) {
+            inclusionTester = new BottomKSketchTester(this.approximateTesterBytes);
+        } else if ("Hash set".equalsIgnoreCase(this.approximateTester)) {
+            inclusionTester = new CombinedHashSetInclusionTester();
+        } else {
+            throw new AlgorithmConfigurationException(String.format("Unknown tester: %s", this.approximateTester));
         }
-        return converter.toMetanomeInds(result, tableNames);
+
+        FAIDACore algorithm = new FAIDACore(
+                detectNary ? Arity.N_ARY : Arity.UNARY,
+                new IdentityRowSampler(),
+                inclusionTester,
+                sampleGoal,
+                isIgnoreNullColumns,
+                isIgnoreConstantColumns,
+                isCombineNull,
+                isReuseColumnStore
+        );
+        List<InclusionDependency> result = algorithm.execute(inputGenerators);
+
+        for (InclusionDependency inclusionDependency : result) {
+            resultReceiver.receiveResult(inclusionDependency);
+        }
+
+    }
+
+    @Override
+    public void setRelationalInputConfigurationValue(String identifier, RelationalInputGenerator... values) throws AlgorithmConfigurationException {
+        if (Identifier.INPUT_FILES.name().equals(identifier)) {
+            if (values.length == 0) {
+                throw new AlgorithmConfigurationException("No input files/tables given.");
+            }
+            this.inputGenerators = values.clone();
+        } else {
+            this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
+        }
+    }
+
+    @Override
+    public void setResultReceiver(InclusionDependencyResultReceiver resultReceiver) {
+        this.resultReceiver = resultReceiver;
+    }
+
+    @Override
+    public void setIntegerConfigurationValue(String identifier, Integer... values) throws AlgorithmConfigurationException {
+        if (Identifier.SAMPLE_GOAL.name().equals(identifier)) {
+            Validate.inclusiveBetween(1, 1, values.length);
+            this.sampleGoal = values[0];
+        } else if (Identifier.APPROXIMATE_TESTER_BYTES.name().equals(identifier)) {
+            Validate.inclusiveBetween(1, 1, values.length);
+            this.approximateTesterBytes = values[0];
+        } else {
+            this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
+        }
     }
 
 
-    List<SimpleInd> executeInternal(RelationalInputGenerator[] fileInputGenerators)
-            throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
-        // Probably for row scalability tests... not the sample described in the paper.
-        fileInputGenerators = sampler.createSample(fileInputGenerators);
-        int arity = 1;
-
-        logger.info("Creating column stores.");
-        ColumnStore[] stores = ColumnStore.create(fileInputGenerators, this.sampleGoal, this.isReuseColumnStore);
-        int constantColumnCounter = 0, nullColumnCounter = 0;
-        for (ColumnStore store : stores) {
-            for (int columnIndex = 0; columnIndex < store.getNumberOfColumns(); columnIndex++) {
-                if (store.isConstantColumn(columnIndex)) constantColumnCounter++;
-                else if (store.isNullColumn(columnIndex)) nullColumnCounter++;
-            }
+    @Override
+    public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
+        if (Identifier.DETECT_NARY.name().equals(identifier)) {
+            this.detectNary = values[0];
+        } else if (Identifier.IGNORE_NULL.name().equals(identifier)) {
+            this.isIgnoreNullColumns = values[0];
+        } else if (Identifier.COMBINE_NULL.name().equals(identifier)) {
+            this.isCombineNull = values[0];
+        } else if (Identifier.IGNORE_CONSTANT.name().equals(identifier)) {
+            this.isIgnoreConstantColumns = values[0];
+        } else if (Identifier.REUSE_COLUMN_STORE.name().equals(identifier)) {
+            this.isReuseColumnStore = values[0];
+        } else {
+            this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
         }
-        logger.info("Detected {} null columns and {} constant columns.", nullColumnCounter, constantColumnCounter);
-
-        logger.info("Creating initial column combinations.");
-        List<SimpleColumnCombination> combinations = createUnaryColumnCombinations(stores);
-        logger.info("Created {} column combinations.", combinations.size());
-
-        logger.info("Creating unary IND candidates.");
-        List<SimpleInd> candidates = createUnaryIndCandidates(combinations);
-        logger.info("Created {} IND candidates.", candidates.size());
-
-        logger.info("Feeding input rows to IND test.");
-        int[] tables = inclusionTester.setColumnCombinations(combinations);
-        insertRows(tables, stores);
-
-        logger.info("Checking unary IND candidates.");
-        List<SimpleInd> result = checkCandidates(candidates);
-
-        List<SimpleInd> lastResult = result;
-        if (detectNary) {
-            while (lastResult.size() > 0) {
-                arity++;
-                logger.info("Creating {}-ary IND candidates.", arity);
-                candidates = candidateLogic.createCombinedCandidates(lastResult, isCombineNull, stores);
-                if (candidates.isEmpty()) {
-                    logger.info("no more candidates for next level!");
-                    break;
-                }
-                logger.info("Created {} {}-ary IND candidates.", candidates.size(), arity);
-
-                logger.info("Extracting {}-ary column combinations.", arity);
-                combinations = extractColumnCombinations(candidates);
-
-                logger.info("Inserting rows to check {} {}-ary IND candidates with {} column combinations", candidates.size(), arity,
-                        combinations.size());
-                int[] activeTables = inclusionTester.setColumnCombinations(combinations);
-                insertRows(activeTables, stores);
-
-                logger.info("Checking {}-ary IND candidates.", arity);
-                lastResult = checkCandidates(candidates);
-                result.addAll(lastResult);
-            }
-        }
-
-        return result;
     }
 
-    private void insertRows(int[] activeTables, ColumnStore[] stores)
-            throws InputGenerationException, InputIterationException {
-        Stopwatch sw = Stopwatch.createStarted();
-
-        List<List<long[]>> samples = new ArrayList<>();
-        for (ColumnStore store : stores) {
-            samples.add(store.getSampleFile());
-        }
-        inclusionTester.initialize(samples);
-
-        for (int table : activeTables) {
-            int rowCount = 0;
-            ColumnStore inputGenerator = stores[table];
-            ColumnIterator input = inputGenerator.getRows();
-            logger.info("Inserting rows for table {}", table);
-            DebugCounter counter = new DebugCounter();
-            inclusionTester.startInsertRow(table);
-            while (input.hasNext()) {
-                inclusionTester.insertRow(input.next(), rowCount);
-                rowCount++;
-                counter.countUp();
+    @Override
+    public void setStringConfigurationValue(String identifier, String... values) throws AlgorithmConfigurationException {
+        if (Identifier.HLL_REL_STD_DEV.name().equals(identifier)) {
+            Validate.inclusiveBetween(1, 1, values.length);
+            this.hllRelativeStddev = Double.parseDouble(values[0]);
+        } else if (Identifier.APPROXIMATE_TESTER.name().equals(identifier)) {
+            Validate.inclusiveBetween(1, 1, values.length);
+            this.approximateTester = values[0];
+            if (!APPROXIMATE_TESTERS.contains(this.approximateTester)) {
+                throw new AlgorithmConfigurationException(
+                        String.format("Unknown tester: %s. Choose from %s.", this.approximateTester, APPROXIMATE_TESTERS)
+                );
             }
-            counter.done();
-            logger.info("{} rows inserted", rowCount);
-            input.close();
+        } else {
+            this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
         }
-        inclusionTester.finalizeInsertion();
-        logger.info("Time processing rows: {}ms", sw.elapsed(TimeUnit.MILLISECONDS));
     }
 
-    private List<SimpleInd> checkCandidates(List<SimpleInd> candidates) {
-        Stopwatch sw = Stopwatch.createStarted();
-        List<SimpleInd> result = new ArrayList<>();
-        logger.info("checking: {} candidates on level {}", candidates.size(),
-                candidates.get(0).size());
-        int candidateCount = 0;
-        for (SimpleInd candidate : candidates) {
-            if (inclusionTester.isIncludedIn(candidate.left, candidate.right)) {
-                result.add(candidate); // add result
-            }
-            candidateCount++;
-            if ((candidates.size() > 1000 && candidateCount % (candidates.size() / 20) == 0) ||
-                    (candidates.size() <= 1000 && candidateCount % 100 == 0)) {
-                logger.info("{}/{} candidates checked", candidateCount, candidates.size());
-            }
-        }
-        logger.info("Time checking candidates on level {}: {}ms, INDs found: {}",
-                candidates.get(0).size(),
-                sw.elapsed(TimeUnit.MILLISECONDS), result.size());
-        return result;
+    protected void handleUnknownConfiguration(String identifier, String value) throws AlgorithmConfigurationException {
+        throw new AlgorithmConfigurationException("Unknown configuration: " + identifier + " -> " + value);
     }
 
-    /**
-     * Creates unary column combinations, thereby removing null columns and constant columns if requested.
-     */
-    public List<SimpleColumnCombination> createUnaryColumnCombinations(ColumnStore[] stores) {
-        List<SimpleColumnCombination> combinations = new ArrayList<>();
-        int index = 0;
-        for (int table = 0; table < stores.length; table++) {
-            final ColumnStore store = stores[table];
-            int numColumns = store.getNumberOfColumns();
-
-            for (int column = 0; column < numColumns; column++) {
-                if (ignoreAllConstantColumns && store.isConstantColumn(column)) {
-                    continue;
-                }
-                if (ignoreNullValueColumns && store.isNullColumn(column)) {
-                    continue;
-                }
-
-                SimpleColumnCombination combination = SimpleColumnCombination.create(table, column);
-                combination.setIndex(index);
-                combinations.add(combination);
-            }
-        }
-        return combinations;
+    @Override
+    public String getAuthors() {
+        return "Moritz Finke, Christian Dullweber, Martin Zabel, Manuel Hegner, Christian Zöllner";
     }
 
-    /**
-     * Create all possible IND candidates from the given column combinations.
-     */
-    private List<SimpleInd> createUnaryIndCandidates(List<SimpleColumnCombination> combinations) {
-        List<SimpleInd> candidates = new ArrayList<>();
-        for (SimpleColumnCombination left : combinations) {
-            for (SimpleColumnCombination right : combinations) {
-                if (!left.equals(right)) {
-                    candidates.add(new SimpleInd(left, right));
-                }
-            }
-        }
-        return candidates;
+    @Override
+    public String getDescription() {
+        return "Approximate IND detection";
     }
 
-    /**
-     * Extract all column combinations from the given IND (candidates).
-     */
-    private List<SimpleColumnCombination> extractColumnCombinations(List<SimpleInd> candidates) {
-        Set<SimpleColumnCombination> combinations = new HashSet<>();
-        for (SimpleInd candidate : candidates) {
-            combinations.add(candidate.left);
-            combinations.add(candidate.right);
-        }
-        return new ArrayList<>(combinations);
-    }
 }
