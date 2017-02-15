@@ -27,7 +27,7 @@ public class VirtualColumnStoreTest {
         } catch (InputGenerationException | AlgorithmConfigurationException e) {
             throw new RuntimeException("Could not access test data.", e);
         }
-        VirtualColumnStore store = new VirtualColumnStore(relationalInput.numberOfColumns(), SAMPLE_SIZE, relationalInputGenerator);
+        VirtualColumnStore store = new VirtualColumnStore(relationalInput.numberOfColumns(), SAMPLE_SIZE, relationalInputGenerator, false);
         store.load("testDataset", 0, relationalInput);
         return store;
     }

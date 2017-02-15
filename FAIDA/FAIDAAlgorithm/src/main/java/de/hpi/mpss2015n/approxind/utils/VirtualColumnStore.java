@@ -1,9 +1,6 @@
 package de.hpi.mpss2015n.approxind.utils;
 
-import de.metanome.algorithm_integration.input.FileInputGenerator;
-import de.metanome.algorithm_integration.input.InputIterationException;
-import de.metanome.algorithm_integration.input.RelationalInput;
-import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.input.*;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 
@@ -23,15 +20,21 @@ public final class VirtualColumnStore extends AbstractColumnStore {
     private final RelationalInputGenerator inputGenerator;
 
     /**
+     * Whether the {@link #inputGenerator} should be close after a {@link ColumnIterator} is closed.
+     */
+    private final boolean isCloseConnectionsRigorously;
+
+    /**
      * Creates a new instance but does not load it.
      *
      * @param numColumns the number of columns to be hosted in this instance
      * @param sampleGoal see {@link #sampleGoal}
      * @see #load(String, int, RelationalInput)
      */
-    VirtualColumnStore(int numColumns, int sampleGoal, RelationalInputGenerator inputGenerator) {
+    VirtualColumnStore(int numColumns, int sampleGoal, RelationalInputGenerator inputGenerator, boolean isCloseConnectionsRigorously) {
         super(numColumns, sampleGoal);
         this.inputGenerator = inputGenerator;
+        this.isCloseConnectionsRigorously = isCloseConnectionsRigorously;
     }
 
 
@@ -108,10 +111,10 @@ public final class VirtualColumnStore extends AbstractColumnStore {
      * Create a columns store for each fileInputGenerators
      *
      * @param fileInputGenerators input
-     * @param isReuseColumnFiles  whether existing column vectors can be reused
+     * @param isCloseConnectionsRigorously  whether connections for reading should be closed when currently not needed
      * @return column stores
      */
-    public static VirtualColumnStore[] create(RelationalInputGenerator[] fileInputGenerators, int sampleGoal, boolean isReuseColumnFiles) {
+    public static VirtualColumnStore[] create(RelationalInputGenerator[] fileInputGenerators, int sampleGoal, boolean isCloseConnectionsRigorously) {
         VirtualColumnStore[] stores = new VirtualColumnStore[fileInputGenerators.length];
 
         for (int tableNumber = 0; tableNumber < fileInputGenerators.length; tableNumber++) {
@@ -123,9 +126,12 @@ public final class VirtualColumnStore extends AbstractColumnStore {
                 } else {
                     datasetDir = "unknown";
                 }
-                stores[tableNumber] = new VirtualColumnStore(input.numberOfColumns(), sampleGoal, generator);
+                stores[tableNumber] = new VirtualColumnStore(input.numberOfColumns(), sampleGoal, generator, isCloseConnectionsRigorously);
                 stores[tableNumber].load(datasetDir, tableNumber, input);
                 input.close();
+                if (isCloseConnectionsRigorously) {
+                  generator.close();
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -178,6 +184,9 @@ public final class VirtualColumnStore extends AbstractColumnStore {
         public void close() {
             try {
                 this.relationalInput.close();
+                if (VirtualColumnStore.this.isCloseConnectionsRigorously) {
+                    VirtualColumnStore.this.inputGenerator.close();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

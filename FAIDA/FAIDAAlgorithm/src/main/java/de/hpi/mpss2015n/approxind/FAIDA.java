@@ -35,7 +35,8 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
             isCombineNull = true,
             isUseVirtualColumnStore = false;
 
-    private boolean detectNary = true;
+    private boolean detectNary = true,
+        isCloseConnectionsRigorously = false;
 
     private String approximateTester = APPROXIMATE_TESTERS.get(0);
 
@@ -54,7 +55,7 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
 
     public enum Identifier {
         INPUT_FILES, DETECT_NARY, APPROXIMATE_TESTER, APPROXIMATE_TESTER_BYTES, HLL_REL_STD_DEV, SAMPLE_GOAL,
-        IGNORE_NULL, IGNORE_CONSTANT, REUSE_COLUMN_STORE, COMBINE_NULL, VIRTUAL_COLUMN_STORE
+        IGNORE_NULL, IGNORE_CONSTANT, REUSE_COLUMN_STORE, COMBINE_NULL, VIRTUAL_COLUMN_STORE, CLOSE_CONNECTIONS_RIGOROUSLY
     }
 
     @Override
@@ -107,6 +108,11 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
         virtualColumnStore.setRequired(false);
         configs.add(virtualColumnStore);
 
+        ConfigurationRequirementBoolean closeConnections = new ConfigurationRequirementBoolean(Identifier.CLOSE_CONNECTIONS_RIGOROUSLY.name());
+        virtualColumnStore.setDefaultValues(new Boolean[]{this.isCloseConnectionsRigorously});
+        virtualColumnStore.setRequired(false);
+        configs.add(virtualColumnStore);
+
         ConfigurationRequirementString hllRelativeStandardDeviation = new ConfigurationRequirementString(Identifier.HLL_REL_STD_DEV.name());
         hllRelativeStandardDeviation.setDefaultValues(new String[]{Double.toString(this.hllRelativeStddev)});
         hllRelativeStandardDeviation.setRequired(false);
@@ -147,14 +153,10 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
                 isIgnoreConstantColumns,
                 isCombineNull,
                 isUseVirtualColumnStore,
-                isReuseColumnStore
+                isReuseColumnStore,
+                isCloseConnectionsRigorously
         );
-        List<InclusionDependency> result = algorithm.execute(inputGenerators);
-
-        for (InclusionDependency inclusionDependency : result) {
-            resultReceiver.receiveResult(inclusionDependency);
-        }
-
+        algorithm.execute(inputGenerators, resultReceiver);
     }
 
     @Override
@@ -202,6 +204,8 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
             this.isUseVirtualColumnStore = values[0];
         } else if (Identifier.REUSE_COLUMN_STORE.name().equals(identifier)) {
             this.isReuseColumnStore = values[0];
+        } else if (Identifier.CLOSE_CONNECTIONS_RIGOROUSLY.name().equals(identifier)) {
+            this.isCloseConnectionsRigorously = values[0];
         } else {
             this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
         }

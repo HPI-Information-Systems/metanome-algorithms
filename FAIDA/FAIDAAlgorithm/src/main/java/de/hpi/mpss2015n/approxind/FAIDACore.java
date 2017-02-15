@@ -6,6 +6,9 @@ import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
+import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
+import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.InclusionDependency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +34,15 @@ public final class FAIDACore {
     private final boolean isUseVirtualColumnStore;
     private final boolean isReuseColumnStore;
     private final int sampleGoal;
+    private final boolean isCloseConnectionsRigorously;
 
     public FAIDACore(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal) {
-        this(arity, sampler, inclusionTester, sampleGoal, true, true, true, false, false);
+        this(arity, sampler, inclusionTester, sampleGoal, true, true, true, false, false, false);
     }
 
     public FAIDACore(Arity arity, RowSampler sampler, InclusionTester inclusionTester, int sampleGoal,
                      boolean ignoreNullValueColumns, boolean ignoreAllConstantColumns, boolean isCombineNull,
-                     boolean isUseVirtualColumnStore, boolean isReuseColumnStore) {
+                     boolean isUseVirtualColumnStore, boolean isReuseColumnStore, boolean isCloseConnectionsRigorously) {
         this.detectNary = arity == Arity.N_ARY;
         this.sampler = sampler;
         this.inclusionTester = inclusionTester;
@@ -49,38 +53,21 @@ public final class FAIDACore {
         this.isCombineNull = isCombineNull;
         this.isUseVirtualColumnStore = isUseVirtualColumnStore;
         this.isReuseColumnStore = isReuseColumnStore;
+        this.isCloseConnectionsRigorously = isCloseConnectionsRigorously;
     }
 
-    public List<InclusionDependency> execute(RelationalInputGenerator[] fileInputGenerators)
+    public List<SimpleInd> execute(RelationalInputGenerator[] fileInputGenerators,
+                                   InclusionDependencyResultReceiver resultReceiver)
             throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
-        IndConverter converter = new IndConverter(fileInputGenerators);
-        List<SimpleInd> result = executeInternal(fileInputGenerators);
-        logger.info("Result size: {}", result.size());
-        logger.info("Certain checks: {}, uncertain checks: {}",
-                this.inclusionTester.getNumCertainChecks(),
-                this.inclusionTester.getNumUnertainChecks()
-        );
 
-        int i = 0;
-        String[] tableNames = new String[fileInputGenerators.length];
-        for (RelationalInputGenerator input : fileInputGenerators) {
-            tableNames[i] = input.generateNewCopy().relationName();
-            i++;
-        }
-        return converter.toMetanomeInds(result, tableNames);
-    }
-
-
-    List<SimpleInd> executeInternal(RelationalInputGenerator[] fileInputGenerators)
-            throws InputGenerationException, InputIterationException, AlgorithmConfigurationException {
         // Probably for row scalability tests... not the sample described in the paper.
         fileInputGenerators = sampler.createSample(fileInputGenerators);
         int arity = 1;
 
         logger.info("Creating column stores.");
         AbstractColumnStore[] stores = this.isUseVirtualColumnStore ?
-                VirtualColumnStore.create(fileInputGenerators, this.sampleGoal, this.isReuseColumnStore) :
-                HashedColumnStore.create(fileInputGenerators, this.sampleGoal, this.isReuseColumnStore);
+                VirtualColumnStore.create(fileInputGenerators, this.sampleGoal, this.isCloseConnectionsRigorously) :
+                HashedColumnStore.create(fileInputGenerators, this.sampleGoal, this.isReuseColumnStore, this.isCloseConnectionsRigorously);
         int constantColumnCounter = 0, nullColumnCounter = 0;
         for (AbstractColumnStore store : stores) {
             for (int columnIndex = 0; columnIndex < store.getNumberOfColumns(); columnIndex++) {
@@ -89,6 +76,9 @@ public final class FAIDACore {
             }
         }
         logger.info("Detected {} null columns and {} constant columns.", nullColumnCounter, constantColumnCounter);
+
+        // Create the IND converter already.
+        IndConverter indConverter = new IndConverter(stores);
 
         logger.info("Creating initial column combinations.");
         List<SimpleColumnCombination> combinations = createUnaryColumnCombinations(stores);
@@ -104,6 +94,15 @@ public final class FAIDACore {
 
         logger.info("Checking unary IND candidates.");
         List<SimpleInd> result = checkCandidates(candidates);
+
+        logger.info("Feeding unary INDs to the result receiver.");
+        for (InclusionDependency inclusionDependency : indConverter.toMetanomeInds(result)) {
+            try {
+                resultReceiver.receiveResult(inclusionDependency);
+            } catch (CouldNotReceiveResultException | ColumnNameMismatchException e) {
+                logger.error("Could not receive {}.", inclusionDependency, e);
+            }
+        }
 
         List<SimpleInd> lastResult = result;
         if (detectNary) {
@@ -128,8 +127,24 @@ public final class FAIDACore {
                 logger.info("Checking {}-ary IND candidates.", arity);
                 lastResult = checkCandidates(candidates);
                 result.addAll(lastResult);
+
+                logger.info("Feeding {}-ary INDs to the result receiver.", arity);
+                for (InclusionDependency inclusionDependency : indConverter.toMetanomeInds(lastResult)) {
+                    try {
+                        resultReceiver.receiveResult(inclusionDependency);
+                    } catch (CouldNotReceiveResultException | ColumnNameMismatchException e) {
+                        logger.error("Could not receive {}.", inclusionDependency, e);
+                    }
+                }
+
             }
         }
+
+        logger.info("Result size: {}", result.size());
+        logger.info("Certain checks: {}, uncertain checks: {}",
+                this.inclusionTester.getNumCertainChecks(),
+                this.inclusionTester.getNumUnertainChecks()
+        );
 
         return result;
     }
@@ -145,6 +160,7 @@ public final class FAIDACore {
         inclusionTester.initialize(samples);
 
         for (int table : activeTables) {
+            // TODO: We always read all columns, even if we don't need to.
             int rowCount = 0;
             AbstractColumnStore inputGenerator = stores[table];
             ColumnIterator input = inputGenerator.getRows();

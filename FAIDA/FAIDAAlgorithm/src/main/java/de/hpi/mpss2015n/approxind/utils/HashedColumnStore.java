@@ -174,11 +174,13 @@ public final class HashedColumnStore extends AbstractColumnStore {
     /**
      * Create a columns store for each fileInputGenerators
      *
-     * @param fileInputGenerators input
-     * @param isReuseColumnFiles  whether existing column vectors can be reused
+     * @param fileInputGenerators          input
+     * @param isCloseConnectionsRigorously whether connections for reading should be closed when currently not needed
+     * @param isReuseColumnFiles           whether existing column vectors can be reused
      * @return column stores
      */
-    public static HashedColumnStore[] create(RelationalInputGenerator[] fileInputGenerators, int sampleGoal, boolean isReuseColumnFiles) {
+    public static HashedColumnStore[] create(RelationalInputGenerator[] fileInputGenerators, int sampleGoal,
+                                             boolean isReuseColumnFiles, boolean isCloseConnectionsRigorously) {
         HashedColumnStore[] stores = new HashedColumnStore[fileInputGenerators.length];
 
         for (int tableNumber = 0; tableNumber < fileInputGenerators.length; tableNumber++) {
@@ -193,6 +195,9 @@ public final class HashedColumnStore extends AbstractColumnStore {
                 stores[tableNumber] = new HashedColumnStore(input.numberOfColumns(), sampleGoal, isReuseColumnFiles);
                 stores[tableNumber].load(datasetDir, tableNumber, input);
                 input.close();
+                if (isCloseConnectionsRigorously) {
+                    generator.close();
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

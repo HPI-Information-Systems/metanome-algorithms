@@ -54,6 +54,15 @@ public abstract class AbstractColumnStore {
     protected boolean[] isConstantColumn;
     protected boolean[] isNullColumn;
 
+    /**
+     * The name of the relation that is represented by this instance.
+     */
+    private String relationName;
+
+    /**
+     * The names of the relation's columns.
+     */
+    private List<String> columnNames;
 
     /**
      * Creates a new instance, thereby creating all relevant files.
@@ -76,6 +85,10 @@ public abstract class AbstractColumnStore {
      * @param input   provides the tuples of the table to be loaded
      */
     protected void load(String dataset, int table, RelationalInput input) {
+        // Retrieve the relation and column names.
+        this.relationName = input.relationName();
+        this.columnNames = new ArrayList<>(input.columnNames());
+
         Path dir = this.prepareDirectory(dataset, table, input);
 
         // Read the original data and update all deliverables.
@@ -222,6 +235,20 @@ public abstract class AbstractColumnStore {
      */
     protected long getHash(String string, int column) {
         return hash(string, this.hashCaches.get(column));
+    }
+
+    /**
+     * @return the name of the relation represented instance
+     */
+    public String getRelationName() {
+        return this.relationName;
+    }
+
+    /**
+     * @return the names of the relation's columns
+     */
+    public List<String> getColumnNames() {
+        return this.columnNames;
     }
 
     /**
