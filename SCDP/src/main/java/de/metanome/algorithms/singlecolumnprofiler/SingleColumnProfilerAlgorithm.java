@@ -34,7 +34,7 @@ public class SingleColumnProfilerAlgorithm {
   private RelationalInput input = null;
   // general statistic
   protected String relationName;
-  protected int NumofTuples = 0;
+  protected long NumofTuples = 0;
   protected List<String> columnNames;
   protected ObjectArrayList<ColumnMainProfile> columnsProfile;
   protected String outputPath;
@@ -254,12 +254,13 @@ public class SingleColumnProfilerAlgorithm {
 
 
     // for all with string
+    bs.addStatistic(NUMTUPLE, new BasicStatisticValueLong(NumofTuples));
     bs.addStatistic(NUMBEROFNULL, new BasicStatisticValueLong(cs.getNumNull()));
     bs.addStatistic(PERCENTOFNULL,
         new BasicStatisticValueLong(cs.getNumNull() * 100 / NumofTuples));
     bs.addStatistic(NUMBEROFDISTINCT, new BasicStatisticValueInteger(cs.getFreq().size()));
     bs.addStatistic(PERCENTODFISTINCT,
-        new BasicStatisticValueInteger(cs.getFreq().size() * 100 / NumofTuples));
+        new BasicStatisticValueInteger((int) (cs.getFreq().size() * 100 / NumofTuples)));
 
 
     // if (cs.getDistinctValues() != null) column.put(DISTINCTVALUES, cs.getDistinctValues());

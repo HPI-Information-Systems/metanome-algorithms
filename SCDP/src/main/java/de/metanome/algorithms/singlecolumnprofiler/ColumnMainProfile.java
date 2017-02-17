@@ -19,6 +19,7 @@ public class ColumnMainProfile {
   private String ColumnName;
   private String DataType;
   private long NumNull;
+  private long numTuples;
  // private String Defaultvalue;// *******
   // %Distinct Percentage of distinct values
  // private int percentDistinct;// -------Calculated
@@ -234,7 +235,7 @@ public class ColumnMainProfile {
 
   }
 
-  public void updateColumnProfilesecondpass(String newvalue, int numberoftuples) { // string values
+  public void updateColumnProfilesecondpass(String newvalue, long numberoftuples) { // string values
     if (DataType == DataTypes.mySTRING || DataType == DataTypes.myTEXT) { 
       // length distribution
       // addValueforlengdist(newvalue.length());
