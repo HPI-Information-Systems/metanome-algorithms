@@ -34,6 +34,12 @@
             <version>${metanome.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>de.metanome</groupId>
+            <artifactId>backend</artifactId>
+            <version>${metanome.version}</version>
+            <scope>test</scope>
+        </dependency>
              
 		<dependency>
 			<groupId>org.json</groupId>

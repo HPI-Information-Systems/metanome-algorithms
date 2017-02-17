@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Map.Entry;
+import java.util.Objects;
+
 import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
 
 
@@ -19,7 +21,6 @@ public class ColumnMainProfile {
   private String ColumnName;
   private String DataType;
   private long NumNull;
-  private long numTuples;
  // private String Defaultvalue;// *******
   // %Distinct Percentage of distinct values
  // private int percentDistinct;// -------Calculated
@@ -204,7 +205,7 @@ public class ColumnMainProfile {
 
     if (!DataTypes.isSameDataType(DataType, newvalue)) {
       String newtype = DataTypes.getDataType(newvalue);
-      if (newtype != DataTypes.UNKOWN) {
+      if (!Objects.equals(newtype, DataTypes.UNKOWN)) {
         DataType = newtype;
       }
     }
@@ -215,7 +216,7 @@ public class ColumnMainProfile {
         LongestString = (LongestString.length() > newvalue.length()) ? LongestString : newvalue;
       if (ShortestString == null)
         ShortestString = newvalue;
-      else if (newvalue != " " && !newvalue.isEmpty())
+      else if (!Objects.equals(newvalue, " ") && !newvalue.isEmpty())
         ShortestString = (ShortestString.length() < newvalue.length()) ? ShortestString : newvalue;
 
       // update numbers

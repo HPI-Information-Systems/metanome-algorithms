@@ -32,6 +32,10 @@ public class SingleColumnProfilerAlgorithm {
   protected RelationalInputGenerator inputGenerator = null;
   protected BasicStatisticsResultReceiver resultReceiver = null;
   private RelationalInput input = null;
+  /**
+   * If set to true, then no metric that require aggregation should be calculated (e.g., top-k frequent items, distinct values, ...)
+   */
+  protected boolean isNotAggregating = false;
   // general statistic
   protected String relationName;
   protected long NumofTuples = 0;
@@ -142,7 +146,7 @@ public class SingleColumnProfilerAlgorithm {
           profile.setShortestString(currentColumnvalue);
 
           // frequency
-          profile.addValueforfreq(currentColumnvalue);
+          if (!this.isNotAggregating) profile.addValueforfreq(currentColumnvalue);
           // profile.addValueforlengdist(currentColumnvalue.length());
           ////////////////
           // rest values
@@ -150,9 +154,10 @@ public class SingleColumnProfilerAlgorithm {
 
           // max min sum
           if (DataTypes.isNumeric(profile.getDataType())) {
-            profile.setMax(Util.getnumberfromstring(currentColumnvalue));
-            profile.setMin(Util.getnumberfromstring(currentColumnvalue));
-            profile.setSum(Util.getnumberfromstring(currentColumnvalue));
+            double doubleValue = Util.getnumberfromstring(currentColumnvalue);
+            profile.setMax(doubleValue);
+            profile.setMin(doubleValue);
+            profile.setSum(doubleValue);
 
           }
 
@@ -258,9 +263,11 @@ public class SingleColumnProfilerAlgorithm {
     bs.addStatistic(NUMBEROFNULL, new BasicStatisticValueLong(cs.getNumNull()));
     bs.addStatistic(PERCENTOFNULL,
         new BasicStatisticValueLong(cs.getNumNull() * 100 / NumofTuples));
-    bs.addStatistic(NUMBEROFDISTINCT, new BasicStatisticValueInteger(cs.getFreq().size()));
-    bs.addStatistic(PERCENTODFISTINCT,
-        new BasicStatisticValueInteger((int) (cs.getFreq().size() * 100 / NumofTuples)));
+    if (!this.isNotAggregating) {
+      bs.addStatistic(NUMBEROFDISTINCT, new BasicStatisticValueInteger(cs.getFreq().size()));
+      bs.addStatistic(PERCENTODFISTINCT,
+              new BasicStatisticValueInteger((int) (cs.getFreq().size() * 100 / NumofTuples)));
+    }
 
 
     // if (cs.getDistinctValues() != null) column.put(DISTINCTVALUES, cs.getDistinctValues());
@@ -275,8 +282,10 @@ public class SingleColumnProfilerAlgorithm {
         bs.addStatistic(LONGESTSTRING, new BasicStatisticValueString(cs.getLongestString()));
       if (cs.getShortestString() != null)
         bs.addStatistic(SHORTESTSTRING, new BasicStatisticValueString(cs.getShortestString()));
-      bs.addStatistic(MINSTRING, new BasicStatisticValueString(cs.getFreq().firstKey()));
-      bs.addStatistic(MAXSTRING, new BasicStatisticValueString(cs.getFreq().lastKey()));
+      if (!this.isNotAggregating) {
+        bs.addStatistic(MINSTRING, new BasicStatisticValueString(cs.getFreq().firstKey()));
+        bs.addStatistic(MAXSTRING, new BasicStatisticValueString(cs.getFreq().lastKey()));
+      }
 
       if (cs.getSemantictype() != null && cs.getSemantictype() != DataTypes.UNKOWN)
         bs.addStatistic(SEMANTICDATATYPE, new BasicStatisticValueString(cs.getSemantictype()));
@@ -307,13 +316,15 @@ public class SingleColumnProfilerAlgorithm {
 
     
     // all
-    cs.setFreq(new Object2IntRBTreeMap<String>(Util.sortByValues(cs.getFreq())));
-    TreeMap<String, Integer> topk = (TreeMap<String, Integer>) Util.getTopK(cs.getFreq(), SingleColumnProfilerAlgorithm.Numoftopk);
-    if(topk!=null){
-      bs.addStatistic(TOPKITEM,
-          new BasicStatisticValueStringList(new ArrayList<String>(topk.keySet())));
-      bs.addStatistic(TOPKITEMFREQ,
-          new BasicStatisticValueIntegerList(new ArrayList<Integer>(topk.values())));
+    if (!this.isNotAggregating) {
+      cs.setFreq(new Object2IntRBTreeMap<String>(Util.sortByValues(cs.getFreq())));
+      TreeMap<String, Integer> topk = (TreeMap<String, Integer>) Util.getTopK(cs.getFreq(), SingleColumnProfilerAlgorithm.Numoftopk);
+      if(topk!=null){
+        bs.addStatistic(TOPKITEM,
+                new BasicStatisticValueStringList(new ArrayList<String>(topk.keySet())));
+        bs.addStatistic(TOPKITEMFREQ,
+                new BasicStatisticValueIntegerList(new ArrayList<Integer>(topk.values())));
+      }
     }
 
     resultReceiver.receiveResult(bs);
