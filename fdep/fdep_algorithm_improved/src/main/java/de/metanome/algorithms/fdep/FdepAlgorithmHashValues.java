@@ -202,7 +202,7 @@ public class FdepAlgorithmHashValues implements FunctionalDependencyAlgorithm,
             ri = this.relationalInputGenerator.generateNewCopy();
         } else if (this.databaseConnectionGenerator != null && this.tableName != null) {
             String sql = "SELECT * FROM " + this.tableName;
-            ri = this.databaseConnectionGenerator.generateRelationalInputFromSql(sql);
+            ri = this.databaseConnectionGenerator.generateRelationalInputFromSql(sql, this.tableName);
         } else {
             throw new AlgorithmConfigurationException("No input Generator set.");
         }

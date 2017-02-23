@@ -28,12 +28,17 @@ import de.metanome.algorithm_integration.input.RelationalInput;
 
 public class PLIBuilder {
 	
-	int numRecords = 0;
+	private int numRecords = 0;
+	private int inputRowLimit;
 	
 	public int getNumLastRecords() {
 		return this.numRecords;
 	}
 	
+	public PLIBuilder(int inputRowLimit) {
+		this.inputRowLimit = inputRowLimit;
+	}
+
 	public List<PositionListIndex> getPLIs(RelationalInput relationalInput, int numAttributes, boolean isNullEqualNull) throws InputIterationException {
 		List<HashMap<String, IntArrayList>> clusterMaps = this.calculateClusterMaps(relationalInput, numAttributes);
 		return this.fetchPositionListIndexes(clusterMaps, isNullEqualNull);
@@ -45,7 +50,7 @@ public class PLIBuilder {
 			clusterMaps.add(new HashMap<String, IntArrayList>());
 		
 		this.numRecords = 0;
-		while (relationalInput.hasNext()) {
+		while (relationalInput.hasNext() && (this.inputRowLimit <= 0 || this.inputRowLimit != this.numRecords)) {
 			List<String> record = relationalInput.next();
 			
 			int attributeId = 0;

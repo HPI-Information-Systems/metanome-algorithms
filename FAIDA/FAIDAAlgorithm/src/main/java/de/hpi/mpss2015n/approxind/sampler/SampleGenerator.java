@@ -16,4 +16,9 @@ public class SampleGenerator implements RelationalInputGenerator {
   public RelationalInput generateNewCopy() throws InputGenerationException {
     return input;
   }
+
+  @Override
+  public void close() throws Exception {
+	  this.input.close();
+  }
 }

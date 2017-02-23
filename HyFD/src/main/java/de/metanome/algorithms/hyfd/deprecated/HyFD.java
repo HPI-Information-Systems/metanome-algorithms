@@ -223,7 +223,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		
 		// Calculate plis
 		System.out.println("Reading data and calculating plis ...");
-		PLIBuilder pliBuilder = new PLIBuilder();
+		PLIBuilder pliBuilder = new PLIBuilder(-1);
 		List<PositionListIndex> plis = pliBuilder.getPLIs(relationalInput, this.numAttributes, this.valueComparator.isNullEqualNull());
 		this.closeInput(relationalInput);
 

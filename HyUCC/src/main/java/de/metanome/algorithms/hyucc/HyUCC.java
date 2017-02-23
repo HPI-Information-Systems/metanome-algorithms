@@ -38,7 +38,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 public class HyUCC implements UniqueColumnCombinationsAlgorithm, BooleanParameterAlgorithm, IntegerParameterAlgorithm, RelationalInputParameterAlgorithm {
     
 	public enum Identifier {
-		INPUT_GENERATOR, NULL_EQUALS_NULL, VALIDATE_PARALLEL, ENABLE_MEMORY_GUARDIAN, MAX_UCC_SIZE
+		INPUT_GENERATOR, NULL_EQUALS_NULL, VALIDATE_PARALLEL, ENABLE_MEMORY_GUARDIAN, MAX_UCC_SIZE, INPUT_ROW_LIMIT
 	};
 
 	private RelationalInputGenerator inputGenerator = null;
@@ -49,6 +49,7 @@ public class HyUCC implements UniqueColumnCombinationsAlgorithm, BooleanParamete
 	
 	private boolean validateParallel = true;
 	private int maxUccSize = -1;
+	private int inputRowLimit = -1;				// Maximum number of rows to be read from for analysis; values smaller or equal 0 will cause the algorithm to read all rows
 	
 	private float efficiencyThreshold = 0.01f;
 	
@@ -98,6 +99,12 @@ public class HyUCC implements UniqueColumnCombinationsAlgorithm, BooleanParamete
 		maxLhsSize.setDefaultValues(defaultMaxLhsSize);
 		maxLhsSize.setRequired(false);
 		configs.add(maxLhsSize);
+
+		ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(HyUCC.Identifier.INPUT_ROW_LIMIT.name());
+		Integer[] defaultInputRowLimit = { Integer.valueOf(this.inputRowLimit) };
+		inputRowLimit.setDefaultValues(defaultInputRowLimit);
+		inputRowLimit.setRequired(false);
+		configs.add(inputRowLimit);
 		
 		return configs;
 	}
@@ -123,6 +130,9 @@ public class HyUCC implements UniqueColumnCombinationsAlgorithm, BooleanParamete
 	public void setIntegerConfigurationValue(String identifier, Integer... values) throws AlgorithmConfigurationException {
 		if (HyUCC.Identifier.MAX_UCC_SIZE.name().equals(identifier))
 			this.maxUccSize = values[0].intValue();
+		else if (HyUCC.Identifier.INPUT_ROW_LIMIT.name().equals(identifier))
+			if (values.length > 0)
+				this.inputRowLimit = values[0].intValue();
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}
@@ -147,6 +157,7 @@ public class HyUCC implements UniqueColumnCombinationsAlgorithm, BooleanParamete
 				"numAttributes: " + this.numAttributes + "\r\n\t" +
 				"isNullEqualNull: " + ((this.valueComparator != null) ? String.valueOf(this.valueComparator.isNullEqualNull()) : "-") + ")\r\n\t" +
 				"maxUccSize: " + this.maxUccSize + "\r\n" +
+				"inputRowLimit: " + this.inputRowLimit + "\r\n" +
 				"\r\n" +
 				"Progress log: \r\n" + Logger.getInstance().read();
 	}
@@ -184,7 +195,7 @@ public class HyUCC implements UniqueColumnCombinationsAlgorithm, BooleanParamete
 		
 		// Calculate plis
 		Logger.getInstance().writeln("Reading data and calculating plis ...");
-		PLIBuilder pliBuilder = new PLIBuilder();
+		PLIBuilder pliBuilder = new PLIBuilder(this.inputRowLimit);
 		List<PositionListIndex> plis = pliBuilder.getPLIs(relationalInput, this.numAttributes, this.valueComparator.isNullEqualNull());
 		this.closeInput(relationalInput);
 

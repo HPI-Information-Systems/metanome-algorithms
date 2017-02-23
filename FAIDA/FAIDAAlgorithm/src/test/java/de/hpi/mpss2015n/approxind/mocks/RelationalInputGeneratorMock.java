@@ -18,4 +18,9 @@ class RelationalInputGeneratorMock implements RelationalInputGenerator {
         mock.reset();
         return mock;
     }
+
+	@Override
+	public void close() throws Exception {
+		this.input.close();
+	}
 }

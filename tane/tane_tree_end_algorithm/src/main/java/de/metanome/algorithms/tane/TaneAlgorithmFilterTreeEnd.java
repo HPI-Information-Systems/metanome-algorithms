@@ -181,7 +181,7 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
             input = this.relationalInputGenerator.generateNewCopy();
         } else if (this.databaseConnectionGenerator != null) {
             String sql = "SELECT * FROM " + this.tableName;
-            input = this.databaseConnectionGenerator.generateRelationalInputFromSql(sql);
+            input = this.databaseConnectionGenerator.generateRelationalInputFromSql(sql, this.tableName);
         }
         if (input != null) {
             this.numberAttributes = input.numberOfColumns();

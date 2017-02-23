@@ -17,6 +17,7 @@ package de.metanome.algorithms.order.sorting.partitions;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
@@ -128,5 +129,9 @@ public class TestFileInputGenerator implements FileInputGenerator {
       throw new FileNotFoundException();
     }
     this.inputFile = inputFile;
+  }
+  
+  @Override
+  public void close() throws IOException {
   }
 }
