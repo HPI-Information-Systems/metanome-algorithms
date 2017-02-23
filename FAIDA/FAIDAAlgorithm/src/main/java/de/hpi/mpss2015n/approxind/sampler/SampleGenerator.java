@@ -19,6 +19,10 @@ public class SampleGenerator implements RelationalInputGenerator {
 
   @Override
   public void close() throws Exception {
-	  this.input.close();
+    try {
+      if (this.input != null) this.input.close();
+    } finally {
+      this.input = null;
+    }
   }
 }

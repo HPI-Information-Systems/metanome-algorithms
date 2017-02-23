@@ -2,7 +2,7 @@ package de.hpi.mpss2015n.approxind.inclusiontester;
 
 import com.google.common.hash.HashFunction;
 import de.hpi.mpss2015n.approxind.InclusionTester;
-import de.hpi.mpss2015n.approxind.utils.ColumnStore;
+import de.hpi.mpss2015n.approxind.utils.HashedColumnStore;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +19,7 @@ public class InclusionTesterTest {
 
     public static final int TABLE0 = 0;
 
-    private final HashFunction hashFunction = ColumnStore.HASH_FUNCTION;
+    private final HashFunction hashFunction = HashedColumnStore.HASH_FUNCTION;
     private final long aHash = hashFunction.hashUnencodedChars("a").asLong();
     private final long bHash = hashFunction.hashUnencodedChars("b").asLong();
     private final long cHash = hashFunction.hashUnencodedChars("c").asLong();

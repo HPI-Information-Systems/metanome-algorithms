@@ -1,7 +1,7 @@
 package de.hpi.mpss2015n.approxind.datastructures;
 
 /**
- * Reduced Bloom filter implementation for FAIDA.
+ * Reduced Bloom filter implementation for FAIDACore.
  */
 public class BloomFilter {
 

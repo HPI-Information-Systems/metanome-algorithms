@@ -3,7 +3,7 @@ package de.hpi.mpss2015n.approxind.inclusiontester;
 import de.hpi.mpss2015n.approxind.InclusionTester;
 import de.hpi.mpss2015n.approxind.datastructures.HyperLogLog;
 import de.hpi.mpss2015n.approxind.datastructures.SampledInvertedIndex;
-import de.hpi.mpss2015n.approxind.utils.ColumnStore;
+import de.hpi.mpss2015n.approxind.utils.HashedColumnStore;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -90,7 +90,7 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
                         boolean anyNull = false;
                         for (int i = 0; i < columns.length; i++) {
                             long hash = sampleRow[columns[i]];
-                            if (anyNull = hash == ColumnStore.NULLHASH) break;
+                            if (anyNull = hash == HashedColumnStore.NULLHASH) break;
                             combinedHash = Long.rotateLeft(combinedHash, 1) ^ hash;
                         }
                         if (!anyNull) {
@@ -120,7 +120,7 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
             int[] columns = combination.getColumns();
             for (int i = 0; i < columns.length; i++) {
                 long hash = values[columns[i]];
-                if (hash == ColumnStore.NULLHASH) {
+                if (hash == HashedColumnStore.NULLHASH) {
                     continue ColumnCombinations;
                 }
                 combinedHash = Long.rotateLeft(combinedHash, 1) ^ hash;

@@ -1,7 +1,7 @@
 package de.hpi.mpss2015n.approxind.inclusiontester;
 
 import de.hpi.mpss2015n.approxind.InclusionTester;
-import de.hpi.mpss2015n.approxind.utils.ColumnStore;
+import de.hpi.mpss2015n.approxind.utils.HashedColumnStore;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public final class HashSetInclusionTester implements InclusionTester {
             boolean anyNull = false;
             for (int c : combination.getColumns()) {
                 long value = values[c];
-                anyNull |= value == ColumnStore.NULLHASH;
+                anyNull |= value == HashedColumnStore.NULLHASH;
                 combinationValues.add(value);
             }
             if (!anyNull) {
