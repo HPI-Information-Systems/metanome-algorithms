@@ -360,12 +360,17 @@ public class DataTypes {
   }
 
   public static boolean isNumeric(String DataType) {
-    String[] Numericdatatypes = {mySHORT, myINTEGER, myLONG, myBIGDECIMAL, myFLOAT, myDOUBLE};
-    ArrayList<String> Ntypes = new ArrayList<String>(Arrays.asList(Numericdatatypes));
-    if (Ntypes.contains(DataType))
-      return true;
-    else
-      return false;
+    switch (DataType) {
+      case mySHORT:
+      case myINTEGER:
+      case myLONG:
+      case myBIGDECIMAL:
+      case myFLOAT:
+      case myDOUBLE:
+        return true;
+      default:
+        return false;
+    }
   }
 
   /////////////////////////////// semantic data types////////////////////////////
