@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Map.Entry;
+import java.util.Objects;
+
 import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
 
 
@@ -203,7 +205,7 @@ public class ColumnMainProfile {
 
     if (!DataTypes.isSameDataType(DataType, newvalue)) {
       String newtype = DataTypes.getDataType(newvalue);
-      if (newtype != DataTypes.UNKOWN) {
+      if (!Objects.equals(newtype, DataTypes.UNKOWN)) {
         DataType = newtype;
       }
     }
@@ -214,7 +216,7 @@ public class ColumnMainProfile {
         LongestString = (LongestString.length() > newvalue.length()) ? LongestString : newvalue;
       if (ShortestString == null)
         ShortestString = newvalue;
-      else if (newvalue != " " && !newvalue.isEmpty())
+      else if (!Objects.equals(newvalue, " ") && !newvalue.isEmpty())
         ShortestString = (ShortestString.length() < newvalue.length()) ? ShortestString : newvalue;
 
       // update numbers
@@ -234,7 +236,7 @@ public class ColumnMainProfile {
 
   }
 
-  public void updateColumnProfilesecondpass(String newvalue, int numberoftuples) { // string values
+  public void updateColumnProfilesecondpass(String newvalue, long numberoftuples) { // string values
     if (DataType == DataTypes.mySTRING || DataType == DataTypes.myTEXT) { 
       // length distribution
       // addValueforlengdist(newvalue.length());
