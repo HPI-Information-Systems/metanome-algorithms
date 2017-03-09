@@ -121,7 +121,7 @@
           <archive>
             <manifestEntries>
               <Algorithm-Bootstrap-Class>
-                de.hpi.metanome.algorithms.hyfd.HyFD
+                de.metanome.algorithms.hyfd.HyFD
               </Algorithm-Bootstrap-Class>
             </manifestEntries>
           </archive>

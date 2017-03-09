@@ -121,7 +121,7 @@
           <archive>
             <manifestEntries>
               <Algorithm-Bootstrap-Class>
-                de.hpi.metanome.algorithms.hyucc.HyUCC
+                de.metanome.algorithms.hyucc.HyUCC
               </Algorithm-Bootstrap-Class>
             </manifestEntries>
           </archive>
