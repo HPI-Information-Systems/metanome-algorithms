@@ -80,7 +80,7 @@
           <archive>
             <manifestEntries>
               <Algorithm-Bootstrap-Class>
-                de.metanome.algorithms.mvddet.MvdDet
+                de.metanome.algorithms.mvddet.MvDDetector
               </Algorithm-Bootstrap-Class>
             </manifestEntries>
           </archive>

@@ -56,11 +56,18 @@ public class StringTuple {
 	}
 	
 	public boolean equalsTuple(StringTuple other) {
-		for (int i = 0; i < values.length; i++){
-			if (!values[i].equals(other.getValueAt(i)))
+		try {
+			if (values.length != other.size()) {
 				return false;
+			}
+			for (int i = 0; i < values.length; i++) {
+				if (!values[i].equals(other.getValueAt(i)))
+					return false;
+			}
+			return true;
+		} catch (Exception e) {
+			return false;
 		}
-		return true;
 	}
 	
 	public boolean equals(Object other){
