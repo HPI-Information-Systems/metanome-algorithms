@@ -1,10 +1,7 @@
 package de.metanome.algorithms.singlecolumnprofiler;
 
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,7 +74,7 @@ public class Util {
       return false;
   }
 
-  public static <K, V extends Comparable<V>> Map<K, V> sortByValues(final Map<K, V> map) {
+  public static <K, V extends Comparable<V>> SortedMap<K, V> sortByValues(final Map<K, V> map) {
     Comparator<K> valueComparator = new Comparator<K>() {
       public int compare(K k1, K k2) {
         int compare = map.get(k2).compareTo(map.get(k1));
@@ -88,7 +85,7 @@ public class Util {
       }
     };
 
-    Map<K, V> sortedByValues = new TreeMap<K, V>(valueComparator);
+    SortedMap<K, V> sortedByValues = new TreeMap<K, V>(valueComparator);
     sortedByValues.putAll(map);
     return sortedByValues;
   }

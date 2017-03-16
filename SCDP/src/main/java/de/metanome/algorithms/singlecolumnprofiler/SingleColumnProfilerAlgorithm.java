@@ -1,12 +1,6 @@
 package de.metanome.algorithms.singlecolumnprofiler;
 
 
-
-import java.io.BufferedWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
-
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.ColumnIdentifier;
@@ -16,14 +10,14 @@ import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.BasicStatisticsResultReceiver;
 import de.metanome.algorithm_integration.results.BasicStatistic;
-import de.metanome.algorithm_integration.results.basic_statistic_values.BasicStatisticValueDouble;
-import de.metanome.algorithm_integration.results.basic_statistic_values.BasicStatisticValueInteger;
-import de.metanome.algorithm_integration.results.basic_statistic_values.BasicStatisticValueIntegerList;
-import de.metanome.algorithm_integration.results.basic_statistic_values.BasicStatisticValueLong;
-import de.metanome.algorithm_integration.results.basic_statistic_values.BasicStatisticValueString;
-import de.metanome.algorithm_integration.results.basic_statistic_values.BasicStatisticValueStringList;
-import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import de.metanome.algorithm_integration.results.basic_statistic_values.*;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.objects.*;
+
+import java.io.BufferedWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 
 
 
@@ -52,6 +46,7 @@ public class SingleColumnProfilerAlgorithm {
   public final String PERCENTODFISTINCT = "Percentage of Distinct Values";
   public final String DISTINCTVALUES = "Distinct Values";
   public final String VALUEDISTRIBUTION = "Value Distribution";
+  public final String ENTROPY = "Entropy";
   public final String STRINGLENGTHDISTRIBUTION = "String Length Distribution";
   public final String TOPKITEM = "Top " + Numoftopk + " frequent items";
   public final String TOPKITEMFREQ = "Frequency Of Top " + Numoftopk + " Frequent Items";
@@ -94,10 +89,10 @@ public class SingleColumnProfilerAlgorithm {
     // =======================================================
     // step 1: initialisation
     InitialiseColumnProfiles();
-    
+
     // step 2: get data types
     getColumnsProfiles();
-  
+
     // step 3: output
     // JSONObject General = new JSONObject();
     // General.put(NUMCOLUMN, columnNames.size());
@@ -110,10 +105,10 @@ public class SingleColumnProfilerAlgorithm {
       // System.out.println(columnsProfile.get(i).toString());
       generateColumnStatistic(columnsProfile.get(i));
       columnsProfile.set(i,null);
-      
+
     }
 
-   
+
   }
 
   private void InitialiseColumnProfiles()
@@ -124,7 +119,7 @@ public class SingleColumnProfilerAlgorithm {
     // outputPath = "io" + File.separator + "measurements" + File.separator
     // + relationName.replaceAll(".csv", "") + "_" + this.getClass().getSimpleName()
     // + File.separator;;
-    columnsProfile = new ObjectArrayList<ColumnMainProfile>();
+    columnsProfile = new ObjectArrayList<>();
     // generate an initial profiles according to the first record
     if (input.hasNext()) {
       NumofTuples++;
@@ -168,7 +163,7 @@ public class SingleColumnProfilerAlgorithm {
       }
 
     }
-   
+
 
   }
 
@@ -264,9 +259,19 @@ public class SingleColumnProfilerAlgorithm {
     bs.addStatistic(PERCENTOFNULL,
         new BasicStatisticValueLong(cs.getNumNull() * 100 / NumofTuples));
     if (!this.isNotAggregating) {
-      bs.addStatistic(NUMBEROFDISTINCT, new BasicStatisticValueInteger(cs.getFreq().size()));
+      Object2IntMap<String> valueFrequencies = cs.getFreq();
+      bs.addStatistic(NUMBEROFDISTINCT, new BasicStatisticValueInteger(valueFrequencies.size()));
       bs.addStatistic(PERCENTODFISTINCT,
-              new BasicStatisticValueInteger((int) (cs.getFreq().size() * 100 / NumofTuples)));
+              new BasicStatisticValueInteger((int) (valueFrequencies.size() * 100 / NumofTuples)));
+      double redundancy = 0d;
+      for (IntIterator iterator = valueFrequencies.values().iterator(); iterator.hasNext(); ) {
+          int valueFrequency = iterator.nextInt();
+          redundancy += valueFrequency * Math.log(valueFrequency);
+      }
+      double entropy = NumofTuples == 0 ?
+              0d :
+              (Math.log(NumofTuples) - redundancy / NumofTuples) / Math.log(2);
+      bs.addStatistic(ENTROPY, new BasicStatisticValueDouble(entropy));
     }
 
 
@@ -283,8 +288,9 @@ public class SingleColumnProfilerAlgorithm {
       if (cs.getShortestString() != null)
         bs.addStatistic(SHORTESTSTRING, new BasicStatisticValueString(cs.getShortestString()));
       if (!this.isNotAggregating) {
-        bs.addStatistic(MINSTRING, new BasicStatisticValueString(cs.getFreq().firstKey()));
-        bs.addStatistic(MAXSTRING, new BasicStatisticValueString(cs.getFreq().lastKey()));
+        ObjectSortedSet<String> valueFrequencies = new ObjectRBTreeSet<>(cs.getFreq().keySet());
+        bs.addStatistic(MINSTRING, new BasicStatisticValueString(valueFrequencies.first()));
+        bs.addStatistic(MAXSTRING, new BasicStatisticValueString(valueFrequencies.last()));
       }
 
       if (cs.getSemantictype() != null && cs.getSemantictype() != DataTypes.UNKOWN)
@@ -314,16 +320,16 @@ public class SingleColumnProfilerAlgorithm {
 
     }
 
-    
+
     // all
     if (!this.isNotAggregating) {
-      cs.setFreq(new Object2IntRBTreeMap<String>(Util.sortByValues(cs.getFreq())));
-      TreeMap<String, Integer> topk = (TreeMap<String, Integer>) Util.getTopK(cs.getFreq(), SingleColumnProfilerAlgorithm.Numoftopk);
+      Object2IntMap<String> valueFrequencies = cs.getFreq();
+      TreeMap<String, Integer> topk = (TreeMap<String, Integer>) Util.getTopK(valueFrequencies, SingleColumnProfilerAlgorithm.Numoftopk);
       if(topk!=null){
         bs.addStatistic(TOPKITEM,
-                new BasicStatisticValueStringList(new ArrayList<String>(topk.keySet())));
+                new BasicStatisticValueStringList(new ArrayList<>(topk.keySet())));
         bs.addStatistic(TOPKITEMFREQ,
-                new BasicStatisticValueIntegerList(new ArrayList<Integer>(topk.values())));
+                new BasicStatisticValueIntegerList(new ArrayList<>(topk.values())));
       }
     }
 

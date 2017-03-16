@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Objects;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
 
 
@@ -30,7 +31,7 @@ public class ColumnMainProfile {
   //private int NumDistinct; // -------Calculated
   // top k value
   // column value distribution (int)
-  Object2IntRBTreeMap<String> freq;
+  Object2IntMap<String> freq;
  // TreeMap<String,Integer> topk;// ------calculated
 
   ////////////////////////////////////////////////////////
@@ -255,7 +256,7 @@ public class ColumnMainProfile {
 
   }
 
-  public  Object2IntRBTreeMap<String> getFreq() {
+  public Object2IntMap<String> getFreq() {
     return freq;
   }
 
