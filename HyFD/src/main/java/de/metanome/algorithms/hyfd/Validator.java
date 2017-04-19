@@ -265,6 +265,7 @@ public class Validator {
 			// Decide if we continue validating the next level or if we go back into the sampling phase
 			if ((numInvalidFds > numValidFds * this.efficiencyThreshold) && (previousNumInvalidFds < numInvalidFds))
 				return comparisonSuggestions;
+			//	return new ArrayList<>();
 			previousNumInvalidFds = numInvalidFds;
 		}
 		
