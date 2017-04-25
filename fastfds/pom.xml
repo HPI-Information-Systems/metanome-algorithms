@@ -3,15 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.metanome.algorithms.fastfds</groupId>
-    <artifactId>fastfds</artifactId>
+    <artifactId>FastFDsModules</artifactId>
     <packaging>pom</packaging>
 
-    <name>fastfds</name>
+    <name>FastFDsModules</name>
 
     <parent>
         <groupId>de.metanome.algorithms</groupId>
         <artifactId>algorithms</artifactId>
-        <version>${metanome.version}</version>
+        <version>1.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>de.metanome.algorithms.mvddetector</groupId>
-  <artifactId>MvDDetector</artifactId>
+  <artifactId>MvDDet</artifactId>
   <packaging>jar</packaging>
 
-  <name>MvdDet</name>
+  <name>MvDDet</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,9 +16,9 @@
   <parent>
     <groupId>de.metanome.algorithms</groupId>
     <artifactId>algorithms</artifactId>
-    <version>${metanome.version}</version>
+    <version>1.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
-  </parent> 
+  </parent>
 
   <dependencies>
     <dependency>
@@ -27,26 +27,20 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>de.metanome</groupId>
       <artifactId>algorithm_integration</artifactId>
-      <version>${metanome.version}</version>
-      <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>de.metanome</groupId>
       <artifactId>algorithm_helper</artifactId>
-      <version>${metanome.version}</version>
-      <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>de.metanome</groupId>
       <artifactId>backend</artifactId>
-      <version>${metanome.version}</version>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 

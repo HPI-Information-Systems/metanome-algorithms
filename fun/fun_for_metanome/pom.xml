@@ -2,22 +2,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.uni-potsdam.hpi.metanome.algorithms</groupId>
-    <artifactId>fun_for_metanome</artifactId>
+    <artifactId>FUN</artifactId>
     <packaging>jar</packaging>
 
-    <name>fun_for_metanome</name>
+    <name>FUN</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-  <parent>
-    <groupId>de.metanome.algorithms</groupId>
-    <artifactId>algorithms</artifactId>
-    <version>${metanome.version}</version>
-    <relativePath>../../pom.xml</relativePath>
-  </parent>
+    <parent>
+        <groupId>de.metanome.algorithms.fun</groupId>
+        <artifactId>FUNModules</artifactId>
+        <version>1.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
     <dependencies>
         <dependency>
@@ -27,22 +26,24 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>de.uni-potsdam.hpi.metanome.algorithms</groupId>
+            <groupId>de.metanome.algorithms.fun</groupId>
             <artifactId>fun_test_helper</artifactId>
-            <version>${metanome.version}</version>
+            <version>1.1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>de.metanome</groupId>
             <artifactId>algorithm_integration</artifactId>
-            <version>${metanome.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.metanome.algorithms.fun</groupId>
+            <artifactId>fun_algorithm</artifactId>
+            <version>1.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>de.uni-potsdam.hpi.metanome.algorithms</groupId>
-            <artifactId>fun_algorithm</artifactId>
-            <version>${metanome.version}</version>
-            <scope>compile</scope>
+      	    <groupId>de.metanome</groupId>
+            <artifactId>backend</artifactId>
         </dependency>
     </dependencies>
 

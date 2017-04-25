@@ -27,6 +27,7 @@ public class Sampler {
 	private float efficiencyThreshold;
 	private ValueComparator valueComparator;
 	private List<AttributeRepresentant> attributeRepresentants = null;
+	private PriorityQueue<AttributeRepresentant> queue = null;
 	private MemoryGuardian memoryGuardian;
 
 	public Sampler(UCCSet negCover, UCCTree posCover, int[][] compressedRecords, List<PositionListIndex> plis, float efficiencyThreshold, ValueComparator valueComparator, MemoryGuardian memoryGuardian) {
@@ -73,32 +74,40 @@ public class Sampler {
 			Logger.getInstance().write("Running initial windows ...");
 			time = System.currentTimeMillis();
 			this.attributeRepresentants = new ArrayList<AttributeRepresentant>(numAttributes);
-			float efficiencyFactor = (int)Math.ceil(1 / this.efficiencyThreshold);
+			this.queue = new PriorityQueue<AttributeRepresentant>(numAttributes);
 			for (int i = 0; i < numAttributes; i++) {
-				AttributeRepresentant attributeRepresentant = new AttributeRepresentant(this.plis.get(i).getClusters(), efficiencyFactor, this.negCover, this.posCover, this, this.memoryGuardian);
+				AttributeRepresentant attributeRepresentant = new AttributeRepresentant(this.plis.get(i).getClusters(), this.negCover, this.posCover, this, this.memoryGuardian);
 				attributeRepresentant.runNext(newNonUCCs, this.compressedRecords);
-				if (attributeRepresentant.getEfficiency() != 0)
-					this.attributeRepresentants.add(attributeRepresentant);
+				this.attributeRepresentants.add(attributeRepresentant);
+				if (attributeRepresentant.getEfficiency() > 0.0f)
+					this.queue.add(attributeRepresentant); // If the efficiency is 0, the algorithm will never schedule a next run for the attribute regardless how low we set the efficiency threshold
 			}
+
+			if (!this.queue.isEmpty())
+				this.efficiencyThreshold = Math.min(0.01f, this.queue.peek().getEfficiency() * 0.5f); // This is an optimization that we added after writing the HyFD paper
+			
 			Logger.getInstance().writeln("(" + (System.currentTimeMillis() - time) + "ms)");
 		}
 		else {
-			// Lower the efficiency factor for this round
-			for (AttributeRepresentant attributeRepresentant : this.attributeRepresentants) {
-				attributeRepresentant.setEfficiencyFactor(attributeRepresentant.getEfficiencyFactor() * 2); // TODO: find a more clever way to increase the efficiency expectation
-			}
+			// Decrease the efficiency threshold
+			if (!this.queue.isEmpty())
+				this.efficiencyThreshold = Math.min(this.efficiencyThreshold / 2, this.queue.peek().getEfficiency() * 0.9f); // This is an optimization that we added after writing the HyFD paper
 		}
 		
 		Logger.getInstance().writeln("Moving window over clusters ... ");
-		PriorityQueue<AttributeRepresentant> queue = new PriorityQueue<AttributeRepresentant>(this.attributeRepresentants);
-		while (!queue.isEmpty()) {
-			AttributeRepresentant attributeRepresentant = queue.remove();
-			if (!attributeRepresentant.runNext(newNonUCCs, this.compressedRecords))
-				continue;
+		
+		while (!this.queue.isEmpty() && (this.queue.peek().getEfficiency() >= this.efficiencyThreshold)) {
+			AttributeRepresentant attributeRepresentant = this.queue.remove();
 			
-			if (attributeRepresentant.getEfficiency() != 0)
-				queue.add(attributeRepresentant);
+			attributeRepresentant.runNext(newNonUCCs, this.compressedRecords);
+			
+			if (attributeRepresentant.getEfficiency() >= 0.0f)
+				this.queue.add(attributeRepresentant);
 		}
+		
+		StringBuilder windows = new StringBuilder("Window signature: ");
+		for (AttributeRepresentant attributeRepresentant : this.attributeRepresentants)
+			windows.append("[" + attributeRepresentant.windowDistance + "]");
 		
 		return newNonUCCs;
 	}
@@ -144,38 +153,23 @@ public class Sampler {
 		private int windowDistance = 0;
 		private IntArrayList numNewNonFds = new IntArrayList();
 		private IntArrayList numComparisons = new IntArrayList();
-		private float efficiencyFactor;
 		private List<IntArrayList> clusters;
 		private UCCSet negCover;
 		private UCCTree posCover;
 		private Sampler sampler;
 		private MemoryGuardian memoryGuardian;
 		
-		public float getEfficiencyFactor() {
-			return this.efficiencyFactor;
-		}
-
-		public void setEfficiencyFactor(float efficiencyFactor) {
-			this.efficiencyFactor = efficiencyFactor;
-		}
-
-		public int getEfficiency() { // TODO: If we keep calculating the efficiency with all comparisons and all results in the log, then we can also aggregate all comparisons and results in two variables without maintaining the entire log
-			int sumNonFds = 0;
-			int sumComparisons = 0;
+		public float getEfficiency() {
 			int index = this.numNewNonFds.size() - 1;
-			while ((index >= 0) && (sumComparisons < this.efficiencyFactor)) {
-				sumNonFds += this.numNewNonFds.getInt(index);
-				sumComparisons += this.numComparisons.getInt(index);
-				index--;
-			}
+			float sumNewNonFds = this.numNewNonFds.getInt(index);
+			float sumComparisons = this.numComparisons.getInt(index);
 			if (sumComparisons == 0)
-				return 0;
-			return (int)(sumNonFds * (this.efficiencyFactor / sumComparisons));
+				return 0.0f;
+			return sumNewNonFds / sumComparisons;
 		}
 		
-		public AttributeRepresentant(List<IntArrayList> clusters, float efficiencyFactor, UCCSet negCover, UCCTree posCover, Sampler sampler, MemoryGuardian memoryGuardian) {
+		public AttributeRepresentant(List<IntArrayList> clusters, UCCSet negCover, UCCTree posCover, Sampler sampler, MemoryGuardian memoryGuardian) {
 			this.clusters = new ArrayList<IntArrayList>(clusters);
-			this.efficiencyFactor = efficiencyFactor;
 			this.negCover = negCover;
 			this.posCover = posCover;
 			this.sampler = sampler;
@@ -187,7 +181,7 @@ public class Sampler {
 			return (int)Math.signum(o.getEfficiency() - this.getEfficiency());
 		}
 		
-		public boolean runNext(UCCList newNonUCCs, int[][] compressedRecords) {
+		public void runNext(UCCList newNonUCCs, int[][] compressedRecords) {
 			this.windowDistance++;
 			int numNewNonFds = 0;
 			int numComparisons = 0;
@@ -224,10 +218,6 @@ public class Sampler {
 			
 			this.numNewNonFds.add(numNewNonFds);
 			this.numComparisons.add(numComparisons);
-			
-			if (numComparisons == 0)
-				return false;
-			return true;
 		}
 	}
 	

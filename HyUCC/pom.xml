@@ -14,9 +14,9 @@
   <parent>
     <groupId>de.metanome.algorithms</groupId>
     <artifactId>algorithms</artifactId>
-    <version>${metanome.version}</version>
+    <version>1.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
-  </parent> 
+  </parent>
 
   <dependencies>
     <dependency>
@@ -25,72 +25,66 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <version>1.9.5</version>
     </dependency>
-    
+
     <dependency>
       <groupId>de.uni-potsdam.hpi</groupId>
       <artifactId>utils</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
-    
+
     <dependency>
       <groupId>de.uni-potsdam.hpi</groupId>
       <artifactId>dao</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
-    
+
     <dependency>
       <groupId>de.metanome</groupId>
       <artifactId>algorithm_integration</artifactId>
-      <version>${metanome.version}</version>
-      <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>de.metanome</groupId>
       <artifactId>algorithm_helper</artifactId>
-      <version>${metanome.version}</version>
-      <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>de.metanome</groupId>
       <artifactId>backend</artifactId>
-      <version>${metanome.version}</version>
-      <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>15.0</version>
     </dependency>
-    
+
     <dependency>
       <groupId>it.unimi.dsi</groupId>
       <artifactId>fastutil</artifactId>
       <version>6.5.9</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
       <version>4.5.1</version>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.javolution</groupId>
       <artifactId>javolution</artifactId>
       <version>5.3.1</version>
-    </dependency> 
+    </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>

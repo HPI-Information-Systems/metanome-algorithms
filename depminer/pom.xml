@@ -3,15 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.metanome.algorithms.depminer</groupId>
-    <artifactId>DepMiner</artifactId>
+    <artifactId>DepMinerModules</artifactId>
     <packaging>pom</packaging>
 
-    <name>DepMiner</name>
+    <name>DepMinerModules</name>
 
     <parent>
         <groupId>de.metanome.algorithms</groupId>
         <artifactId>algorithms</artifactId>
-        <version>${metanome.version}</version>
+        <version>1.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

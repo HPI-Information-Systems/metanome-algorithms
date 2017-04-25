@@ -1,23 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>de.uni-potsdam.hpi.metanome.algorithms</groupId>
-  <artifactId>fun</artifactId>
+  <groupId>de.metanome.algorithms.fun</groupId>
+  <artifactId>FUNModules</artifactId>
   <packaging>pom</packaging>
 
-  <name>fun</name>
+  <name>FUNModules</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
+
   <parent>
     <groupId>de.metanome.algorithms</groupId>
     <artifactId>algorithms</artifactId>
-    <version>${metanome.version}</version>
+    <version>1.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
-  </parent> 
-  
+  </parent>
+
   <modules>
     <module>fun_algorithm_helper</module>
     <module>fun_test_helper</module>

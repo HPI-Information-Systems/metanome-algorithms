@@ -2,7 +2,6 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>de.uni-potsdam.hpi.metanome.algorithms</groupId>
   <artifactId>fdmine_test_helper</artifactId>
   <packaging>jar</packaging>
 
@@ -13,10 +12,10 @@
   </properties>
 
   <parent>
-    <groupId>de.metanome.algorithms</groupId>
-    <artifactId>algorithms</artifactId>
-    <version>${metanome.version}</version>
-    <relativePath>../../pom.xml</relativePath>
+    <groupId>de.metanome.algorithms.fdmine</groupId>
+    <artifactId>FDMineModules</artifactId>
+    <version>1.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
     <dependencies>
@@ -29,23 +28,17 @@
     <dependency>
       <groupId>de.metanome</groupId>
       <artifactId>algorithm_integration</artifactId>
-        <version>${metanome.version}</version>
-        <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>de.metanome</groupId>
       <artifactId>algorithm_helper</artifactId>
-        <version>${metanome.version}</version>
-        <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>de.metanome</groupId>
       <artifactId>backend</artifactId>
-      <version>${metanome.version}</version>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -71,7 +64,7 @@
 	    </goals>
 	  </execution>
         </executions>
-      </plugin> 
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>

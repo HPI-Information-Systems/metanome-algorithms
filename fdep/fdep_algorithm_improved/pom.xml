@@ -2,17 +2,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.metanome.algorithms.fdep</groupId>
-    <artifactId>fdep_algorithm_improved</artifactId>
+    <artifactId>FDep_improved</artifactId>
     <packaging>jar</packaging>
 
-    <name>fdep_algorithm_improved</name>
+    <name>FDep_improved</name>
 
     <parent>
-        <groupId>de.metanome.algorithms</groupId>
-        <artifactId>algorithms</artifactId>
-        <version>${metanome.version}</version>
-        <relativePath>../../pom.xml</relativePath>
+        <groupId>de.metanome.algorithms.fdep</groupId>
+        <artifactId>FDepModules</artifactId>
+        <version>1.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
@@ -25,8 +24,6 @@
         <dependency>
             <groupId>de.metanome</groupId>
             <artifactId>algorithm_integration</artifactId>
-            <version>${metanome.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>it.unimi.dsi</groupId>
@@ -43,7 +40,7 @@
         <dependency>
             <groupId>de.metanome.algorithms.tane</groupId>
             <artifactId>tane_algorithm_helper</artifactId>
-            <version>${metanome.version}</version>
+            <version>1.1-SNAPSHOT</version>
             <!-- <scope>test</scope>-->
         </dependency>
     </dependencies>

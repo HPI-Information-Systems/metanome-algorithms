@@ -90,7 +90,8 @@ public class Sampler {
 		}
 		else {
 			// Decrease the efficiency threshold
-			this.efficiencyThreshold = Math.min(this.efficiencyThreshold / 2, this.queue.peek().getEfficiency() * 0.9f); // This is an optimization that we added after writing the HyFD paper
+			if (!this.queue.isEmpty())
+				this.efficiencyThreshold = Math.min(this.efficiencyThreshold / 2, this.queue.peek().getEfficiency() * 0.9f); // This is an optimization that we added after writing the HyFD paper
 		}
 		
 		Logger.getInstance().writeln("Moving window over clusters ... ");

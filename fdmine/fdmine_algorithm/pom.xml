@@ -2,17 +2,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.uni_potsdam.hpi.metanome.algorithms.fdmine</groupId>
-    <artifactId>fdmine_algorithm</artifactId>
+    <artifactId>FDMine</artifactId>
     <packaging>jar</packaging>
 
-    <name>fdmine_algorithm</name>
+    <name>FDMine</name>
 
     <parent>
-        <groupId>de.metanome.algorithms</groupId>
-        <artifactId>algorithms</artifactId>
-        <version>${metanome.version}</version>
-        <relativePath>../../pom.xml</relativePath>
+        <groupId>de.metanome.algorithms.fdmine</groupId>
+        <artifactId>FDMineModules</artifactId>
+        <version>1.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
@@ -37,19 +36,15 @@
         <dependency>
             <groupId>de.metanome</groupId>
             <artifactId>algorithm_integration</artifactId>
-            <version>${metanome.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>de.metanome</groupId>
             <artifactId>algorithm_helper</artifactId>
-            <version>${metanome.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>de.uni-potsdam.hpi.metanome.algorithms</groupId>
+            <groupId>de.metanome.algorithms.fdmine</groupId>
             <artifactId>fdmine_test_helper</artifactId>
-            <version>${metanome.version}</version>
+            <version>1.1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
