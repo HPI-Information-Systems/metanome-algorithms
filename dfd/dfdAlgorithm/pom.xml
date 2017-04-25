@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.metanome.algorithms.dfd</groupId>
-    <artifactId>dfdAlgorithm</artifactId>
+    <artifactId>DFDAlgorithm</artifactId>
     <packaging>jar</packaging>
 
-    <name>dfdAlgorithm</name>
+    <name>DFDAlgorithm</name>
 
     <parent>
         <groupId>de.metanome.algorithms</groupId>

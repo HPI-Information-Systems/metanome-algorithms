@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.metanome.algorithms.dfd</groupId>
-    <artifactId>dfdMetanome</artifactId>
+    <artifactId>DFD</artifactId>
     <packaging>jar</packaging>
 
-    <name>dfdMetanome</name>
+    <name>DFD</name>
 
     <parent>
         <groupId>de.metanome.algorithms</groupId>
@@ -47,7 +47,7 @@
                     <archive>
                         <manifestEntries>
                             <Algorithm-Bootstrap-Class>
-                                de.metanome.algorithms.dfd.dfdMetanome.DFDMetanome
+                                de.metanome.algorithms.dfd.DFDMetanome
                             </Algorithm-Bootstrap-Class>
                         </manifestEntries>
                     </archive>
@@ -78,11 +78,10 @@
         </dependency>
         <dependency>
             <groupId>de.metanome.algorithms.dfd</groupId>
-            <artifactId>dfdAlgorithm</artifactId>
+            <artifactId>DFDAlgorithm</artifactId>
             <version>${metanome.version}</version>
             <scope>compile</scope>
         </dependency>
-
     </dependencies>
 
 </project>

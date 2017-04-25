@@ -1,4 +1,4 @@
-package de.metanome.algorithms.binder.BINDERDatabase;
+package de.metanome.algorithms.binder;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -4,7 +4,9 @@
     <groupId>de.metanome.algorithms</groupId>
     <artifactId>algorithms</artifactId>
     <packaging>pom</packaging>
+    
     <name>algorithms</name>
+    
     <version>${metanome.version}</version>
     <description>The metanome algorithms collection</description>
 

@@ -16,3 +16,4 @@ output/
 _COLLECTION_
 ORDER/order.log
 .DS_Store
+*.versionsBackup

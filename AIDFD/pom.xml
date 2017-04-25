@@ -5,7 +5,7 @@
 	<artifactId>AIDFD</artifactId>
 	<packaging>jar</packaging>
 
-	<name>AID-FD</name>
+	<name>AIDFD</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -70,7 +70,6 @@
                     </execution>
                 </executions>
             </plugin>
-
 		</plugins>
 	</build>
 </project>

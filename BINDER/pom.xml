@@ -2,10 +2,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>de.metanome.algorithms.binder</groupId>
-  <artifactId>BINDER</artifactId>
+  <artifactId>BINDERModules</artifactId>
   <packaging>pom</packaging>
 
-  <name>BINDER</name>
+  <name>BINDERModules</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

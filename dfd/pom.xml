@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.metanome.algorithms.dfd</groupId>
-    <artifactId>dfd</artifactId>
+    <artifactId>DFDModules</artifactId>
     <packaging>pom</packaging>
 
-    <name>dfd</name>
+    <name>DFDModules</name>
 
     <modules>
         <module>dfdAlgorithm</module>

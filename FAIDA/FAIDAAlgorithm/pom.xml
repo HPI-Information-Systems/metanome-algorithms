@@ -3,14 +3,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>FAIDAAlgorithm</artifactId>
+	<artifactId>FAIDA</artifactId>
     <packaging>jar</packaging>
 
-    <name>FAIDAAlgorithm</name>
+    <name>FAIDA</name>
 
     <parent>
 		<groupId>de.metanome.algorithms.faida</groupId>
-		<artifactId>FAIDA</artifactId>
+		<artifactId>FAIDAModules</artifactId>
         <version>${metanome.version}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>

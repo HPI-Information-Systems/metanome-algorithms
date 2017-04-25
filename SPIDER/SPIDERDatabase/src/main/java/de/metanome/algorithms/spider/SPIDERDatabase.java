@@ -1,4 +1,4 @@
-package de.metanome.algorithms.spider.SPIDERDatabase;
+package de.metanome.algorithms.spider;
 
 import java.io.File;
 import java.util.ArrayList;

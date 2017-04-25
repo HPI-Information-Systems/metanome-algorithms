@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.metanome.algorithms.ducc</groupId>
-    <artifactId>ducc_algorithm</artifactId>
+    <artifactId>DUCCAlgorithm</artifactId>
     <packaging>jar</packaging>
 
-    <name>ducc_algorithm</name>
+    <name>DUCCAlgorithm</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -92,7 +92,8 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Algorithm-Bootstrap-Class>de.metanome.algorithms.ducc.DuccAlgorithm
+                            <Algorithm-Bootstrap-Class>
+                            	de.metanome.algorithms.ducc.DuccAlgorithm
                             </Algorithm-Bootstrap-Class>
                         </manifestEntries>
                     </archive>

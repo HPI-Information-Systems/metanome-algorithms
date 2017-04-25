@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.metanome.algorithms.depminer</groupId>
-    <artifactId>depminer</artifactId>
+    <artifactId>DepMiner</artifactId>
     <packaging>pom</packaging>
 
-    <name>depminer</name>
+    <name>DepMiner</name>
 
     <parent>
         <groupId>de.metanome.algorithms</groupId>

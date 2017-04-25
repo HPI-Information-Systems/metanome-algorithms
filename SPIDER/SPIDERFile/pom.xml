@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>de.metanome.algorithms.spider.SPIDERFile</groupId>
-  <artifactId>SPIDERFile</artifactId>
+  <groupId>de.metanome.algorithms.spider</groupId>
+  <artifactId>SPIDER</artifactId>
   <packaging>jar</packaging>
 
-  <name>SPIDERFile</name>
+  <name>SPIDER</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -70,7 +70,7 @@
           <archive>
             <manifestEntries>
               <Algorithm-Bootstrap-Class>
-                de.metanome.algorithms.spider.SPIDERFile.SPIDERFile
+                de.metanome.algorithms.spider.SPIDERFile
               </Algorithm-Bootstrap-Class>
             </manifestEntries>
           </archive>

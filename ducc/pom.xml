@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.metanome.algorithms.ducc</groupId>
-    <artifactId>ducc</artifactId>
+    <artifactId>DUCC</artifactId>
     <packaging>pom</packaging>
 
-    <name>ducc</name>
+    <name>DUCC</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

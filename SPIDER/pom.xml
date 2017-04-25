@@ -2,10 +2,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>de.metanome.algorithms.spider</groupId>
-  <artifactId>SPIDER</artifactId>
+  <artifactId>SPIDERModules</artifactId>
   <packaging>pom</packaging>
 
-  <name>SPIDER</name>
+  <name>SPIDERModules</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

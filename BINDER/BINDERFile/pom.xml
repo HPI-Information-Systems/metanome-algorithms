@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>de.metanome.algorithms.binder.BINDERFile</groupId>
-  <artifactId>BINDERFile</artifactId>
+  <groupId>de.metanome.algorithms.binder</groupId>
+  <artifactId>BINDER</artifactId>
   <packaging>jar</packaging>
 
-  <name>BINDERFile</name>
+  <name>BINDER</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -41,7 +41,7 @@
     </dependency>
     
     <dependency>
-      <groupId>de.metanome.algorithms.binder.BINDERAlgorithm</groupId>
+      <groupId>de.metanome.algorithms.binder</groupId>
       <artifactId>BINDERAlgorithm</artifactId>
       <version>${metanome.version}</version>
       <scope>compile</scope>
@@ -70,7 +70,7 @@
           <archive>
             <manifestEntries>
               <Algorithm-Bootstrap-Class>
-                de.metanome.algorithms.binder.BINDERFile.BINDERFile
+                de.metanome.algorithms.binder.BINDERFile
               </Algorithm-Bootstrap-Class>
             </manifestEntries>
           </archive>

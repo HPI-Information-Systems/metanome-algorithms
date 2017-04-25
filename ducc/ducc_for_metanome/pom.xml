@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.metanome.algorithms.ducc</groupId>
-    <artifactId>ducc_for_metanome</artifactId>
+    <artifactId>DUCC</artifactId>
     <packaging>jar</packaging>
 
-    <name>ducc_for_metanome</name>
+    <name>DUCC</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -65,7 +65,7 @@
         </dependency>
         <dependency>
             <groupId>de.metanome.algorithms.ducc</groupId>
-            <artifactId>ducc_algorithm</artifactId>
+            <artifactId>DUCCAlgorithm</artifactId>
             <version>${metanome.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -92,7 +92,8 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Algorithm-Bootstrap-Class>de.metanome.algorithms.ducc.Ducc
+                            <Algorithm-Bootstrap-Class>
+                            	de.metanome.algorithms.ducc.Ducc
                             </Algorithm-Bootstrap-Class>
                         </manifestEntries>
                     </archive>
