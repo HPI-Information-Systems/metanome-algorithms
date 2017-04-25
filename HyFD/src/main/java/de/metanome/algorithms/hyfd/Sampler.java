@@ -101,7 +101,7 @@ public class Sampler {
 			
 			attributeRepresentant.runNext(newNonFds, this.compressedRecords);
 			
-			if (attributeRepresentant.getEfficiency() >= 0.0f)
+			if (attributeRepresentant.getEfficiency() > 0.0f)
 				this.queue.add(attributeRepresentant);
 		}
 		
