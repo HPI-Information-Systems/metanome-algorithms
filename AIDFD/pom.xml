@@ -14,9 +14,9 @@
 	<parent>
 		<groupId>de.metanome.algorithms</groupId>
 		<artifactId>algorithms</artifactId>
-		<version>${metanome.version}</version>
+		<version>1.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
-	</parent> 
+	</parent>
 
 	<dependencies>
 		<dependency>
@@ -27,8 +27,6 @@
 		<dependency>
 			<groupId>de.metanome</groupId>
 			<artifactId>algorithm_integration</artifactId>
-			<version>${metanome.version}</version>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
