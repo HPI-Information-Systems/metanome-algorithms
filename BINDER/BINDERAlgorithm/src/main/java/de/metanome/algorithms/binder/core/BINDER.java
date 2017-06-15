@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -829,7 +830,7 @@ public class BINDER {
 			}
 		}
 		
-		// Format the results
+		// Remove deps that have no refs
 		IntIterator depIterator = attribute2Refs.keySet().iterator();
 		while (depIterator.hasNext()) {
 			if (attribute2Refs.get(depIterator.nextInt()).isEmpty())
@@ -1304,15 +1305,106 @@ public class BINDER {
 					depIterator.remove();
 			}
 			
-			
 			this.naryDep2ref.putAll(nPlusOneAryDep2ref);
 			
 			this.naryCompareTime.add(System.currentTimeMillis() - naryCompareTimeCurrent);
 		}
 	}
-
+/**/
 	private Map<AttributeCombination, List<AttributeCombination>> generateNPlusOneAryCandidates(Map<AttributeCombination, List<AttributeCombination>> naryDep2ref) {
 		Map<AttributeCombination, List<AttributeCombination>> nPlusOneAryDep2ref = new HashMap<AttributeCombination, List<AttributeCombination>>();
+		
+		if ((naryDep2ref == null) || (naryDep2ref.isEmpty()))
+			return nPlusOneAryDep2ref;
+		
+		int previousSize = naryDep2ref.keySet().iterator().next().size();
+		
+//if (previousSize >= 3)
+//	return nPlusOneAryDep2ref;
+//System.out.println("apriori-gen level: " + (previousSize + 1));
+		
+		List<AttributeCombination> deps = new ArrayList<>(naryDep2ref.keySet());
+		for (int i = 0; i < deps.size() - 1; i++) {
+			AttributeCombination depPivot = deps.get(i);
+			for (int j = i + 1; j < deps.size(); j++) { // if INDs of the form AA<CD should be discovered as well, remove + 1
+				AttributeCombination depExtension = deps.get(j);
+				
+				// Ensure same tables
+				if (depPivot.getTable() != depExtension.getTable())
+					continue;
+				
+				// Ensure same prefix
+				if (!this.samePrefix(depPivot, depExtension))
+					continue;
+				
+				int depPivotAttr = depPivot.getAttributes()[previousSize - 1];
+				int depExtensionAttr = depExtension.getAttributes()[previousSize - 1];
+				
+				// Ensure non-empty attribute extension
+				if ((previousSize == 1) && ((this.columnSizes.getLong(depPivotAttr) == 0) || (this.columnSizes.getLong(depExtensionAttr) == 0)))
+					continue;
+				
+				for (AttributeCombination refPivot : naryDep2ref.get(depPivot)) {
+					for (AttributeCombination refExtension : naryDep2ref.get(depExtension)) {
+						
+						// Ensure same tables
+						if (refPivot.getTable() != refExtension.getTable())
+							continue;
+						
+						// Ensure same prefix
+						if (!this.samePrefix(refPivot, refExtension))
+							continue;
+						
+						int refPivotAttr = refPivot.getAttributes()[previousSize - 1];
+						int refExtensionAttr = refExtension.getAttributes()[previousSize - 1];
+						
+						// Ensure that the extension attribute is different from the pivot attribute; remove check if INDs of the form AB<CC should be discovered as well
+						if (refPivotAttr == refExtensionAttr)
+							continue;
+						
+						// We want the lhs and rhs to be disjunct, because INDs with non-disjunct sides usually don't have practical relevance; remove this check if INDs with overlapping sides are of interest
+						if ((depPivotAttr == refExtensionAttr) || (depExtensionAttr == refPivotAttr))
+							continue;
+						//if (nPlusOneDep.contains(nPlusOneRef.getAttributes()[previousSize - 1]) ||
+						//	nPlusOneRef.contains(nPlusOneDep.getAttributes()[previousSize - 1]))
+						//	continue;
+						
+						// The new candidate was created with two lhs and their rhs that share the same prefix; but other subsets of the lhs and rhs must also exist if the new candidate is larger than two attributes
+						// TODO: Test if the other subsets exist as well (because this test is expensive, same prefix of two INDs might be a strong enough filter for now)
+
+						// Merge the dep attributes and ref attributes, respectively
+						AttributeCombination nPlusOneDep = new AttributeCombination(depPivot.getTable(), depPivot.getAttributes(), depExtensionAttr);
+						AttributeCombination nPlusOneRef = new AttributeCombination(refPivot.getTable(), refPivot.getAttributes(), refExtensionAttr);
+						
+						// Store the new candidate
+						if (!nPlusOneAryDep2ref.containsKey(nPlusOneDep))
+							nPlusOneAryDep2ref.put(nPlusOneDep, new LinkedList<AttributeCombination>());
+						nPlusOneAryDep2ref.get(nPlusOneDep).add(nPlusOneRef);
+						
+//System.out.println(CollectionUtils.concat(nPlusOneDep.getAttributes(), ",") + "c" + CollectionUtils.concat(nPlusOneRef.getAttributes(), ","));
+					}
+				}
+			}
+		}
+		return nPlusOneAryDep2ref;
+	}
+
+	private boolean samePrefix(AttributeCombination combination1, AttributeCombination combination2) {
+		for (int i = 0; i < combination1.size() - 1; i++)
+			if (combination1.getAttributes()[i] != combination2.getAttributes()[i])
+				return false;
+		return true;
+	}
+/**//*
+	private Map<AttributeCombination, List<AttributeCombination>> generateNPlusOneAryCandidates(Map<AttributeCombination, List<AttributeCombination>> naryDep2ref) {
+		Map<AttributeCombination, List<AttributeCombination>> nPlusOneAryDep2ref = new HashMap<AttributeCombination, List<AttributeCombination>>();
+		
+		if ((naryDep2ref == null) || (naryDep2ref.isEmpty()))
+			return nPlusOneAryDep2ref;
+		
+//System.out.println("Level: " + (naryDep2ref.keySet().iterator().next().getAttributes().length + 1));
+//if (naryDep2ref.keySet().iterator().next().getAttributes().length >= 3)
+//	return nPlusOneAryDep2ref;
 		
 		for (AttributeCombination depAttributeCombination : naryDep2ref.keySet()) {
 			if (!this.validAttributeCombinationForNaryCandidates(depAttributeCombination))
@@ -1352,13 +1444,15 @@ public class BINDER {
 							nPlusOneAryDep2ref.put(nPlusOneDep, new LinkedList<AttributeCombination>());
 						
 						nPlusOneAryDep2ref.get(nPlusOneDep).add(nPlusOneRef);
+						
+//System.out.println(CollectionUtils.concat(nPlusOneDep.getAttributes(), ",") + "c" + CollectionUtils.concat(nPlusOneRef.getAttributes(), ","));
 					}
 				}
 			}
 		}
 		return nPlusOneAryDep2ref;
 	}
-	
+/**/
 	private boolean validAttributeForNaryCandidates(int attribute) {
 		// Do not use empty attributes
 		if (this.columnSizes.getLong(attribute) == 0)

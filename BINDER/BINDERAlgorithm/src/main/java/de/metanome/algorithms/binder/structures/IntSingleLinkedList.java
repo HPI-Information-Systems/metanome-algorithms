@@ -97,6 +97,13 @@ public class IntSingleLinkedList {
 		this.selfAdd(value);
 	}
 	
+	public void addAll(IntSingleLinkedList values) {
+		this.initialize();
+		ElementIterator iterator = values.elementIterator();
+		while (iterator.hasNext())
+			this.selfAdd(iterator.next());
+	}
+	
 	public boolean isEmpty() {
 		this.initialize();
 		

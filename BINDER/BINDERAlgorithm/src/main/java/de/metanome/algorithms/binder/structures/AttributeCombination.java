@@ -12,13 +12,16 @@ public class AttributeCombination implements Comparable<AttributeCombination> {
 
 	public AttributeCombination(int table, int... attributes) {
 		this.table = table;
-		this.attributes = attributes;
+		this.setAttributes(attributes);
 	}
 
 	public AttributeCombination(int table, int[] attributes, int attribute) {
 		this.table = table;
-		this.attributes = Arrays.copyOf(attributes, attributes.length + 1);
-		this.attributes[attributes.length] = attribute;
+		this.setAttributes(attributes, attribute);
+	}
+	
+	public int size() {
+		return this.attributes.length;
 	}
 	
 	public int getTable() {
@@ -27,6 +30,15 @@ public class AttributeCombination implements Comparable<AttributeCombination> {
 	
 	public int[] getAttributes() {
 		return this.attributes;
+	}
+	
+	public void setAttributes(int[] attributes) {
+		this.attributes = attributes;
+	}
+	
+	public void setAttributes(int[] attributes, int attribute) {
+		this.attributes = Arrays.copyOf(attributes, attributes.length + 1);
+		this.attributes[attributes.length] = attribute;
 	}
 	
 	public String[] getAttributes(List<String> names) {
