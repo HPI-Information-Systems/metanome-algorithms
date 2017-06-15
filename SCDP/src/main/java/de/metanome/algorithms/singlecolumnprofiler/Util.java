@@ -93,14 +93,15 @@ public class Util {
   public static <K, V extends Comparable<V>> Map<K, V> getTopK(final Map<K, V> map, int k) {
     int count = 1;
     TreeMap<K, V> target = new TreeMap<K, V>();
-    for (Map.Entry<K, V> entry : map.entrySet()) {
+    Map<K, V> sortedmap=sortByValues(map);
+    for (Map.Entry<K, V> entry : sortedmap.entrySet()) {
       if (count >= k)
         break;
 
       target.put(entry.getKey(), entry.getValue());
       count++;
     }
-    return target;
+    return sortByValues(target);
 
 
 
