@@ -108,5 +108,18 @@
         <module>depminer</module>
         <module>fastfds</module>
         <module>fdep</module>
+		<module>DVA</module>
+		<module>DVAKMV</module>
+		<module>DVAMS</module>
+		<module>DVBJKST</module>
+		<module>DVBloomFilter</module>
+		<module>DVFM</module>
+		<module>DVHyperLogLog</module>
+		<module>DVHyperLogLogPlus</module>
+		<module>DVLC</module>
+		<module>DVLogLog</module>
+		<module>DVMinCount</module>
+		<module>DVPCSA</module>
+		<module>DVSuperLogLog</module>
     </modules>
 </project>

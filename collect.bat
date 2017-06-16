@@ -42,3 +42,29 @@ copy FAIDA\FAIDAAlgorithm\target\*.jar _COLLECTION_
 copy SCDP\target\*.jar _COLLECTION_
 
 copy MvdDet\target\*.jar _COLLECTION_
+
+copy DVA\target\*.jar _COLLECTION_
+
+copy DVAKMV\target\*.jar _COLLECTION_
+
+copy DVAMS\target\*.jar _COLLECTION_
+
+copy DVBJKST\target\*.jar _COLLECTION_
+
+copy DVBloomFilter\target\*.jar _COLLECTION_
+
+copy DVFM\target\*.jar _COLLECTION_
+
+copy DVHyperLogLog\target\*.jar _COLLECTION_
+
+copy DVHyperLogLogPlus\target\*.jar _COLLECTION_
+
+copy DVLC\target\*.jar _COLLECTION_
+
+copy DVLogLog\target\*.jar _COLLECTION_
+
+copy DVMinCount\target\*.jar _COLLECTION_
+
+copy DVPCSA\target\*.jar _COLLECTION_
+
+copy DVSuperLogLog\target\*.jar _COLLECTION_
