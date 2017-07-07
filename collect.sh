@@ -35,6 +35,8 @@ cp fdep/fdep_algorithm/target/*.jar _COLLECTION_
 
 cp ducc/ducc_for_metanome/target/*.jar _COLLECTION_
 
+cp dcucc/dcucc/target/*.jar _COLLECTION_
+
 cp dfd/dfdMetanome/target/*.jar _COLLECTION_
 
 cp ORDER/target/*.jar _COLLECTION_
