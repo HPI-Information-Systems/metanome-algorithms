@@ -35,6 +35,8 @@ cp fdep/fdep_algorithm/target/*.jar _COLLECTION_
 
 cp ducc/ducc_for_metanome/target/*.jar _COLLECTION_
 
+cp dcucc/dcucc/target/*.jar _COLLECTION_
+
 cp dfd/dfdMetanome/target/*.jar _COLLECTION_
 
 cp ORDER/target/*.jar _COLLECTION_
@@ -46,3 +48,30 @@ cp FAIDA/FAIDAAlgorithm/target/*.jar _COLLECTION_
 cp SCDP/target/*.jar _COLLECTION_
 
 cp MvdDet/target/*.jar _COLLECTION_
+
+cp DVA/target/*.jar _COLLECTION_
+
+cp DVAKMV/target/*.jar _COLLECTION_
+
+cp DVAMS/target/*.jar _COLLECTION_
+
+cp DVBJKST/target/*.jar _COLLECTION_
+
+cp DVBloomFilter/target/*.jar _COLLECTION_
+
+cp DVFM/target/*.jar _COLLECTION_
+
+cp DVHyperLogLog/target/*.jar _COLLECTION_
+
+cp DVHyperLogLogPlus/target/*.jar _COLLECTION_
+
+cp DVLC/target/*.jar _COLLECTION_
+
+cp DVLogLog/target/*.jar _COLLECTION_
+
+cp DVMinCount/target/*.jar _COLLECTION_
+
+cp DVPCSA/target/*.jar _COLLECTION_
+
+cp DVSuperLogLog/target/*.jar _COLLECTION_
+

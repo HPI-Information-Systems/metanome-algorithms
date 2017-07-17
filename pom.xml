@@ -4,7 +4,7 @@
     <groupId>de.metanome.algorithms</groupId>
     <artifactId>algorithms</artifactId>
     <packaging>pom</packaging>
-    
+
     <name>algorithms</name>
     <version>1.1-SNAPSHOT</version>
     <description>The metanome algorithms collection</description>
@@ -99,6 +99,7 @@
         <module>FAIDA</module>
         <module>MANY</module>
         <module>ducc</module>
+        <module>dcucc</module>
         <module>dfd</module>
         <module>ORDER</module>
         <module>MvdDet</module>
@@ -108,5 +109,18 @@
         <module>depminer</module>
         <module>fastfds</module>
         <module>fdep</module>
+        <module>DVA</module>
+        <module>DVAKMV</module>
+        <module>DVAMS</module>
+        <module>DVBJKST</module>
+        <module>DVBloomFilter</module>
+        <module>DVFM</module>
+        <module>DVHyperLogLog</module>
+        <module>DVHyperLogLogPlus</module>
+        <module>DVLC</module>
+        <module>DVLogLog</module>
+        <module>DVMinCount</module>
+        <module>DVPCSA</module>
+        <module>DVSuperLogLog</module>
     </modules>
 </project>

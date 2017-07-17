@@ -1,0 +1,118 @@
+package de.metanome.algorithms.test_helper.fixtures;
+
+import com.google.common.collect.ImmutableList;
+
+import de.metanome.algorithm_integration.ColumnIdentifier;
+import de.metanome.algorithm_integration.input.InputGenerationException;
+import de.metanome.algorithm_integration.input.InputIterationException;
+import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ConditionalUniqueColumnCombinationResultReceiver;
+import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
+import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
+import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
+import de.metanome.algorithm_integration.result_receiver.UniqueColumnCombinationResultReceiver;
+import de.metanome.backend.input.file.DefaultFileInputGenerator;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.mockito.Mockito.mock;
+
+/**
+ * @author Jens Ehrlich
+ */
+public class BreastCancerFixture {
+
+  protected ImmutableList<String>
+      columnNames =
+      ImmutableList.of("column1", "column2", "column3", "column4", "column5", "column6", "column7",
+                       "column8", "column9", "column10", "column11");
+  protected int numberOfColumns = 11;
+  protected int rowPosition;
+  protected String relationName = "breast-cancer-wisconsin.csv";
+  protected List<ImmutableList<String>> table = new LinkedList<>();
+  protected FunctionalDependencyResultReceiver
+      fdResultReceiver =
+      mock(FunctionalDependencyResultReceiver.class);
+  protected UniqueColumnCombinationResultReceiver
+      uniqueColumnCombinationResultReceiver =
+      mock(UniqueColumnCombinationResultReceiver.class);
+  protected InclusionDependencyResultReceiver
+      inclusionDependencyResultReceiver =
+      mock(InclusionDependencyResultReceiver.class);
+  protected ConditionalUniqueColumnCombinationResultReceiver
+      cuccResultReceiver =
+      mock(ConditionalUniqueColumnCombinationResultReceiver.class);
+
+  public BreastCancerFixture() throws CouldNotReceiveResultException {
+
+//    doAnswer(new Answer() {
+//      public Object answer(InvocationOnMock invocation) {
+//        Object[] args = invocation.getArguments();
+//        System.out.println(args[0]);
+//        return null;
+//      }
+//    }).when(cuccResultReceiver).receiveResult(isA(ConditionalUniqueColumnCombination.class));
+
+  }
+
+  public RelationalInputGenerator getInputGenerator()
+      throws InputGenerationException, InputIterationException, UnsupportedEncodingException,
+             FileNotFoundException {
+    String
+        pathToInputFile =
+        URLDecoder.decode(
+            Thread.currentThread().getContextClassLoader().getResource(relationName).getPath(),
+            "utf-8");
+    RelationalInputGenerator
+        inputGenerator =
+        new DefaultFileInputGenerator(new File(pathToInputFile));
+    return inputGenerator;
+  }
+
+  public ConditionalUniqueColumnCombinationResultReceiver getCUCCResultReceiver() {
+    return cuccResultReceiver;
+  }
+
+  public void verifyConditionalUniqueColumnCombinationAndOr()
+      throws CouldNotReceiveResultException {
+
+    ColumnIdentifier
+        c1 = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
+    ColumnIdentifier
+        c2 = new ColumnIdentifier(this.relationName, this.columnNames.get(1));
+    ColumnIdentifier
+        c3 = new ColumnIdentifier(this.relationName, this.columnNames.get(2));
+    ColumnIdentifier
+        c4 = new ColumnIdentifier(this.relationName, this.columnNames.get(3));
+    ColumnIdentifier
+        c5 = new ColumnIdentifier(this.relationName, this.columnNames.get(4));
+    ColumnIdentifier
+        c6 = new ColumnIdentifier(this.relationName, this.columnNames.get(5));
+    ColumnIdentifier
+        c7 = new ColumnIdentifier(this.relationName, this.columnNames.get(6));
+    ColumnIdentifier
+        c8 = new ColumnIdentifier(this.relationName, this.columnNames.get(7));
+    ColumnIdentifier
+        c9 = new ColumnIdentifier(this.relationName, this.columnNames.get(8));
+    ColumnIdentifier
+        c10 = new ColumnIdentifier(this.relationName, this.columnNames.get(9));
+    ColumnIdentifier
+        c11 = new ColumnIdentifier(this.relationName, this.columnNames.get(10));
+
+//    verify(cuccResultReceiver, never()).receiveResult(new ConditionalUniqueColumnCombination(
+//        new ColumnCombination(c1),
+//        new ColumnConditionOr(c2, "1", "10", "2", "3", "4", "5", "6", "7", "8", "9"),
+//        new ColumnConditionOr(c8, "1", "10", "2", "3", "4", "5", "6", "7", "8", "9")));
+//
+//    verify(cuccResultReceiver, never()).receiveResult(new ConditionalUniqueColumnCombination(
+//        new ColumnCombination(c1),
+//        new ColumnConditionOr(c2, "1", "10", "2", "3", "4", "5", "6", "7", "8", "9"),
+//        new ColumnConditionOr(c3, "1", "10", "2", "3", "4", "5", "6", "7", "8", "9")));
+  }
+
+}
