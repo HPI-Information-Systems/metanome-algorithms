@@ -44,7 +44,7 @@ public class Inductor {
 			for (OpenBitSet lhs : nonFdLevel) {
 				
 				OpenBitSet fullRhs = lhs.clone();
-				fullRhs.flip(0, fullRhs.size());
+				fullRhs.flip(0, this.posCover.getNumAttributes());
 				
 				for (int rhs = fullRhs.nextSetBit(0); rhs >= 0; rhs = fullRhs.nextSetBit(rhs + 1))
 					this.specializePositiveCover(lhs, rhs, nonFds);
