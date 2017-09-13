@@ -943,20 +943,13 @@ public class BINDER {
 		if ((values == null) || (values.isEmpty()))
 			return;
 		
-		File file = new File(bucketFilePath);
-		boolean append = file.exists();
-		
 		BufferedWriter writer = null;
 		try {
 			writer = FileUtils.buildFileWriter(bucketFilePath, true);
-			if (append)
-				writer.newLine();
-			
 			Iterator<String> valueIterator = values.iterator();
 			while (valueIterator.hasNext()) {
 				writer.write(valueIterator.next());
-				if (valueIterator.hasNext())
-					writer.newLine();
+				writer.newLine();
 			}
 			writer.flush();
 		}

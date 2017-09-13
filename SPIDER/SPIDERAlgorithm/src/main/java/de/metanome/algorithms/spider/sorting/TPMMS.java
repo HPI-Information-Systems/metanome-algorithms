@@ -88,20 +88,13 @@ public class TPMMS {
 	}
 	
 	private static void write(String filePath, Set<String> values) throws AlgorithmExecutionException {
-		File file = new File(filePath);
-		boolean append = file.exists();
-		
 		BufferedWriter writer = null;
 		try {
 			writer = FileUtils.buildFileWriter(filePath, false); // TODO: Use Metanome temp file functionality here
-			if (append)
-				writer.newLine();
-			
 			Iterator<String> valueIterator = values.iterator();
 			while (valueIterator.hasNext()) {
 				writer.write(valueIterator.next());
-				if (valueIterator.hasNext())
-					writer.newLine();
+				writer.newLine();
 			}
 			writer.flush();
 		}
