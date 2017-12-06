@@ -14,27 +14,6 @@
         <metanome.version>1.1-SNAPSHOT</metanome.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>metanomeRepo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>mavenRepoOnJenkins</id>
-            <url>scp://maven_deploy@172.16.64.27/var/www/html/maven</url>
-        </repository>
-    </distributionManagement>
-
-    <scm>
-        <connection>scm:git:https://hpi.de/naumann/git/metanomealgorithms/</connection>
-        <developerConnection>scm:git:https://hpi.de/naumann/git/metanomealgorithms/</developerConnection>
-        <url>https://hpi.de/naumann/admin/repositories/</url>
-        <tag>HEAD</tag>
-    </scm>
-
     <build>
       <plugins>
         <plugin>
