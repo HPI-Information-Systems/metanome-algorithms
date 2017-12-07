@@ -17,7 +17,7 @@ Because all profiling algorithms rely on the [Metanome platform](https://github.
 
 Then, all algorithms can be built with this command:
 ```
-.../metanomealgorithms$ MAVEN_OPTS="-Xmx1g -Xms20m -Xss10m" mvn clean install
+.../metanome-algorithms$ MAVEN_OPTS="-Xmx1g -Xms20m -Xss10m" mvn clean install
 
 ```
 
@@ -29,4 +29,30 @@ The build creates one "fatjar" for each algorithm in the repository. After the b
 
 To run the Metanome algorithms without a full Metanome deployment, consider the [Metanome-cli](https://github.com/sekruse/metanome-cli) project. This project extends the Metanome framework with a command line interface, so you can configure end execute the jars from a shell. If you need to integrate Metanome algorithms into your own projects, the Metanome-cli implementation can serve as a reference on how to add the algorithms into other projects.
 
+## Adding new algorithms
 
+All algorithms in this repository are continuously maintained and upgraded to newer versions with every release of the Metanome framework. To add a new algorithm to the repository, the following steps should be followed:
+
+1. Copy the algorithm maven project into a subdirectory of the algorithms repository.
+1. Use the following pattern for the naming of your algorithm artifact:
+
+    ```
+      <groupId>de.metanome.algorithms.[algorithm-name-lowercase]</groupId>
+      <artifactId>[algorithm-name]</artifactId>
+      <packaging>jar</packaging>
+      <name>[algorithm-name]</name>
+    ```
+1. Set the parent pom to the root pom using the root's current version:
+
+    ```
+      <parent>
+        <groupId>de.metanome.algorithms</groupId>
+        <artifactId>algorithms</artifactId>
+        <version>1.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+      </parent>
+    ```
+1. Add the algorithm project as a module to the root pom of the reposotory.
+1. Remove the version tags of your project and all dependencies to Metanome subprojects; these versions are inherited from the root pom.
+1. Remove unnecessary repository information, e.g., all repositories that are defined in root/parent should not be duplicated.
+1. Add a copy command for the jar file of the new algorithm to the collect.bat and collect.sh scripts.
