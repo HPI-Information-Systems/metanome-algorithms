@@ -17,11 +17,16 @@ Because all profiling algorithms rely on the [Metanome platform](https://github.
 
 Then, all algorithms can be built with this command:
 ```
-.../metanomealgorithms$ MAVEN_OPS="-DargLine="-Xmx1g -Xms20m -Xss10m" mvn clean install
+.../metanomealgorithms$ MAVEN_OPTS="-Xmx1g -Xms20m -Xss10m" mvn clean install
 
 ```
 
 Alternatively, you can open the algorithms project in your IDE of choice, specify `-Xmx1g -Xms20m -Xss10m` as build parameters, and run it as `mvn clean install`. 
 
 The build creates one "fatjar" for each algorithm in the repository. After the build succeeded, run either the collect.bat (Windows) or collect.sh (Linux) script to copy all created algorithms into one folder named "_COLLECTION_". Now, you can choose the algorithms you need and copy them over into a Metanome deployment.
+
+## Headless deployment
+
+To run the Metanome algorithms without a full Metanome deployment, consider the [Metanome-cli](https://github.com/sekruse/metanome-cli) project. This project extends the Metanome framework with a command line interface, so you can configure end execute the jars from a shell. If you need to integrate Metanome algorithms into your own projects, the Metanome-cli implementation can serve as a reference on how to add the algorithms into other projects.
+
 
