@@ -101,5 +101,6 @@
         <module>DVMinCount</module>
         <module>DVPCSA</module>
         <module>DVSuperLogLog</module>
+        <module>hydra</module>
     </modules>
 </project>
