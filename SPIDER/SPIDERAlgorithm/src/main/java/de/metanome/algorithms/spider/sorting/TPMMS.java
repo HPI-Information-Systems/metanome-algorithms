@@ -126,17 +126,16 @@ public class TPMMS {
 			String previousValue = null;
 			while (!values.isEmpty()) {
 				TPMMSTuple tuple = values.remove();
-				if ((previousValue == null) || (!previousValue.equals(tuple.value)))
+				if ((previousValue == null) || (!previousValue.equals(tuple.value))) {
 					writer.write(tuple.value);
+					writer.newLine();
+				}
 				
 				previousValue = tuple.value;
 				tuple.value = readers[tuple.readerNumber].readLine();
 				
 				if (tuple.value != null)
 					values.add(tuple);
-				
-				if (!values.isEmpty())
-					writer.newLine();
 			}
 			writer.flush();
 		}

@@ -336,80 +336,15 @@ public class Dcucc implements ConditionalUniqueColumnCombinationAlgorithm,
   }
 
   protected UniqueColumnCombinationResultReceiver createDummyResultReceiver() {
-    return new OmniscientResultReceiver() {
-      @Override
-      public void receiveResult(MultivaluedDependency multivaluedDependency) throws CouldNotReceiveResultException, ColumnNameMismatchException {
-
-      }
-
-      @Override
-      public Boolean acceptedResult(MultivaluedDependency multivaluedDependency) {
-        return null;
-      }
-
-      @Override
-      public void receiveResult(BasicStatistic statistic) throws CouldNotReceiveResultException {
-
-      }
-
-      @Override
-      public Boolean acceptedResult(BasicStatistic basicStatistic) {
-        return null;
-      }
-
-      @Override
-      public void receiveResult(
-          ConditionalUniqueColumnCombination conditionalUniqueColumnCombination)
-          throws CouldNotReceiveResultException {
-
-      }
-
-      @Override
-      public Boolean acceptedResult(ConditionalUniqueColumnCombination conditionalUniqueColumnCombination) {
-        return null;
-      }
-
-      @Override
-      public void receiveResult(FunctionalDependency functionalDependency)
-          throws CouldNotReceiveResultException {
-
-      }
-
-      @Override
-      public Boolean acceptedResult(FunctionalDependency functionalDependency) {
-        return null;
-      }
-
-      @Override
-      public void receiveResult(InclusionDependency inclusionDependency)
-          throws CouldNotReceiveResultException {
-
-      }
-
-      @Override
-      public Boolean acceptedResult(InclusionDependency inclusionDependency) {
-        return null;
-      }
-
+    return new UniqueColumnCombinationResultReceiver() {
       @Override
       public void receiveResult(UniqueColumnCombination uniqueColumnCombination)
-          throws CouldNotReceiveResultException {
+          throws CouldNotReceiveResultException, ColumnNameMismatchException {
 
       }
 
       @Override
-      public Boolean acceptedResult(UniqueColumnCombination uniqueColumnCombination) {
-        return null;
-      }
-
-      @Override
-      public void receiveResult(OrderDependency orderDependency)
-          throws CouldNotReceiveResultException {
-
-      }
-
-      @Override
-      public Boolean acceptedResult(OrderDependency orderDependency) {
+      public Boolean acceptedResult(UniqueColumnCombination result) {
         return null;
       }
     };
