@@ -1,0 +1,32 @@
+package de.hpi.is.md.demo;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Jackson {
+
+	public static <T> ObjectReader createReader(Class<T> type) {
+		ObjectMapper mapper = createMapper();
+		return mapper.readerFor(type);
+	}
+
+	private static ObjectMapper createMapper() {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+		mapper.findAndRegisterModules();
+		SimpleModule module = new SimpleModule();
+		mapper.registerModule(module);
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
+		mapper.setSerializationInclusion(Include.NON_NULL);
+		return mapper;
+	}
+}

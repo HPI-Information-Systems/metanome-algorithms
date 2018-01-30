@@ -1,0 +1,5 @@
+<dataset>
+  <PERSON AGE="18" NAME="Bob"/>
+  <PERSON AGE="23" LAST_NAME="Foo" NAME="Alice"/>
+  <PERSON AGE="42" LAST_NAME="Brown" NAME="Charlie"/>
+</dataset>

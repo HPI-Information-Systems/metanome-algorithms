@@ -1,0 +1,42 @@
+{
+  "discovery": {
+    "support_calculator": {
+      "type": "size"
+    },
+    "min_threshold": 0.7,
+    "specialization_filter": {
+      "type": "disjoint"
+    }
+  },
+  "mapping": {
+    "threshold_filters": {
+      "fixed": [
+        {
+          "key": {
+            "left": {
+              "name": "lastname",
+              "type": "java.lang.String",
+              "table_name": "example"
+            },
+            "right": {
+              "name": "lastname",
+              "type": "java.lang.String",
+              "table_name": "example"
+            }
+          },
+          "value": {
+            "type": "step",
+            "steps": [
+              0.8,
+              0.9,
+              1.0
+            ]
+          }
+        }
+      ]
+    },
+    "schema_mapper": {
+      "type": "self"
+    }
+  }
+}
