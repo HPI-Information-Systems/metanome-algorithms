@@ -36,8 +36,31 @@ public class Result {
         builder.append("] -> ");
         builder.append(attributeNames.get(embeddedFD.rhs));
         builder.append("\nPatternTableau {");
+        builder.append(getPatternTableauAsString(true));
+        builder.append("\n}");
+        builder.append("\n\tSupport: ");
+        builder.append(patternTableau.getSupport());
+        builder.append("\n\tConfidence: ");
+        builder.append(patternTableau.getConfidence());
+        return builder.toString();
+    }
+
+    public String getPatternTableauAsString() {
+        return getPatternTableauAsString(false);
+    }
+
+    public String getPatternTableauAsString(boolean multiLine) {
+        StringBuilder builder = new StringBuilder();
+        boolean second = false;
         for (Pattern pattern : patternTableau.getPatterns()) {
-            builder.append("\n\t(");
+            if (multiLine) {
+                builder.append("\n\t");
+            } else {
+                if (second) {
+                    builder.append(";");
+                }
+            }
+            builder.append("(");
             List<Map.Entry<Integer, PatternEntry>> entries = new ArrayList<>(pattern.getAttributes().entrySet());
             Collections.sort(entries, new Comparator<Map.Entry<Integer, PatternEntry>>() {
                 @Override
@@ -70,12 +93,8 @@ public class Result {
             }
             builder.append(Joiner.on(",").join(values));
             builder.append(")");
+            second = true;
         }
-        builder.append("\n}");
-        builder.append("\n\tSupport: ");
-        builder.append(patternTableau.getSupport());
-        builder.append("\n\tConfidence: ");
-        builder.append(patternTableau.getConfidence());
         return builder.toString();
     }
 

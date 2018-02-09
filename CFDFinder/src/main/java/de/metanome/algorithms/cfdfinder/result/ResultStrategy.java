@@ -35,7 +35,8 @@ public abstract class ResultStrategy {
 
         ColumnCombination colCombination = new ColumnCombination(lhsColumns);
         int rhsId = result.getEmbeddedFD().rhs; // todo: Here we translate the column rhs back to the real column rhs before the sorting
-        ConditionalFunctionalDependency cfdResult = new ConditionalFunctionalDependency(colCombination, columnIdentifiers.get(rhsId), result.getPatternTableau().toString());
+        ConditionalFunctionalDependency cfdResult = new ConditionalFunctionalDependency(
+                colCombination, columnIdentifiers.get(rhsId), result.getPatternTableauAsString());
         try {
             resultReceiver.receiveResult(cfdResult);
         } catch (CouldNotReceiveResultException | ColumnNameMismatchException e) {
