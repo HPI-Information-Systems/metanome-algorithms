@@ -70,3 +70,5 @@ copy DVMinCount\target\*.jar _COLLECTION_
 copy DVPCSA\target\*.jar _COLLECTION_
 
 copy DVSuperLogLog\target\*.jar _COLLECTION_
+
+copy CFDFinder\target\*.jar _COLLECTION_
