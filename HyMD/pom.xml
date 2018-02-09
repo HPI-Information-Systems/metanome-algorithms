@@ -35,7 +35,6 @@
     <module>util</module>
     <module>db</module>
     <module>sim</module>
-    <module>data</module>
     <module>hybrid</module>
     <module>mapping</module>
     <module>config</module>
