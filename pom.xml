@@ -102,6 +102,7 @@
         <module>DVMinCount</module>
         <module>DVPCSA</module>
         <module>DVSuperLogLog</module>
+        <module>hydra</module>
         <module>CFDFinder</module>
     </modules>
 </project>

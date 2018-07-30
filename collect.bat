@@ -71,4 +71,6 @@ copy DVPCSA\target\*.jar _COLLECTION_
 
 copy DVSuperLogLog\target\*.jar _COLLECTION_
 
+copy hydra\target\*.jar _COLLECTION_
+
 copy CFDFinder\target\*.jar _COLLECTION_
