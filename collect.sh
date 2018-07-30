@@ -18,6 +18,8 @@ cp HyFD/target/*.jar _COLLECTION_
 
 cp HyUCC/target/*.jar _COLLECTION_
 
+cp HyMD/metanome/target/*.jar _COLLECTION_
+
 cp tane/tane_algorithm/target/*.jar _COLLECTION_
 #cp tane/tane_tree_dir_algorithm/target/*.jar _COLLECTION_
 #cp tane/tane_tree_end_algorithm/target/*.jar _COLLECTION_

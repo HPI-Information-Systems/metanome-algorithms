@@ -6,7 +6,6 @@
 
   <groupId>de.hpi.is</groupId>
   <artifactId>matching-dependencies</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <parent>

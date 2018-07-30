@@ -4,13 +4,17 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <groupId>de.metanome.algorithms.hymd</groupId>
+  <artifactId>HyMD</artifactId>
+
+  <name>HyMD</name>
+
   <parent>
     <artifactId>matching-dependencies</artifactId>
     <groupId>de.hpi.is</groupId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
-  <groupId>de.metanome.algorithms.hymd</groupId>
-  <artifactId>HyMD</artifactId>
 
   <properties>
     <java.version>1.8</java.version>
