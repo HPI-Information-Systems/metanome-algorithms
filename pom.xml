@@ -72,6 +72,7 @@
         <module>BINDER</module>
         <module>SPIDER</module>
         <module>HyFD</module>
+        <module>HyMD</module>
         <module>HyUCC</module>
         <module>SCDP</module>
         <module>AIDFD</module>
@@ -102,5 +103,6 @@
         <module>DVPCSA</module>
         <module>DVSuperLogLog</module>
         <module>hydra</module>
+        <module>CFDFinder</module>
     </modules>
 </project>

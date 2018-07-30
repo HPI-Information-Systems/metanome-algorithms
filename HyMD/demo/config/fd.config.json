@@ -1,0 +1,19 @@
+{
+  "discovery": {
+    "support_calculator": {
+      "type": "constant",
+      "support": 0
+    }
+  },
+  "mapping": {
+    "similarity_measures": {
+      "default": {
+        "type": "equals"
+      },
+      "by_type": {}
+    },
+    "schema_mapper": {
+      "type": "self"
+    }
+  }
+}
