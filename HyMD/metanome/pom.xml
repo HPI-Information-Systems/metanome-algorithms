@@ -24,7 +24,7 @@
     <slf4j.version>1.7.25</slf4j.version>
     <metrics.version>3.2.4</metrics.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <md.version>0.0.1-SNAPSHOT</md.version>
+    <md.version>1.1-SNAPSHOT</md.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
   </properties>
