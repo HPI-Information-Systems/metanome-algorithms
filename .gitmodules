@@ -1,0 +1,6 @@
+[submodule "pyro"]
+	path = pyro
+	url = https://github.com/HPI-Information-Systems/pyro.git
+[submodule "sindy"]
+	path = sindy
+	url = https://github.com/HPI-Information-Systems/sindy.git
