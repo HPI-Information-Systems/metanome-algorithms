@@ -41,6 +41,6 @@ final class LhsAddContext extends LhsContext {
 	}
 
 	private void addToThis() {
-		notSupported.setValue(true);
+		notSupported.setValue(Boolean.TRUE);
 	}
 }

@@ -1,27 +1,26 @@
 package de.metanome.algorithms.cfdfinder.expansion;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import de.metanome.algorithms.cfdfinder.pattern.ConstantPatternEntry;
 import de.metanome.algorithms.cfdfinder.pattern.Pattern;
 import de.metanome.algorithms.cfdfinder.pattern.PatternEntry;
 import de.metanome.algorithms.cfdfinder.pattern.VariablePatternEntry;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.apache.lucene.util.OpenBitSet;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ConstantPatternExpansionStrategyTest {
 
     @Test
     public void testNullPatternGenerationSubset() {
         ConstantPatternExpansionStrategy out = new ConstantPatternExpansionStrategy(new int[][] {});
-        Pattern nullPattern = out.generateNullPattern(createAttributes(5, new long[] {2, 4}));
+        Pattern nullPattern = out.generateNullPattern(createAttributes(5, new int[] {2, 4}));
         PatternEntry[] patternEntries = nullPattern.getPatternEntries();
         Assert.assertEquals(2, patternEntries.length);
         Assert.assertTrue(patternEntries[0] instanceof VariablePatternEntry);
@@ -31,7 +30,7 @@ public class ConstantPatternExpansionStrategyTest {
     @Test
     public void testNullPatternGenerationAllSet() {
         ConstantPatternExpansionStrategy out = new ConstantPatternExpansionStrategy(new int[][] {});
-        Pattern nullPattern = out.generateNullPattern(createAttributes(7, new long[] {0, 1, 2, 3, 4, 5, 6}));
+        Pattern nullPattern = out.generateNullPattern(createAttributes(7, new int[] {0, 1, 2, 3, 4, 5, 6}));
         PatternEntry[] patternEntries = nullPattern.getPatternEntries();
         Assert.assertEquals(7, patternEntries.length);
         Assert.assertTrue(patternEntries[0] instanceof VariablePatternEntry);
@@ -46,7 +45,7 @@ public class ConstantPatternExpansionStrategyTest {
     @Test
     public void testNullPatternGenerationNoneSet() {
         ConstantPatternExpansionStrategy out = new ConstantPatternExpansionStrategy(new int[][] {});
-        Pattern nullPattern = out.generateNullPattern(createAttributes(3, new long[] {}));
+        Pattern nullPattern = out.generateNullPattern(createAttributes(3, new int[] {}));
         PatternEntry[] patternEntries = nullPattern.getPatternEntries();
         Assert.assertEquals(0, patternEntries.length);
     }
@@ -58,7 +57,7 @@ public class ConstantPatternExpansionStrategyTest {
             new int[] {2, 3}
         };
         ConstantPatternExpansionStrategy out = new ConstantPatternExpansionStrategy(values);
-        Pattern nullPattern = out.generateNullPattern(createAttributes(2, new long[] {0, 1}));
+        Pattern nullPattern = out.generateNullPattern(createAttributes(2, new int[] {0, 1}));
 
         List<IntArrayList> cover = new ArrayList<>();
         cover.add(new IntArrayList(new int[] {0}));
@@ -116,9 +115,9 @@ public class ConstantPatternExpansionStrategyTest {
         Assert.assertEquals(0, children.size());
     }
 
-    private OpenBitSet createAttributes(long numBits, long[] setBits) {
-        OpenBitSet attributes = new OpenBitSet(numBits);
-        for (long setBit : setBits) {
+    private BitSet createAttributes(int numBits, int[] setBits) {
+        BitSet attributes = new BitSet(numBits);
+        for (int setBit : setBits) {
             attributes.set(setBit);
         }
         return attributes;
@@ -129,9 +128,9 @@ public class ConstantPatternExpansionStrategyTest {
         for (int i = 0; i < values.length; i += 1) {
             int value = values[i];
             if (value == -1) {
-                result.put(i, new VariablePatternEntry());
+                result.put(Integer.valueOf(i), new VariablePatternEntry());
             } else {
-                result.put(i, new ConstantPatternEntry(value));
+                result.put(Integer.valueOf(i), new ConstantPatternEntry(value));
             }
         }
         return result;

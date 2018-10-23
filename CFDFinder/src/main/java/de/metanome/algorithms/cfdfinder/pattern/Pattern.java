@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class Pattern implements Comparable {
+public class Pattern implements Comparable<Pattern> {
 
     private Int2ReferenceArrayMap<PatternEntry> attributes;
     private int[] ids;
@@ -90,7 +90,7 @@ public class Pattern implements Comparable {
         int index = 0;
         for (Map.Entry<Integer, PatternEntry> entry : attributes.entrySet()) {
             this.attributes.put(entry.getKey(), entry.getValue());
-            this.ids[index] = entry.getKey();
+            this.ids[index] = entry.getKey().intValue();
             this.patternEntries[index] = entry.getValue();
             index += 1;
         }
@@ -174,9 +174,9 @@ public class Pattern implements Comparable {
         int violations = 0;
         for (IntArrayList cluster : this.getCover()) {
             for (int i = 0; i < cluster.size(); i += 1) {
-                int iValue = rhs[cluster.get(i)];
+                int iValue = rhs[cluster.get(i).intValue()];
                 for (int j = 0; j < cluster.size(); j += 1) {
-                    int jValue = rhs[cluster.get(j)];
+                    int jValue = rhs[cluster.get(j).intValue()];
                     if (iValue != jValue || iValue == -1) {
                         violations += 1;
                     }
@@ -187,8 +187,7 @@ public class Pattern implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-        Pattern other = (Pattern) o;
+    public int compareTo(Pattern other) {
         int supportMeasure = (int) (other.support - this.support);
         if (supportMeasure == 0) {
             return other.numKeepers - this.numKeepers;

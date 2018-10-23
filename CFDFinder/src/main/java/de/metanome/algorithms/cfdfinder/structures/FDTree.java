@@ -3,9 +3,8 @@ package de.metanome.algorithms.cfdfinder.structures;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
@@ -51,7 +50,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		this.rhsFds.set(0, this.numAttributes);
 	}
 
-	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addFunctionalDependency(OpenBitSet lhs, int rhs) {
+	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addFunctionalDependency(BitSet lhs, int rhs) {
 		de.metanome.algorithms.cfdfinder.structures.FDTreeElement currentNode = this;
 		currentNode.addRhsAttribute(rhs);
 
@@ -76,7 +75,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		return currentNode;
 	}
 
-	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addFunctionalDependency(OpenBitSet lhs, OpenBitSet rhs) {
+	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addFunctionalDependency(BitSet lhs, BitSet rhs) {
 		de.metanome.algorithms.cfdfinder.structures.FDTreeElement currentNode = this;
 		currentNode.addRhsAttributes(rhs);
 
@@ -101,7 +100,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		return currentNode;
 	}
 
-	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addFunctionalDependencyGetIfNew(OpenBitSet lhs, int rhs) {
+	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addFunctionalDependencyGetIfNew(BitSet lhs, int rhs) {
 		de.metanome.algorithms.cfdfinder.structures.FDTreeElement currentNode = this;
 		currentNode.addRhsAttribute(rhs);
 
@@ -131,11 +130,11 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		return null;
 	}
 
-	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addFunctionalDependencyIfNotInvalid(OpenBitSet lhs, OpenBitSet rhs) {
+	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addFunctionalDependencyIfNotInvalid(BitSet lhs, BitSet rhs) {
 		de.metanome.algorithms.cfdfinder.structures.FDTreeElement currentNode = this;
 		currentNode.addRhsAttributes(rhs);
 
-		OpenBitSet invalidFds = currentNode.rhsAttributes.clone();
+		BitSet invalidFds = (BitSet) currentNode.rhsAttributes.clone();
 		int lhsLength = 0;
 		for (int i = lhs.nextSetBit(0); i >= 0; i = lhs.nextSetBit(i + 1)) {
 			lhsLength++;
@@ -161,7 +160,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		return currentNode;
 	}
 
-	public boolean containsFd(OpenBitSet lhs, int rhs) {
+	public boolean containsFd(BitSet lhs, int rhs) {
 		de.metanome.algorithms.cfdfinder.structures.FDTreeElement element = this;
 		for (int i = lhs.nextSetBit(0); i >= 0; i = lhs.nextSetBit(i + 1)) {
 			if ((element.getChildren() == null) || (element.getChildren()[i] == null))
@@ -171,7 +170,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		return element.isFd(rhs);
 	}
 
-	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addGeneralization(OpenBitSet lhs, int rhs) {
+	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addGeneralization(BitSet lhs, int rhs) {
 		de.metanome.algorithms.cfdfinder.structures.FDTreeElement currentNode = this;
 		currentNode.addRhsAttribute(rhs);
 
@@ -196,7 +195,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		return null;
 	}
 
-	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addGeneralization(OpenBitSet lhs, OpenBitSet rhs) {
+	public de.metanome.algorithms.cfdfinder.structures.FDTreeElement addGeneralization(BitSet lhs, BitSet rhs) {
 		de.metanome.algorithms.cfdfinder.structures.FDTreeElement currentNode = this;
 		currentNode.addRhsAttributes(rhs);
 
@@ -221,22 +220,22 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		return null;
 	}
 
-	public boolean containsFdOrGeneralization(OpenBitSet lhs, int rhs) {
+	public boolean containsFdOrGeneralization(BitSet lhs, int rhs) {
 		int nextLhsAttr = lhs.nextSetBit(0);
 		return this.containsFdOrGeneralization(lhs, rhs, nextLhsAttr);
 	}
 	
-	public OpenBitSet getFdOrGeneralization(OpenBitSet lhs, int rhs) {
-		OpenBitSet foundLhs = new OpenBitSet();
+	public BitSet getFdOrGeneralization(BitSet lhs, int rhs) {
+		BitSet foundLhs = new BitSet();
 		int nextLhsAttr = lhs.nextSetBit(0);
 		if (this.getFdOrGeneralization(lhs, rhs, nextLhsAttr, foundLhs))
 			return foundLhs;
 		return null;
 	}
 
-	public List<OpenBitSet> getFdAndGeneralizations(OpenBitSet lhs, int rhs) {
-		List<OpenBitSet> foundLhs = new ArrayList<>();
-		OpenBitSet currentLhs = new OpenBitSet();
+	public List<BitSet> getFdAndGeneralizations(BitSet lhs, int rhs) {
+		List<BitSet> foundLhs = new ArrayList<>();
+		BitSet currentLhs = new BitSet();
 		int nextLhsAttr = lhs.nextSetBit(0);
 		this.getFdAndGeneralizations(lhs, rhs, nextLhsAttr, currentLhs, foundLhs);
 		return foundLhs;
@@ -244,7 +243,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 
 	public List<FDTreeElementLhsPair> getLevel(int level) {
 		List<FDTreeElementLhsPair> result = new ArrayList<>();
-		OpenBitSet currentLhs = new OpenBitSet();
+		BitSet currentLhs = new BitSet();
 		int currentLevel = 0;
 		this.getLevel(level, currentLevel, currentLhs, result);
 		return result;
@@ -254,22 +253,22 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		// Traverse the tree depth-first
 		// For each node, iterate all FDs
 		// For each FD, store the FD, then remove all this.getFdOrGeneralization(lhs, rhs) and add the FD again
-		OpenBitSet currentLhs = new OpenBitSet(this.numAttributes);
+		BitSet currentLhs = new BitSet(this.numAttributes);
 		this.filterGeneralizations(currentLhs, this);
 	}
 	
-	public void filterGeneralizations(OpenBitSet lhs, int rhs) {
-		OpenBitSet currentLhs = new OpenBitSet(this.numAttributes);
+	public void filterGeneralizations(BitSet lhs, int rhs) {
+		BitSet currentLhs = new BitSet(this.numAttributes);
 		int nextLhsAttr = lhs.nextSetBit(0);
 		this.filterGeneralizations(lhs, rhs, nextLhsAttr, currentLhs);
 	}
 
-	public void removeFunctionalDependency(OpenBitSet lhs, int rhs) {
+	public void removeFunctionalDependency(BitSet lhs, int rhs) {
 		int currentLhsAttr = lhs.nextSetBit(0);
 		this.removeRecursive(lhs, rhs, currentLhsAttr);
 	}
 
-	public boolean containsFunctionalDependency(OpenBitSet lhs, int rhs) {
+	public boolean containsFunctionalDependency(BitSet lhs, int rhs) {
 		de.metanome.algorithms.cfdfinder.structures.FDTreeElement currentNode = this;
 
 		for (int i = lhs.nextSetBit(0); i >= 0; i = lhs.nextSetBit(i + 1)) {
@@ -287,7 +286,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 	}
 
 /*	public void filterSpecializations() {
-		OpenBitSet activePath = new OpenBitSet();
+		BitSet activePath = new BitSet();
 		FDTree filteredTree = new FDTree(this.maxAttributeNumber);
 		this.filterSpecializations(filteredTree, activePath);
 
@@ -296,16 +295,16 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 	}
 
 	public void printDependencies() {
-		OpenBitSet activePath = new OpenBitSet();
+		BitSet activePath = new BitSet();
 		this.printDependencies(activePath);
 	}
 */	
 	// FUDEBS
 	public class FD {
-		public OpenBitSet lhs;
+		public BitSet lhs;
 		public int rhs;
 		public de.metanome.algorithms.cfdfinder.structures.PositionListIndex pli;
-		public FD(OpenBitSet lhs, int rhs, de.metanome.algorithms.cfdfinder.structures.PositionListIndex pli) {
+		public FD(BitSet lhs, int rhs, de.metanome.algorithms.cfdfinder.structures.PositionListIndex pli) {
 			this.lhs = lhs;
 			this.rhs = rhs;
 			this.pli = pli;
@@ -315,7 +314,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 	public void addPrunedElements() {
 		int numAttributes = this.numAttributes;
 		
-		OpenBitSet currentLhs = new OpenBitSet(numAttributes);
+		BitSet currentLhs = new BitSet(numAttributes);
 		
 		if (this.getChildren() == null)
 			return;
@@ -332,7 +331,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 	public void growNegative(List<de.metanome.algorithms.cfdfinder.structures.PositionListIndex> plis, int[][] invertedPlis, int numRecords) {
 		int numAttributes = plis.size();
 		
-		OpenBitSet currentLhs = new OpenBitSet(numAttributes);
+		BitSet currentLhs = new BitSet(numAttributes);
 		
 		// As root node, we need to check each rhs
 		for (int rhs = 0; rhs < numAttributes; rhs++) {
@@ -377,7 +376,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 	public void maximizeNegative(List<de.metanome.algorithms.cfdfinder.structures.PositionListIndex> plis, int[][] invertedPlis, int numRecords) {
 		// Maximizing negative cover is better than maximizing positive cover, because we do not need to check minimality; inversion does this automatically, i.e., generating a non-FD that creates a valid, non-minimal FD is not possible
 		int numAttributes = plis.size();
-		OpenBitSet currentLhs = new OpenBitSet(numAttributes);
+		BitSet currentLhs = new BitSet(numAttributes);
 		
 		// Traverse the tree depth-first, left-first
 		if (this.getChildren() != null) {
@@ -397,7 +396,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		//     which supersets to consider: add all attributes A with A notIn lhs and A notequal rhs; 
 		//         for newLhs->rhs check that no FdOrSpecialization exists, because it is invalid then; this check might be slower than the FD check on high levels but faster on low levels in particular in the root! this check is faster on the negative cover, because we look for a non-FD
 		for (int rhs = this.rhsFds.nextSetBit(0); rhs >= 0; rhs = this.rhsFds.nextSetBit(rhs + 1)) {
-			OpenBitSet extensions = currentLhs.clone();
+			BitSet extensions = (BitSet) currentLhs.clone();
 			extensions.flip(0, numAttributes);
 			extensions.clear(rhs);
 			
@@ -429,7 +428,7 @@ public class FDTree extends de.metanome.algorithms.cfdfinder.structures.FDTreeEl
 		List<FDTreeElementLhsPair> currentLevel = new ArrayList<>();
 		
 		// Initialize first level with root
-		currentLevel.add(new FDTreeElementLhsPair(this, new OpenBitSet(this.numAttributes)));
+		currentLevel.add(new FDTreeElementLhsPair(this, new BitSet(this.numAttributes)));
 		
 		// Start the level-wise validation/discovery
 		int level = 0;
@@ -442,7 +441,7 @@ System.out.print("(V)");
 			List<FD> invalidFDs = new ArrayList<FD>();
 			for (FDTreeElementLhsPair elementLhsPair : currentLevel) {
 				FDTreeElement element = elementLhsPair.getElement();
-				OpenBitSet lhs = elementLhsPair.getLhs();
+				BitSet lhs = elementLhsPair.getLhs();
 				
 				for (int rhs = element.rhsFds.nextSetBit(0); rhs >= 0; rhs = element.rhsFds.nextSetBit(rhs + 1)) { // TODO: do not do this for all rhs separately!
 					validations++;
@@ -503,7 +502,7 @@ System.out.print("(C)");
 			List<FDTreeElementLhsPair> nextLevel = new ArrayList<>();
 			for (FDTreeElementLhsPair elementLhsPair : currentLevel) {
 				FDTreeElement element = elementLhsPair.getElement();
-				OpenBitSet lhs = elementLhsPair.getLhs();
+				BitSet lhs = elementLhsPair.getLhs();
 				
 				if (element.getChildren() == null)
 					continue;
@@ -512,7 +511,7 @@ System.out.print("(C)");
 					FDTreeElement child = element.getChildren()[childAttr];
 					
 					if (child != null) {
-						OpenBitSet childLhs = lhs.clone();
+						BitSet childLhs = lhs.clone();
 						childLhs.set(childAttr);
 						nextLevel.add(new FDTreeElementLhsPair(child, childLhs));
 					}
@@ -524,7 +523,7 @@ System.out.print("(G); ");
 			int candidates = 0;
 			for (FD invalidFD : invalidFDs) {
 				for (int extensionAttr = 0; extensionAttr < this.numAttributes; extensionAttr++) {
-					OpenBitSet childLhs = this.extendWith(invalidFD.lhs, invalidFD.rhs, extensionAttr);
+					BitSet childLhs = this.extendWith(invalidFD.lhs, invalidFD.rhs, extensionAttr);
 					if (childLhs != null) {
 						FDTreeElement child = this.addFunctionalDependency(childLhs, invalidFD.rhs);
 						nextLevel.add(new FDTreeElementLhsPair(child, childLhs));
@@ -544,7 +543,7 @@ System.out.print("(G); ");
 		List<FDTreeElementLhsPair> currentLevel = new ArrayList<>();
 		
 		// Initialize first level with root
-		currentLevel.add(new FDTreeElementLhsPair(this, new OpenBitSet(numAttributes)));
+		currentLevel.add(new FDTreeElementLhsPair(this, new BitSet(numAttributes)));
 		
 		// Start the level-wise validation/discovery
 		int level = 0;
@@ -559,8 +558,8 @@ System.out.print("(V)");
 			List<FD> invalidFDs = new ArrayList<FD>();
 			for (FDTreeElementLhsPair elementLhsPair : currentLevel) {
 				FDTreeElement element = elementLhsPair.getElement();
-				OpenBitSet lhs = elementLhsPair.getLhs();
-				OpenBitSet rhs = element.rhsFds;
+				BitSet lhs = elementLhsPair.getLhs();
+				BitSet rhs = element.rhsFds;
 				
 				int rhsSize = (int) rhs.cardinality();
 				if (rhsSize == 0)
@@ -591,7 +590,7 @@ System.out.print("(V)");
 					int firstLhsAttr = lhs.nextSetBit(0);
 					
 					lhs.clear(firstLhsAttr);
-					OpenBitSet validRhs = plis.get(firstLhsAttr).refines(invertedPlis, lhs, rhs, numAttributes, comparisonSuggestions);
+					BitSet validRhs = plis.get(firstLhsAttr).refines(invertedPlis, lhs, rhs, numAttributes, comparisonSuggestions);
 					lhs.set(firstLhsAttr);
 					
 					intersections++;
@@ -613,7 +612,7 @@ System.out.print("(C)");
 			List<FDTreeElementLhsPair> nextLevel = new ArrayList<>();
 			for (FDTreeElementLhsPair elementLhsPair : currentLevel) {
 				FDTreeElement element = elementLhsPair.getElement();
-				OpenBitSet lhs = elementLhsPair.getLhs();
+				BitSet lhs = elementLhsPair.getLhs();
 
 				if (element.getChildren() == null)
 					continue;
@@ -622,7 +621,7 @@ System.out.print("(C)");
 					FDTreeElement child = element.getChildren()[childAttr];
 					
 					if (child != null) {
-						OpenBitSet childLhs = lhs.clone();
+						BitSet childLhs = lhs.clone();
 						childLhs.set(childAttr);
 						nextLevel.add(new FDTreeElementLhsPair(child, childLhs));
 					}
@@ -635,7 +634,7 @@ System.out.print("(G); ");
 			for (FD invalidFD : invalidFDs) {
 				int newCandidates = 0;
 				for (int extensionAttr = 0; extensionAttr < this.numAttributes; extensionAttr++) {
-					OpenBitSet childLhs = this.extendWith(invalidFD.lhs, invalidFD.rhs, extensionAttr);
+					BitSet childLhs = this.extendWith(invalidFD.lhs, invalidFD.rhs, extensionAttr);
 					if (childLhs != null) {
 						FDTreeElement child = this.addFunctionalDependencyGetIfNew(childLhs, invalidFD.rhs);
 						if (child != null)
@@ -656,7 +655,7 @@ System.out.print("(G); ");
 		}
 	}
 	
-	private OpenBitSet extendWith(OpenBitSet lhs, int rhs, int extensionAttr) {
+	private BitSet extendWith(BitSet lhs, int rhs, int extensionAttr) {
 		if (lhs.get(extensionAttr) || 											// Triviality: AA->C cannot be valid, because A->C is invalid
 			(rhs == extensionAttr) || 											// Triviality: AC->C cannot be valid, because A->C is invalid
 			this.containsFdOrGeneralization(lhs, extensionAttr) ||				// Pruning: If A->B, then AB->C cannot be minimal 
@@ -664,7 +663,7 @@ System.out.print("(G); ");
 																				// Pruning: If B->C, then AB->C cannot be minimal
 			return null;
 		
-		OpenBitSet childLhs = lhs.clone(); // TODO: This clone() could be avoided when done externally
+		BitSet childLhs = lhs.clone(); // TODO: This clone() could be avoided when done externally
 		childLhs.set(extensionAttr);
 		
 		// TODO: Add more pruning here:
@@ -677,10 +676,10 @@ System.out.print("(G); ");
 		return childLhs;
 	}
 */
-/*	private OpenBitSet lookupAggressively(OpenBitSet lhs, int rhs, PositionListIndex pli, List<PositionListIndex> plis) {
+/*	private BitSet lookupAggressively(BitSet lhs, int rhs, PositionListIndex pli, List<PositionListIndex> plis) {
 		// Extend the lhs with some attribute
 		int extensionAttr = -1;
-		OpenBitSet extendedLhs = null;
+		BitSet extendedLhs = null;
 		while (extendedLhs == null) {
 			extensionAttr++;
 			if (extensionAttr == this.numAttributes)
@@ -708,16 +707,16 @@ System.out.print("(G); ");
 	
 	public List<FunctionalDependency> getFunctionalDependencies(ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<de.metanome.algorithms.cfdfinder.structures.PositionListIndex> plis) {
 		List<FunctionalDependency> functionalDependencies = new ArrayList<FunctionalDependency>();
-		this.addFunctionalDependenciesInto(functionalDependencies, new OpenBitSet(), columnIdentifiers, plis);
+		this.addFunctionalDependenciesInto(functionalDependencies, new BitSet(), columnIdentifiers, plis);
 		return functionalDependencies;
 	}
 	
 	public int addFunctionalDependenciesInto(FunctionalDependencyResultReceiver resultReceiver, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<de.metanome.algorithms.cfdfinder.structures.PositionListIndex> plis) throws CouldNotReceiveResultException, ColumnNameMismatchException {
-		return this.addFunctionalDependenciesInto(resultReceiver, new OpenBitSet(), columnIdentifiers, plis);
+		return this.addFunctionalDependenciesInto(resultReceiver, new BitSet(), columnIdentifiers, plis);
 	}
 
 	public void getInternalFunctionalDependencies(List<InternalFunctionalDependency> result, List<de.metanome.algorithms.cfdfinder.structures.PositionListIndex> plis) {
-		this.getInternalFunctionalDependencies(result, new OpenBitSet(), plis);
+		this.getInternalFunctionalDependencies(result, new BitSet(), plis);
 	}
 
 	public int writeFunctionalDependencies(String outputFilePath, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<de.metanome.algorithms.cfdfinder.structures.PositionListIndex> plis, boolean writeTableNamePrefix) {
@@ -725,7 +724,7 @@ System.out.print("(G); ");
 		int numFDs = 0;
 		try {
 			writer = FileUtils.buildFileWriter(outputFilePath, false);
-			numFDs = this.writeFunctionalDependencies(writer, new OpenBitSet(), columnIdentifiers, plis, writeTableNamePrefix);
+			numFDs = this.writeFunctionalDependencies(writer, new BitSet(), columnIdentifiers, plis, writeTableNamePrefix);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -750,7 +749,7 @@ System.out.print("(G); ");
 		Int2ObjectOpenHashMap<ArrayList<ElementLhsPair>> level2elements = new Int2ObjectOpenHashMap<>(maxLevel);
 		for (int level = 0; level < maxLevel; level++)
 			level2elements.put(level, new ArrayList<ElementLhsPair>());
-		this.addToIndex(level2elements, 0, new OpenBitSet(this.numAttributes));
+		this.addToIndex(level2elements, 0, new BitSet(this.numAttributes));
 		
 		// Traverse the levels top-down and add all direct generalizations
 		for (int level = maxLevel - 1; level >= 0; level--) {
@@ -763,7 +762,7 @@ System.out.print("(G); ");
 					pair.lhs.clear(lhsAttr);
 					de.metanome.algorithms.cfdfinder.structures.FDTreeElement generalization = this.addGeneralization(pair.lhs, pair.element.getRhsAttributes());
 					if (generalization != null)
-						level2elements.get(level - 1).add(new ElementLhsPair(generalization, pair.lhs.clone()));
+						level2elements.get(level - 1).add(new ElementLhsPair(generalization, (BitSet) pair.lhs.clone()));
 					pair.lhs.set(lhsAttr);
 				}
 			}
@@ -771,18 +770,18 @@ System.out.print("(G); ");
 	}
 
 	public void grow() {
-		this.grow(new OpenBitSet(this.numAttributes), this);
+		this.grow(new BitSet(this.numAttributes), this);
 	}
 
 	public void minimize() {
-		this.minimize(new OpenBitSet(this.numAttributes), this);
+		this.minimize(new BitSet(this.numAttributes), this);
 	}
 
 /*	public void discover(FDTree validFds, List<PositionListIndex> plis) {
 		List<FDTreeElementLhsPair> currentLevel = new ArrayList<>();
 		
 		// Initialize with first level
-		currentLevel.add(new FDTreeElementLhsPair(this, new OpenBitSet(this.numAttributes)));
+		currentLevel.add(new FDTreeElementLhsPair(this, new BitSet(this.numAttributes)));
 
 		// Start the level-wise discovery
 		while (!currentLevel.isEmpty()) {
@@ -791,11 +790,11 @@ System.out.print("(G); ");
 			// Add all children of the current level to the next level (new children that we create during the following discovery will be added dynamically)
 			for (FDTreeElementLhsPair elementLhsPair : currentLevel) {
 				FDTreeElement element = elementLhsPair.getElement();
-				OpenBitSet lhs = elementLhsPair.getLhs();
+				BitSet lhs = elementLhsPair.getLhs();
 				
 				for (int childAttr = 0; childAttr < this.numAttributes; childAttr++) {
 					if (element.getChildren()[childAttr] != null) {
-						OpenBitSet childLhs = lhs.clone();
+						BitSet childLhs = lhs.clone();
 						childLhs.set(childAttr);
 						nextLevel.add(new FDTreeElementLhsPair(element.getChildren()[childAttr], childLhs));
 					}
@@ -805,7 +804,7 @@ System.out.print("(G); ");
 			// Discover FDs with the elements of the current level; do not forget to place new invalid elements into the next level
 			for (FDTreeElementLhsPair elementLhsPair : currentLevel) {
 				FDTreeElement element = elementLhsPair.getElement();
-				OpenBitSet lhs = elementLhsPair.getLhs();
+				BitSet lhs = elementLhsPair.getLhs();
 				
 				element.discover(lhs, plis, this, validFds, nextLevel);
 			}

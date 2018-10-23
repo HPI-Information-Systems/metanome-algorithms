@@ -27,7 +27,8 @@ final class LhsContainsContext extends LhsContext {
 		}
 		return getNext(currentLhsAttr)
 			.map(this::containsMdOrGeneralization)
-			.orElse(false);
+			.orElse(Boolean.FALSE)
+			.booleanValue();
 	}
 
 	private boolean containsMdOrGeneralization(MDElement next) {
@@ -35,13 +36,14 @@ final class LhsContainsContext extends LhsContext {
 		int nextLhsAttrId = id + 1;
 		double threshold = next.getThreshold();
 		boolean childContains = children.get(id)
-			.map(child -> child.containsMdOrGeneralization(lhs, nextLhsAttrId, threshold))
-			.orElse(false);
+			.map(child -> Boolean.valueOf(child.containsMdOrGeneralization(lhs, nextLhsAttrId, threshold)))
+			.orElse(Boolean.FALSE)
+			.booleanValue();
 		return childContains || containsMdOrGeneralization(nextLhsAttrId);
 	}
 
 	private boolean isNotSupported() {
-		return notSupported.getValue();
+		return notSupported.getValue().booleanValue();
 	}
 
 }

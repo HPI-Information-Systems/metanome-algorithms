@@ -40,7 +40,6 @@ public final class Dimensions implements LevelFunction {
 		@NonNull
 		private final Double2IntMap map;
 
-		@SuppressWarnings("TypeMayBeWeakened")
 		private static Dimension toDimension(DoubleSortedSet thresholds) {
 			int size = thresholds.size();
 			Double2IntMap map = new Double2IntOpenHashMap(size);

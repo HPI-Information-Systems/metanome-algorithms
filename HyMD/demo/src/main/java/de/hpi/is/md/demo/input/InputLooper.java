@@ -59,7 +59,7 @@ public class InputLooper implements IOProvider {
 		String end = receiver.getEndKeyword();
 		writeLine("Continue? (" + cont + "/" + end + ")");
 		return readLine().map(this::continueInput)
-			.orElse(false);
+			.orElse(Boolean.FALSE).booleanValue();
 	}
 
 	private boolean continueInput(String answer) {

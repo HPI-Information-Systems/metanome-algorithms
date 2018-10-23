@@ -21,7 +21,6 @@ public final class StreamUtils {
 		return Seq.seq(stream);
 	}
 
-	@SuppressWarnings("TypeMayBeWeakened")
 	public static Seq<Double> seq(double[] doubles) {
 		DoubleStream stream = Arrays.stream(doubles);
 		return Seq.seq(stream);

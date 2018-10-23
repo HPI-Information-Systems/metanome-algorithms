@@ -81,7 +81,9 @@ import com.clearspring.analytics.util.IBuilder;
  */
 public class HyperLogLog implements ICardinality, Serializable {
 
-    private final RegisterSet registerSet;
+	private static final long serialVersionUID = 2247928718406874368L;
+	
+	private final RegisterSet registerSet;
     private final int log2m;
     private final double alphaMM;
 
@@ -181,11 +183,12 @@ public class HyperLogLog implements ICardinality, Serializable {
 
     //// <---- BEGIN CHANGES ---->
     @Override
+    @SuppressWarnings("unused")
     public long cardinality() {
         double registerSum = 0;
         int[] bits = registerSet.readOnlyBits();
         int count = registerSet.count;
-        double zeros = 0.0;
+		double zeros = 0.0;
 
         for (int bucket = 0; bucket < bits.length; ++bucket) {
             int bit = bits[bucket];
@@ -329,6 +332,8 @@ public class HyperLogLog implements ICardinality, Serializable {
 
     public static class Builder implements IBuilder<ICardinality>, Serializable {
 
+        private static final long serialVersionUID = 283072264689524468L;
+		
         private double rsd;
 
         public Builder(double rsd) {

@@ -45,8 +45,8 @@ public class SamplingExecutor {
 	}
 
 	private void updateStatistics(Statistics newStatistics) {
-		log.debug("Sampled {} rounds. Deduced {} MDs", newStatistics.getCount(),
-			newStatistics.getNewDeduced());
+		log.debug("Sampled {} rounds. Deduced {} MDs", Integer.valueOf(newStatistics.getCount()),
+			Integer.valueOf(newStatistics.getNewDeduced()));
 		statistics.add(newStatistics);
 	}
 
@@ -76,7 +76,7 @@ public class SamplingExecutor {
 		}
 
 		private void processAll(Collection<SimilaritySet> similaritySets) {
-			log.debug("Processing {} recommended similarity sets", similaritySets.size());
+			log.debug("Processing {} recommended similarity sets", Integer.valueOf(similaritySets.size()));
 			for (SimilaritySet similaritySet : similaritySets) {
 				if (evaluator.test(statistics)) {
 					break;
@@ -86,14 +86,14 @@ public class SamplingExecutor {
 		}
 
 		private void processAndQueue(Collection<SimilaritySet> similaritySets) {
-			log.debug("Processing {} sampled similarity sets", similaritySets.size());
+			log.debug("Processing {} sampled similarity sets", Integer.valueOf(similaritySets.size()));
 			queue.addAll(similaritySets);
 			clearQueue();
 		}
 
 		@Timed
 		private void processRecommendations(Collection<IntArrayPair> recommendations) {
-			log.debug("Got {} recommendations", recommendations.size());
+			log.debug("Got {} recommendations", Integer.valueOf(recommendations.size()));
 			Collection<SimilaritySet> similaritySets = sampler
 				.processRecommendations(recommendations);
 			processAll(similaritySets);

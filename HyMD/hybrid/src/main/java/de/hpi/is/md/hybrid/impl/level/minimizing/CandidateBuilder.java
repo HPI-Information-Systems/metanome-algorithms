@@ -36,7 +36,7 @@ class CandidateBuilder {
 
 	private void addToValidated(MDSite lhs, MDElement rhs) {
 		int rhsAttr = rhs.getId();
-		validated.put(lhs, rhsAttr);
+		validated.put(lhs, Integer.valueOf(rhsAttr));
 	}
 
 	private IntermediateCandidate toCandidate(LatticeMD latticeMd) {
@@ -77,7 +77,7 @@ class CandidateBuilder {
 		private boolean notValidated(MDElement rhs) {
 			MDSite lhs = latticeMd.getLhs();
 			int rhsAttr = rhs.getId();
-			return !validated.containsEntry(lhs, rhsAttr);
+			return !validated.containsEntry(lhs, Integer.valueOf(rhsAttr));
 		}
 
 		private IntermediateCandidate toCandidate() {

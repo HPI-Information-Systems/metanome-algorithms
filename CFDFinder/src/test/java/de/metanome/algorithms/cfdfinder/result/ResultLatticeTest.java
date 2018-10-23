@@ -1,17 +1,16 @@
 package de.metanome.algorithms.cfdfinder.result;
 
-import de.metanome.algorithms.cfdfinder.pattern.Pattern;
-import de.metanome.algorithms.cfdfinder.pattern.PatternTableau;
-import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.apache.lucene.util.OpenBitSet;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import de.metanome.algorithms.cfdfinder.pattern.Pattern;
+import de.metanome.algorithms.cfdfinder.pattern.PatternTableau;
+import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
 
 public class ResultLatticeTest {
 
@@ -146,11 +145,11 @@ public class ResultLatticeTest {
     }
 
     private FDTreeElement.InternalFunctionalDependency mockFD(int[] lhs, int rhs) {
-        OpenBitSet lhsSet = new OpenBitSet(64);
+        BitSet lhsSet = new BitSet(64);
         for (int lhsElem : lhs) {
             lhsSet.flip(lhsElem);
         }
-        return new FDTreeElement.InternalFunctionalDependency(lhsSet, rhs);
+        return new FDTreeElement.InternalFunctionalDependency(lhsSet, rhs, 64);
     }
 
 }

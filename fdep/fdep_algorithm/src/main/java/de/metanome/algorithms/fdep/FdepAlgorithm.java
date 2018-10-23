@@ -1,11 +1,8 @@
 package de.metanome.algorithms.fdep;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
@@ -27,6 +24,7 @@ import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyRes
 import de.metanome.algorithm_integration.results.FunctionalDependency;
 import de.metanome.algorithms.tane.algorithm_helper.FDTree;
 import de.metanome.algorithms.tane.algorithm_helper.FDTreeElement;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
         RelationalInputParameterAlgorithm,
@@ -90,7 +88,7 @@ public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
 
         posCoverTree = new FDTree(numberAttributes);
         posCoverTree.addMostGeneralDependencies();
-        OpenBitSet activePath = new OpenBitSet();
+        BitSet activePath = new BitSet();
         calculatePositiveCover(negCoverTree, activePath);
 //		posCoverTree.filterGeneralizations();
         addAllDependenciesToResultReceiver();
@@ -104,8 +102,8 @@ public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
     /**
      * Calculate a set of fds, which do not cover the invalid dependency lhs -> a.
      */
-    private void specializePositiveCover(OpenBitSet lhs, int a) {
-        OpenBitSet specLhs = new OpenBitSet();
+    private void specializePositiveCover(BitSet lhs, int a) {
+        BitSet specLhs = new BitSet();
 
         while (posCoverTree.getGeneralizationAndDelete(lhs, a, 0, specLhs)) {
             for (int attr = this.numberAttributes; attr > 0; attr--) {
@@ -117,11 +115,11 @@ public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
                     specLhs.clear(attr);
                 }
             }
-            specLhs = new OpenBitSet();
+            specLhs = new BitSet();
         }
     }
 
-    private void calculatePositiveCover(FDTreeElement negCoverSubtree, OpenBitSet activePath) {
+    private void calculatePositiveCover(FDTreeElement negCoverSubtree, BitSet activePath) {
         for (int attr = 1; attr <= numberAttributes; attr++) {
             if (negCoverSubtree.isFd(attr - 1)) {
                 specializePositiveCover(activePath, attr);
@@ -161,9 +159,9 @@ public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
      * @param t2 An ObjectArrayList with the values of another entry of the relation.
      */
     private void violatedFds(List<String> t1, List<String> t2) {
-        OpenBitSet equalAttr = new OpenBitSet();
+        BitSet equalAttr = new BitSet();
         equalAttr.set(1, this.numberAttributes + 1);
-        OpenBitSet diffAttr = new OpenBitSet();
+        BitSet diffAttr = new BitSet();
         for (int i = 0; i < t1.size(); i++) {
             Object val1 = t1.get(i);
             Object val2 = t2.get(i);
@@ -171,7 +169,7 @@ public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
             if (val1 == null && val2 == null) {
                 continue;
             } else if ((val1 == null && val2 != null) || !(val1.equals(val2))) {
-                // OpenBitSet start with 1 for first attribute
+                // BitSet start with 1 for first attribute
                 diffAttr.set(i + 1);
             }
         }
@@ -219,19 +217,19 @@ public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
         }
     }
 
-    private void addAllDependenciesToResultReceiver(FDTreeElement fds, OpenBitSet activePath) throws CouldNotReceiveResultException, ColumnNameMismatchException {
+    private void addAllDependenciesToResultReceiver(FDTreeElement fds, BitSet activePath) throws CouldNotReceiveResultException, ColumnNameMismatchException {
         if (this.fdResultReceiver == null) {
             return;
         }
         for (int attr = 1; attr <= numberAttributes; attr++) {
             if (fds.isFd(attr - 1)) {
                 int j = 0;
-                ColumnIdentifier[] columns = new ColumnIdentifier[(int) activePath.cardinality()];
+                ColumnIdentifier[] columns = new ColumnIdentifier[activePath.cardinality()];
                 for (int i = activePath.nextSetBit(0); i >= 0; i = activePath.nextSetBit(i + 1)) {
                     columns[j++] = this.columnIdentifiers.get(i - 1);
                 }
                 ColumnCombination colCombination = new ColumnCombination(columns);
-                FunctionalDependency fdResult = new FunctionalDependency(colCombination, columnIdentifiers.get((int) attr - 1));
+                FunctionalDependency fdResult = new FunctionalDependency(colCombination, columnIdentifiers.get(attr - 1));
 //				System.out.println(fdResult.toString());
                 fdResultReceiver.receiveResult(fdResult);
             }
@@ -258,7 +256,7 @@ public class FdepAlgorithm implements FunctionalDependencyAlgorithm,
         if (this.fdResultReceiver == null) {
             return;
         }
-        this.addAllDependenciesToResultReceiver(posCoverTree, new OpenBitSet());
+        this.addAllDependenciesToResultReceiver(posCoverTree, new BitSet());
     }
 
 	@Override

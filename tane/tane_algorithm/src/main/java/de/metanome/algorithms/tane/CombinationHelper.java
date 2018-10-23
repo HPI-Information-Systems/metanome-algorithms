@@ -1,14 +1,13 @@
 package de.metanome.algorithms.tane;
 
-import org.apache.lucene.util.OpenBitSet;
-
 import java.io.Serializable;
+import java.util.BitSet;
 
 public class CombinationHelper implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private OpenBitSet rhsCandidates;
+    private BitSet rhsCandidates;
     private boolean valid;
 
     private StrippedPartition partition;
@@ -17,11 +16,11 @@ public class CombinationHelper implements Serializable {
         valid = true;
     }
 
-    public OpenBitSet getRhsCandidates() {
+    public BitSet getRhsCandidates() {
         return rhsCandidates;
     }
 
-    public void setRhsCandidates(OpenBitSet rhsCandidates) {
+    public void setRhsCandidates(BitSet rhsCandidates) {
         this.rhsCandidates = rhsCandidates;
     }
 

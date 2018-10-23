@@ -23,6 +23,7 @@ public class EnumNameDeserializer<T extends Enum<T>> extends JsonDeserializer<T>
 	private final JavaType type;
 
 	//Jackson
+	@SuppressWarnings("unused")
 	private EnumNameDeserializer() {
 		this.type = null;
 	}

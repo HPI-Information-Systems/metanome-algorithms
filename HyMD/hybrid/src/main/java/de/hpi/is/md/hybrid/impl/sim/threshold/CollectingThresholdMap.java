@@ -45,9 +45,8 @@ public class CollectingThresholdMap implements ThresholdMap {
 			GreaterOrEqualCall call = new GreaterOrEqualCall(valueId, max);
 			LoadingCache<GreaterOrEqualCall, IntCollection> cache = getCache();
 			return cache.getUnchecked(call);
-		} else {
-			return greaterOrEqual_(valueId, max);
 		}
+		return greaterOrEqual_(valueId, max);
 	}
 
 	private LoadingCache<GreaterOrEqualCall, IntCollection> createCache() {

@@ -27,13 +27,10 @@ public class HybridDiscoverer extends AbstractResultEmitter<MatchingDependencyRe
 	private final DiscoveryConfiguration configuration;
 	@NonNull
 	private final MDMapping mappings;
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	private boolean parallel = false;
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	private boolean store = true;
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	@NonNull
 	private File cacheDirectory = new File("preprocessed/");

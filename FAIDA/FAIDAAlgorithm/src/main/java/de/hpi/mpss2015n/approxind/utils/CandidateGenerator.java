@@ -44,7 +44,7 @@ public final class CandidateGenerator {
 
                 // Combine the two INDs and test them.
                 SimpleInd newCandidate = a.combineWith(b, columnCombinations);
-                if (isPotentiallyValid(newCandidate, lastResults, isCombineNull, stores)) {
+                if (isPotentiallyValid(newCandidate, lastResults)) {
                     newIndCandidates.add(newCandidate);
                 }
 
@@ -53,7 +53,7 @@ public final class CandidateGenerator {
         return newIndCandidates;
     }
 
-    private boolean isPotentiallyValid(SimpleInd newCandidate, HashSet<SimpleInd> lastResults, boolean isCombineNull, AbstractColumnStore[] stores) {
+    private boolean isPotentiallyValid(SimpleInd newCandidate, HashSet<SimpleInd> lastResults) {
         //only allow each column once in LHS and RHS - comment out in case this is not desired!
         if (newCandidate.left.getTable() == newCandidate.right.getTable()) {
             for (int i : newCandidate.left.getColumns()) {

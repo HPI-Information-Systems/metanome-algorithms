@@ -21,7 +21,7 @@ public class PositiveAndNegativeConstantPatternExpansionStrategy extends Constan
     protected List<Pattern> specializeVariablePatternEntry(Pattern parent, int id, int value) {
         List<Pattern> specializations = super.specializeVariablePatternEntry(parent, id, value);
         HashMap<Integer, PatternEntry> copy = new HashMap<>(parent.getAttributes());
-        copy.put(id, new NegativeConstantPatternEntry(value));
+        copy.put(Integer.valueOf(id), new NegativeConstantPatternEntry(value));
         specializations.add(new Pattern(copy));
         return specializations;
     }

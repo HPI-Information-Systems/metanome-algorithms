@@ -32,7 +32,7 @@ public class LazyArray<T> implements LazyMap<Integer, T> {
 	@Deprecated
 	@Override
 	public Optional<T> get(Integer key) {
-		int k = key;
+		int k = key.intValue();
 		return get(k);
 	}
 
@@ -43,7 +43,7 @@ public class LazyArray<T> implements LazyMap<Integer, T> {
 	@Deprecated
 	@Override
 	public T getOrCreate(Integer key) {
-		int k = key;
+		int k = key.intValue();
 		return getOrCreate(k);
 	}
 

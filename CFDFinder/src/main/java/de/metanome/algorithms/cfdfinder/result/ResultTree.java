@@ -1,12 +1,12 @@
 package de.metanome.algorithms.cfdfinder.result;
 
-import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
-import org.apache.lucene.util.OpenBitSet;
+import static de.metanome.algorithms.cfdfinder.utils.LhsUtils.generateLhsSupersets;
 
+import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import static de.metanome.algorithms.cfdfinder.utils.LhsUtils.generateLhsSupersets;
+import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
 
 public class ResultTree {
 
@@ -44,7 +44,7 @@ public class ResultTree {
     }
 
     public ResultTree getInsertPosition(Result result) {
-        OpenBitSet parent = findParentOf(result);
+        BitSet parent = findParentOf(result);
         if (parent != null) {
             ResultTree child = findNode(parent, result.getEmbeddedFD().rhs);
             assert child != null;
@@ -53,8 +53,8 @@ public class ResultTree {
         return null;
     }
 
-    private OpenBitSet findParentOf(Result result) {
-        for (OpenBitSet parent : generateLhsSupersets(result.getEmbeddedFD().lhs)) {
+    private BitSet findParentOf(Result result) {
+        for (BitSet parent : generateLhsSupersets(result.getEmbeddedFD().lhs, result.getEmbeddedFD().numAttributes)) {
             if (this.contains(parent, result.getEmbeddedFD().rhs)) {
                 return parent;
             }
@@ -62,11 +62,11 @@ public class ResultTree {
         return null;
     }
 
-    public boolean contains(OpenBitSet lhs, int rhs) {
+    public boolean contains(BitSet lhs, int rhs) {
         return (findNode(lhs, rhs) != null);
     }
 
-    private ResultTree findNode(OpenBitSet lhs, int rhs) {
+    private ResultTree findNode(BitSet lhs, int rhs) {
         FDTreeElement.InternalFunctionalDependency fd = node.getEmbeddedFD();
         if (fd.rhs != rhs) {
             return null;

@@ -71,24 +71,26 @@
         <module>dao</module>
         <module>BINDER</module>
         <module>SPIDER</module>
+        <module>HyUCC</module>
         <module>HyFD</module>
         <module>HyMD</module>
-        <module>HyUCC</module>
         <module>SCDP</module>
         <module>AIDFD</module>
         <module>FAIDA</module>
+        <module>hydra</module>
         <module>MANY</module>
+        <module>MvdDet</module>
+        <module>CFDFinder</module>
         <module>ducc</module>
         <module>dcucc</module>
         <module>dfd</module>
-        <module>ORDER</module>
-        <module>MvdDet</module>
         <module>tane</module>
         <module>fun</module>
         <module>fdmine</module>
         <module>depminer</module>
         <module>fastfds</module>
         <module>fdep</module>
+        <module>ORDER</module>
         <module>DVA</module>
         <module>DVAKMV</module>
         <module>DVAMS</module>
@@ -102,7 +104,5 @@
         <module>DVMinCount</module>
         <module>DVPCSA</module>
         <module>DVSuperLogLog</module>
-        <module>hydra</module>
-        <module>CFDFinder</module>
     </modules>
 </project>

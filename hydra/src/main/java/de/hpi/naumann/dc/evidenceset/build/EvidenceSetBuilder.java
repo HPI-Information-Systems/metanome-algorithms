@@ -84,7 +84,7 @@ public abstract class EvidenceSetBuilder {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private int compare(int i, int j, ColumnPair p) {
-		return ((Comparable) getValue(i, p.getC1())).compareTo(((Comparable) getValue(j, p.getC2())));
+		return ((Comparable) getValue(i, p.getC1())).compareTo((getValue(j, p.getC2())));
 	}
 
 	private boolean equals(int i, int j, ColumnPair p) {
@@ -146,6 +146,8 @@ public abstract class EvidenceSetBuilder {
 			list.add(pr);
 	}
 
+	@SuppressWarnings("unused")
 	private static Logger log = LoggerFactory.getLogger(EvidenceSetBuilder.class);
+	
 	private static final PredicateProvider predicateProvider = PredicateProvider.getInstance();  
 }

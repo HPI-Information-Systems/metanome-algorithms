@@ -74,8 +74,8 @@ public final class VirtualColumnStore extends AbstractColumnStore {
                 long hash = getHash(str, i);
 
                 // Keep track of the first column value and delete it if multiple values are observed.
-                if (rowCounter == 0) firstColumnValues[i] = hash;
-                else if (firstColumnValues[i] != null && firstColumnValues[i] != hash) firstColumnValues[i] = null;
+                if (rowCounter == 0) firstColumnValues[i] = Long.valueOf(hash);
+                else if (firstColumnValues[i] != null && firstColumnValues[i].longValue() != hash) firstColumnValues[i] = null;
 
                 // Check if the value requests to put the row into the sample.
                 if (hash != NULLHASH) {
@@ -102,8 +102,8 @@ public final class VirtualColumnStore extends AbstractColumnStore {
 
         // Check for constant and null columns.
         for (int i = 0; i < firstColumnValues.length; i++) {
-            this.isNullColumn[i] = firstColumnValues[i] != null && firstColumnValues[i] == NULLHASH;
-            this.isConstantColumn[i] = firstColumnValues[i] != null && firstColumnValues[i] != NULLHASH;
+            this.isNullColumn[i] = firstColumnValues[i] != null && firstColumnValues[i].longValue() == NULLHASH;
+            this.isConstantColumn[i] = firstColumnValues[i] != null && firstColumnValues[i].longValue() != NULLHASH;
         }
     }
 

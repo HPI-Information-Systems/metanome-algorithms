@@ -48,7 +48,7 @@ public final class ArrayPositionListIndex implements PositionListIndex {
 		private int maxValue;
 
 		private static <T> BiConsumer<Integer, T> set(T[] array) {
-			return (k, v) -> array[k] = v;
+			return (k, v) -> array[k.intValue()] = v;
 		}
 
 		@Override

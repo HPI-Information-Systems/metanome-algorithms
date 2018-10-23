@@ -80,9 +80,8 @@ public class RegisterSet {
         if (curVal < newVal) {
             this.M[bucket] = (int) ((this.M[bucket] & ~mask) | newVal);
             return true;
-        } else {
-            return false;
         }
+		return false;
     }
 
     public void merge(RegisterSet that) {

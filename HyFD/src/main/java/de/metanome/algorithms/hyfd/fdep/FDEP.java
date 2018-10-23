@@ -1,10 +1,9 @@
 package de.metanome.algorithms.hyfd.fdep;
 
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithms.hyfd.structures.FDTree;
@@ -49,12 +48,12 @@ public class FDEP {
 	 * Note: t1 and t2 must have the same length.
 	 */
 	protected void addViolatedFdsToCover(int[] t1, int[] t2, FDTree negCoverTree) {
-		OpenBitSet equalAttrs = new OpenBitSet(t1.length);
+		BitSet equalAttrs = new BitSet(t1.length);
 		for (int i = 0; i < t1.length; i++)
 			if (this.valueComparator.isEqual(t1[i], t2[i]))
 				equalAttrs.set(i);
 		
-		OpenBitSet diffAttrs = new OpenBitSet(t1.length);
+		BitSet diffAttrs = new BitSet(t1.length);
 		diffAttrs.set(0, this.numAttributes);
 		diffAttrs.andNot(equalAttrs);
 		
@@ -64,15 +63,15 @@ public class FDEP {
 	protected FDTree calculatePositiveCover(FDTree negCoverTree) {
 		FDTree posCoverTree = new FDTree(this.numAttributes, -1);
 		posCoverTree.addMostGeneralDependencies();
-		OpenBitSet activePath = new OpenBitSet();
+		BitSet activePath = new BitSet();
 		
 		this.calculatePositiveCover(posCoverTree, negCoverTree, activePath);
 		
 		return posCoverTree;
 	}
 	
-	protected void calculatePositiveCover(FDTree posCoverTree, FDTreeElement negCoverSubtree, OpenBitSet activePath) {
-		OpenBitSet fds = negCoverSubtree.getFds();
+	protected void calculatePositiveCover(FDTree posCoverTree, FDTreeElement negCoverSubtree, BitSet activePath) {
+		BitSet fds = negCoverSubtree.getFds();
 		for (int rhs = fds.nextSetBit(0); rhs >= 0; rhs = fds.nextSetBit(rhs + 1))
 			this.specializePositiveCover(posCoverTree, activePath, rhs);
 		
@@ -87,10 +86,10 @@ public class FDEP {
 		}
 	}
 
-	protected void specializePositiveCover(FDTree posCoverTree, OpenBitSet lhs, int rhs) {
-		List<OpenBitSet> specLhss = null;
+	protected void specializePositiveCover(FDTree posCoverTree, BitSet lhs, int rhs) {
+		List<BitSet> specLhss = null;
 		specLhss = posCoverTree.getFdAndGeneralizations(lhs, rhs);
-		for (OpenBitSet specLhs : specLhss) {
+		for (BitSet specLhs : specLhss) {
 			posCoverTree.removeFunctionalDependency(specLhs, rhs);
 			for (int attr = this.numAttributes - 1; attr >= 0; attr--) {
 				if (!lhs.get(attr) && (attr != rhs)) {
@@ -103,17 +102,17 @@ public class FDEP {
 		}
 	}
 	
-	public Set<OpenBitSet> bitSets(FDTree negCoverTree) {
-		Set<OpenBitSet> posCoverTree = new HashSet<>(this.numAttributes);
-		OpenBitSet activePath = new OpenBitSet();
+	public Set<BitSet> bitSets(FDTree negCoverTree) {
+		Set<BitSet> posCoverTree = new HashSet<>(this.numAttributes);
+		BitSet activePath = new BitSet();
 		
 		this.fetchBitSets(posCoverTree, negCoverTree, activePath);
 		
 		return posCoverTree;
 	}
 
-	protected void fetchBitSets(Set<OpenBitSet> posCoverTree, FDTreeElement negCoverSubtree, OpenBitSet activePath) {
-		posCoverTree.add(activePath.clone());
+	protected void fetchBitSets(Set<BitSet> posCoverTree, FDTreeElement negCoverSubtree, BitSet activePath) {
+		posCoverTree.add((BitSet) activePath.clone());
 		
 		if (negCoverSubtree.getChildren() != null) {
 			for (int attr = 0; attr < this.numAttributes; attr++) {

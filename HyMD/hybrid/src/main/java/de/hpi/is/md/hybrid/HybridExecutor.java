@@ -59,9 +59,8 @@ class HybridExecutor {
 	private boolean traverse_(boolean samplingDone) {
 		if (shouldTraverse(samplingDone)) {
 			return traverse(samplingDone);
-		} else {
-			return samplingDone;
 		}
+		return samplingDone;
 	}
 
 }

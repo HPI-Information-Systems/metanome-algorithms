@@ -75,18 +75,18 @@ public final class FAIDACore {
                 else if (store.isNullColumn(columnIndex)) nullColumnCounter++;
             }
         }
-        logger.info("Detected {} null columns and {} constant columns.", nullColumnCounter, constantColumnCounter);
+        logger.info("Detected {} null columns and {} constant columns.", Integer.valueOf(nullColumnCounter), Integer.valueOf(constantColumnCounter));
 
         // Create the IND converter already.
         IndConverter indConverter = new IndConverter(stores);
 
         logger.info("Creating initial column combinations.");
         List<SimpleColumnCombination> combinations = createUnaryColumnCombinations(stores);
-        logger.info("Created {} column combinations.", combinations.size());
+        logger.info("Created {} column combinations.", Integer.valueOf(combinations.size()));
 
         logger.info("Creating unary IND candidates.");
         List<SimpleInd> candidates = createUnaryIndCandidates(combinations);
-        logger.info("Created {} IND candidates.", candidates.size());
+        logger.info("Created {} IND candidates.", Integer.valueOf(candidates.size()));
 
         logger.info("Feeding input rows to IND test.");
         int[] tables = inclusionTester.setColumnCombinations(combinations);
@@ -108,27 +108,27 @@ public final class FAIDACore {
         if (detectNary) {
             while (lastResult.size() > 0) {
                 arity++;
-                logger.info("Creating {}-ary IND candidates.", arity);
+                logger.info("Creating {}-ary IND candidates.", Integer.valueOf(arity));
                 candidates = candidateLogic.createCombinedCandidates(lastResult, isCombineNull, stores);
                 if (candidates.isEmpty()) {
                     logger.info("no more candidates for next level!");
                     break;
                 }
-                logger.info("Created {} {}-ary IND candidates.", candidates.size(), arity);
+                logger.info("Created {} {}-ary IND candidates.", Integer.valueOf(candidates.size()), Integer.valueOf(arity));
 
-                logger.info("Extracting {}-ary column combinations.", arity);
+                logger.info("Extracting {}-ary column combinations.", Integer.valueOf(arity));
                 combinations = extractColumnCombinations(candidates);
 
-                logger.info("Inserting rows to check {} {}-ary IND candidates with {} column combinations", candidates.size(), arity,
-                        combinations.size());
+                logger.info("Inserting rows to check {} {}-ary IND candidates with {} column combinations", Integer.valueOf(candidates.size()), Integer.valueOf(arity),
+                		Integer.valueOf(combinations.size()));
                 int[] activeTables = inclusionTester.setColumnCombinations(combinations);
                 insertRows(activeTables, stores);
 
-                logger.info("Checking {}-ary IND candidates.", arity);
+                logger.info("Checking {}-ary IND candidates.", Integer.valueOf(arity));
                 lastResult = checkCandidates(candidates);
                 result.addAll(lastResult);
 
-                logger.info("Feeding {}-ary INDs to the result receiver.", arity);
+                logger.info("Feeding {}-ary INDs to the result receiver.", Integer.valueOf(arity));
                 for (InclusionDependency inclusionDependency : indConverter.toMetanomeInds(lastResult)) {
                     try {
                         resultReceiver.receiveResult(inclusionDependency);
@@ -140,10 +140,10 @@ public final class FAIDACore {
             }
         }
 
-        logger.info("Result size: {}", result.size());
+        logger.info("Result size: {}", Integer.valueOf(result.size()));
         logger.info("Certain checks: {}, uncertain checks: {}",
-                this.inclusionTester.getNumCertainChecks(),
-                this.inclusionTester.getNumUnertainChecks()
+        		Integer.valueOf(this.inclusionTester.getNumCertainChecks()),
+        		Integer.valueOf(this.inclusionTester.getNumUnertainChecks())
         );
 
         return result;
@@ -164,7 +164,7 @@ public final class FAIDACore {
             int rowCount = 0;
             AbstractColumnStore inputGenerator = stores[table];
             ColumnIterator input = inputGenerator.getRows();
-            logger.info("Inserting rows for table {}", table);
+            logger.info("Inserting rows for table {}", Integer.valueOf(table));
             DebugCounter counter = new DebugCounter();
             inclusionTester.startInsertRow(table);
             while (input.hasNext()) {
@@ -173,18 +173,18 @@ public final class FAIDACore {
                 counter.countUp();
             }
             counter.done();
-            logger.info("{} rows inserted", rowCount);
+            logger.info("{} rows inserted", Integer.valueOf(rowCount));
             input.close();
         }
         inclusionTester.finalizeInsertion();
-        logger.info("Time processing rows: {}ms", sw.elapsed(TimeUnit.MILLISECONDS));
+        logger.info("Time processing rows: {}ms", Long.valueOf(sw.elapsed(TimeUnit.MILLISECONDS)));
     }
 
     private List<SimpleInd> checkCandidates(List<SimpleInd> candidates) {
         Stopwatch sw = Stopwatch.createStarted();
         List<SimpleInd> result = new ArrayList<>();
-        logger.info("checking: {} candidates on level {}", candidates.size(),
-                candidates.get(0).size());
+        logger.info("checking: {} candidates on level {}", Integer.valueOf(candidates.size()),
+        		Integer.valueOf(candidates.get(0).size()));
         int candidateCount = 0;
         for (SimpleInd candidate : candidates) {
             if (inclusionTester.isIncludedIn(candidate.left, candidate.right)) {
@@ -193,12 +193,12 @@ public final class FAIDACore {
             candidateCount++;
             if ((candidates.size() > 1000 && candidateCount % (candidates.size() / 20) == 0) ||
                     (candidates.size() <= 1000 && candidateCount % 100 == 0)) {
-                logger.info("{}/{} candidates checked", candidateCount, candidates.size());
+                logger.info("{}/{} candidates checked", Integer.valueOf(candidateCount), Integer.valueOf(candidates.size()));
             }
         }
         logger.info("Time checking candidates on level {}: {}ms, INDs found: {}",
-                candidates.get(0).size(),
-                sw.elapsed(TimeUnit.MILLISECONDS), result.size());
+        		Integer.valueOf(candidates.get(0).size()),
+        		Long.valueOf(sw.elapsed(TimeUnit.MILLISECONDS)), Integer.valueOf(result.size()));
         return result;
     }
 

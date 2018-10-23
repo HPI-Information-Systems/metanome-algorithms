@@ -1,8 +1,7 @@
 package de.metanome.algorithms.hyucc.structures;
 
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.ColumnCombination;
 import de.metanome.algorithm_integration.ColumnIdentifier;
@@ -80,7 +79,7 @@ public class UCCTreeElement {
 		}
 	}
 
-	protected void removeRecursive(OpenBitSet ucc, int currentUCCAttr) {
+	protected void removeRecursive(BitSet ucc, int currentUCCAttr) {
 		if (currentUCCAttr < 0) {
 			this.isUCC = false;
 			return;
@@ -94,9 +93,9 @@ public class UCCTreeElement {
 		}
 	}
 
-	protected void getUCCAndGeneralizations(OpenBitSet ucc, int currentUCCAttr, OpenBitSet currentUCC, List<OpenBitSet> foundUCCs) {
+	protected void getUCCAndGeneralizations(BitSet ucc, int currentUCCAttr, BitSet currentUCC, List<BitSet> foundUCCs) {
 		if (this.isUCC)
-			foundUCCs.add(currentUCC.clone());
+			foundUCCs.add((BitSet) currentUCC.clone());
 
 		if (this.children == null)
 			return;
@@ -114,7 +113,7 @@ public class UCCTreeElement {
 		}
 	}
 
-	protected boolean containsUCCOrGeneralization(OpenBitSet ucc, int currentUCCAttr) {
+	protected boolean containsUCCOrGeneralization(BitSet ucc, int currentUCCAttr) {
 		if (this.isUCC())
 			return true;
 
@@ -130,7 +129,7 @@ public class UCCTreeElement {
 		return this.containsUCCOrGeneralization(ucc, nextUCCAttr);
 	}
 
-	protected boolean containsUCCOrSpecialization(OpenBitSet ucc, int currentUCCAttr) {
+	protected boolean containsUCCOrSpecialization(BitSet ucc, int currentUCCAttr) {
 		if (this.isUCC() && (currentUCCAttr < 0))
 			return true;
 
@@ -152,9 +151,9 @@ public class UCCTreeElement {
 		return false;
 	}
 
-	public void getLevel(int level, int currentLevel, OpenBitSet currentUCC, List<UCCTreeElementUCCPair> result) {
+	public void getLevel(int level, int currentLevel, BitSet currentUCC, List<UCCTreeElementUCCPair> result) {
 		if (level == currentLevel) {
-			result.add(new UCCTreeElementUCCPair(this, currentUCC.clone()));
+			result.add(new UCCTreeElementUCCPair(this, (BitSet) currentUCC.clone()));
 			return;
 		}
 		currentLevel++;
@@ -171,10 +170,10 @@ public class UCCTreeElement {
 		}
 	}
 
-	public int addUniqueColumnCombinationsInto(UniqueColumnCombinationResultReceiver resultReceiver, OpenBitSet ucc, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<PositionListIndex> plis) throws CouldNotReceiveResultException, ColumnNameMismatchException {
+	public int addUniqueColumnCombinationsInto(UniqueColumnCombinationResultReceiver resultReceiver, BitSet ucc, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<PositionListIndex> plis) throws CouldNotReceiveResultException, ColumnNameMismatchException {
 		int numUCCs = 0;
 		if (this.isUCC) {
-			ColumnIdentifier[] columns = new ColumnIdentifier[(int) ucc.cardinality()];
+			ColumnIdentifier[] columns = new ColumnIdentifier[ucc.cardinality()];
 			int j = 0;
 			for (int i = ucc.nextSetBit(0); i >= 0; i = ucc.nextSetBit(i + 1)) {
 				int columnId = plis.get(i).getAttribute(); // Here we translate the column i back to the real column i before the sorting

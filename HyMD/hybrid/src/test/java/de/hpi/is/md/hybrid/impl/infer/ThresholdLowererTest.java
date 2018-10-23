@@ -25,7 +25,7 @@ public class ThresholdLowererTest {
 		int rhsAttr = 0;
 		double threshold = 0.1;
 		ThresholdLowerer task = new ThresholdLowerer(latticeMd);
-		when(latticeMd.wouldBeMinimal(new MDElementImpl(rhsAttr, threshold))).thenReturn(true);
+		when(Boolean.valueOf(latticeMd.wouldBeMinimal(new MDElementImpl(rhsAttr, threshold)))).thenReturn(Boolean.TRUE);
 		when(latticeMd.getLhs()).thenReturn(lhs);
 		task.lowerThreshold(rhsAttr, threshold);
 		verify(latticeMd).setRhs(rhsAttr, threshold);
@@ -36,7 +36,7 @@ public class ThresholdLowererTest {
 		int rhsAttr = 0;
 		double threshold = 0.1;
 		ThresholdLowerer task = new ThresholdLowerer(latticeMd);
-		when(latticeMd.wouldBeMinimal(new MDElementImpl(rhsAttr, threshold))).thenReturn(false);
+		when(Boolean.valueOf(latticeMd.wouldBeMinimal(new MDElementImpl(rhsAttr, threshold)))).thenReturn(Boolean.FALSE);
 		when(latticeMd.getLhs()).thenReturn(lhs);
 		task.lowerThreshold(rhsAttr, threshold);
 		verify(latticeMd).removeRhs(rhsAttr);
@@ -48,9 +48,9 @@ public class ThresholdLowererTest {
 		int rhsAttr = 0;
 		double threshold = 0.1;
 		ThresholdLowerer task = new ThresholdLowerer(latticeMd);
-		when(latticeMd.wouldBeMinimal(new MDElementImpl(rhsAttr, threshold))).thenReturn(true);
+		when(Boolean.valueOf(latticeMd.wouldBeMinimal(new MDElementImpl(rhsAttr, threshold)))).thenReturn(Boolean.TRUE);
 		when(latticeMd.getLhs()).thenReturn(lhs);
-		when(lhs.getOrDefault(0)).thenReturn(0.1);
+		when(Double.valueOf(lhs.getOrDefault(0))).thenReturn(Double.valueOf(0.1));
 		task.lowerThreshold(rhsAttr, threshold);
 		verify(latticeMd).removeRhs(rhsAttr);
 		verify(latticeMd, never()).setRhs(rhsAttr, threshold);

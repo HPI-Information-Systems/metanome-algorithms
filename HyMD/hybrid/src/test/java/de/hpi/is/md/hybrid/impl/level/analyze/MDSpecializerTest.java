@@ -38,7 +38,7 @@ public class MDSpecializerTest {
 		doReturn(OptionalDouble.of(1.0)).when(provider).getNext(2, 0.0);
 		doReturn(OptionalDouble.of(0.6)).when(provider).getNext(3, 0.0);
 		doReturn(OptionalDouble.empty()).when(provider).getNext(4, 0.0);
-		when(specializationFilter.filter(any(), any())).thenReturn(true);
+		when(Boolean.valueOf(specializationFilter.filter(any(), any()))).thenReturn(Boolean.TRUE);
 		int columnPairs = 5;
 		MDSite lhs = new MDSiteImpl(columnPairs)
 			.set(0, 0.7)

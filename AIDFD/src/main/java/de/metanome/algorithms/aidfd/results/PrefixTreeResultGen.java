@@ -51,15 +51,15 @@ public class PrefixTreeResultGen {
 
 		int[] invIndexes = new int[numberAttributes];
 		for (int i = 0; i < numberAttributes; ++i) {
-			invIndexes[indexes[i]] = i;
+			invIndexes[indexes[i].intValue()] = i;
 		}
 
 		final ArrayList<IBitSet> sortedNegCover = new ArrayList<IBitSet>();
 		invalid.stream().forEach(bitset -> {
 			IBitSet bitset2 = LongBitSet.FACTORY.create();
 			for (Integer i : indexes) {
-				if (bitset.get(indexes[i])) {
-					bitset2.set(i);
+				if (bitset.get(indexes[i.intValue()].intValue())) {
+					bitset2.set(i.intValue());
 				}
 			}
 			sortedNegCover.add(bitset2);
@@ -102,7 +102,7 @@ public class PrefixTreeResultGen {
 				IBitSet valid = LongBitSet.FACTORY.create();
 				for (int i = bitset.nextSetBit(0); i >= 0; i = bitset
 						.nextSetBit(i + 1)) {
-					valid.set(indexes[i]);
+					valid.set(indexes[i].intValue());
 				}
 				try {
 					resultReceiver.receiveResult(valid, finalTarget);
@@ -132,7 +132,7 @@ public class PrefixTreeResultGen {
 		TreeSearch tree = new TreeSearch();
 		// determined by all other, non-constant attributes
 		for (int single = 0; single < numberAttributes; ++single) {
-			if (single != target && !constantColumns.get(indexes[single])) {		
+			if (single != target && !constantColumns.get(indexes[single].intValue())) {		
 				IBitSet bs = LongBitSet.FACTORY.create();
 				bs.set(single);
 				tree.add(bs);
@@ -145,7 +145,7 @@ public class PrefixTreeResultGen {
 		Set<IBitSet> remove = getAndRemoveGeneralizations(tree, invalidFD);
 		for (IBitSet removed : remove) {
 			for (int i = 0; i < numberAttributes; ++i) {
-				if (i == target || invalidFD.get(i) || constantColumns.get(indexes[i]))
+				if (i == target || invalidFD.get(i) || constantColumns.get(indexes[i].intValue()))
 					continue;
 				IBitSet add = LongBitSet.FACTORY.create(removed);
 				add.set(i);

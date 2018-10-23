@@ -27,10 +27,10 @@ public final class HashSetInclusionTester implements InclusionTester {
         int[] activeTables = combinations.stream().mapToInt(SimpleColumnCombination::getTable).distinct().sorted().toArray();
         sets.clear();
         for (int table : activeTables) {
-            sets.put(table, new HashMap<>());
+            sets.put(Integer.valueOf(table), new HashMap<>());
         }
         for (SimpleColumnCombination combination : combinations) {
-            sets.get(combination.getTable()).put(combination, new HashSet<>());
+            sets.get(Integer.valueOf(combination.getTable())).put(combination, new HashSet<>());
         }
         return activeTables;
     }
@@ -44,7 +44,7 @@ public final class HashSetInclusionTester implements InclusionTester {
             for (int c : combination.getColumns()) {
                 long value = values[c];
                 anyNull |= value == HashedColumnStore.NULLHASH;
-                combinationValues.add(value);
+                combinationValues.add(Long.valueOf(value));
             }
             if (!anyNull) {
                 entry.getValue().add(combinationValues);
@@ -55,15 +55,15 @@ public final class HashSetInclusionTester implements InclusionTester {
 
     @Override
     public boolean isIncludedIn(SimpleColumnCombination a, SimpleColumnCombination b) {
-        HashSet<List<Long>> setA = sets.get(a.getTable()).get(a);
-        HashSet<List<Long>> setB = sets.get(b.getTable()).get(b);
+        HashSet<List<Long>> setA = sets.get(Integer.valueOf(a.getTable())).get(a);
+        HashSet<List<Long>> setB = sets.get(Integer.valueOf(b.getTable())).get(b);
         this.numChecks++;
         return setB.containsAll(setA);
     }
 
 	@Override
 	public void startInsertRow(int table) {
-		currentTable=sets.get(table);
+		currentTable=sets.get(Integer.valueOf(table));
 	}
 
     @Override

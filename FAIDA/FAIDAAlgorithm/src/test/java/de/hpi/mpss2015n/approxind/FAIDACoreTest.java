@@ -1,30 +1,33 @@
 package de.hpi.mpss2015n.approxind;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.Assert.assertThat;
+
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
 import de.hpi.mpss2015n.approxind.inclusiontester.HLLInclusionTester;
 import de.hpi.mpss2015n.approxind.mocks.RelationalInputBuilder;
 import de.hpi.mpss2015n.approxind.sampler.IdentityRowSampler;
 import de.hpi.mpss2015n.approxind.utils.Arity;
 import de.hpi.mpss2015n.approxind.utils.SimpleColumnCombination;
 import de.hpi.mpss2015n.approxind.utils.SimpleInd;
+import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.backend.result_receiver.ResultCache;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.assertThat;
 
 //@RunWith(Parameterized.class)
 public class FAIDACoreTest {
 
     private static final int TABLE = 0;
     FAIDACore algo;
-    private static String level;
 
     private InclusionTester t = new HLLInclusionTester(0.001);
     private int sampleGoal = 2;
@@ -50,12 +53,14 @@ public class FAIDACoreTest {
     public void testExecuteSingleLine() throws Exception {
         algo = new FAIDACore(Arity.UNARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
-        inputs[0] = new RelationalInputBuilder("testTable")
-                .setHeader("c0", "c1", "c2")
+        String[] header = {"c0", "c1", "c2"};
+        String tableName = "testTable";
+        inputs[0] = new RelationalInputBuilder(tableName)
+                .setHeader(header)
                 .addRow("b", "b", "3")
                 .build();
 
-        ResultCache resultCache = new ResultCache("FAIDA", Collections.emptyList());
+        ResultCache resultCache = this.buildResultCache(tableName, header);
         List<SimpleInd> inds = algo.execute(inputs, resultCache);
 
         assertThat(inds, containsInAnyOrder(
@@ -68,16 +73,19 @@ public class FAIDACoreTest {
     public void testExecute() throws Exception {
         algo = new FAIDACore(Arity.UNARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
-        inputs[0] = new RelationalInputBuilder("testTable")
-                .setHeader("c0", "c1", "c2")
+        String[] header = {"c0", "c1", "c2"};
+        String tableName = "testTable";
+        inputs[0] = new RelationalInputBuilder(tableName)
+                .setHeader(header)
                 .addRow("a", "b", "1")
                 .addRow("b", "b", "3")
                 .build();
 
-        ResultCache resultCache = new ResultCache("FAIDA", Collections.emptyList());
+        ResultCache resultCache = this.buildResultCache(tableName, header);
         List<SimpleInd> inds = algo.execute(inputs, resultCache);
 
-        assertThat(inds, contains(new SimpleInd(SimpleColumnCombination.create(0, 1),
+        assertThat(inds, contains(new SimpleInd(
+        		SimpleColumnCombination.create(0, 1),
                 SimpleColumnCombination.create(0, 0))));
     }
 
@@ -85,21 +93,22 @@ public class FAIDACoreTest {
     public void testExecuteBinary() throws Exception {
         algo = new FAIDACore(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
-        inputs[0] = new RelationalInputBuilder("testTable")
-                .setHeader("c0", "c1", "c2", "c3")
+        String[] header = {"c0", "c1", "c2", "c3"};
+        String tableName = "testTable";
+        inputs[0] = new RelationalInputBuilder(tableName)
+                .setHeader(header)
                 .addRow("a", "1", "b", "2")
                 .addRow("b", "2", "b", "2")
                 .addRow("c", "3", "a", "1")
                 .build();
 
-        ResultCache resultCache = new ResultCache("FAIDA", Collections.emptyList());
+        ResultCache resultCache = this.buildResultCache(tableName, header);
         List<SimpleInd> inds = algo.execute(inputs, resultCache);
 
         assertThat(inds, contains(
                 SimpleInd.left(TABLE, 2).right(TABLE, 0),
                 SimpleInd.left(TABLE, 3).right(TABLE, 1),
                 SimpleInd.left(TABLE, 2, 3).right(TABLE, 0, 1)
-
         ));
     }
 
@@ -107,30 +116,32 @@ public class FAIDACoreTest {
     public void testExecuteTrinary() throws Exception {
         algo = new FAIDACore(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
-        inputs[0] = new RelationalInputBuilder("testTable")
-                .setHeader("c0", "c1", "c2", "c3", "c4", "c5")
+        String[] header = {"c0", "c1", "c2", "c3", "c4", "c5"};
+        String tableName = "testTable";
+        inputs[0] = new RelationalInputBuilder(tableName)
+                .setHeader(header)
                 .addRow("a", "1", "x", "b", "2", "y")
                 .addRow("b", "2", "y", "b", "2", "y")
                 .addRow("c", "3", "y", "a", "1", "x")
                 .build();
 
-        ResultCache resultCache = new ResultCache("FAIDA", Collections.emptyList());
+        ResultCache resultCache = this.buildResultCache(tableName, header);
         List<SimpleInd> inds = algo.execute(inputs, resultCache);
 
         assertThat(inds, hasItem(new SimpleInd(
                 SimpleColumnCombination.create(TABLE, 3, 4, 5),
                 SimpleColumnCombination.create(TABLE, 0, 1, 2))
-
         ));
     }
-
-
+    
     @Test
     public void testExecuteWdcPlanets() throws Exception {
         algo = new FAIDACore(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
-        inputs[0] = new RelationalInputBuilder("planets")
-                .setHeader("Domicile", "Detriment", "Exaltation", "Fall")
+        String[] header = {"Domicile", "Detriment", "Exaltation", "Fall"};
+        String tableName = "planets";
+        inputs[0] = new RelationalInputBuilder(tableName)
+                .setHeader(header)
                 .addRow("Mars", "Venus", "Sun", "Saturn")
                 .addRow("Venus", "Pluto", "Moon", "Uranus")
                 .addRow("Mercury", "Jupiter", "N/A", "N/A")
@@ -145,8 +156,7 @@ public class FAIDACoreTest {
                 .addRow("Neptune", "Mercury", "Venus", "Pluto, Mercury")
                 .build();
 
-
-        ResultCache resultCache = new ResultCache("FAIDA", Collections.emptyList());
+        ResultCache resultCache = this.buildResultCache(tableName, header);
         List<SimpleInd> inds = algo.execute(inputs, resultCache);
 
         assertThat(inds, containsInAnyOrder(
@@ -174,7 +184,6 @@ public class FAIDACoreTest {
                 new SimpleInd(
                         SimpleColumnCombination.create(TABLE, 1, 2),
                         SimpleColumnCombination.create(TABLE, 0, 3))
-
         ));
     }
 
@@ -182,8 +191,10 @@ public class FAIDACoreTest {
     public void testExecuteWdcPlanets2Col() throws Exception {
         algo = new FAIDACore(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
-        inputs[0] = new RelationalInputBuilder("planets_2col")
-                .setHeader("Exaltation", "Fall")
+        String[] header = {"Exaltation", "Fall"};
+        String tableName = "planets_2col";
+        inputs[0] = new RelationalInputBuilder(tableName)
+                .setHeader(header)
                 .addRow("Sun", "Saturn")
                 .addRow("Moon", "Uranus")
                 .addRow("N/A", "N/A")
@@ -197,7 +208,7 @@ public class FAIDACoreTest {
                 .addRow("Mercury", "Neptune")
                 .addRow("Venus", "Pluto, Mercury").build();
 
-        ResultCache resultCache = new ResultCache("FAIDA", Collections.emptyList());
+        ResultCache resultCache = this.buildResultCache(tableName, header);
         List<SimpleInd> inds = algo.execute(inputs, resultCache);
 
         assertThat(inds, containsInAnyOrder(
@@ -210,21 +221,21 @@ public class FAIDACoreTest {
         ));
     }
 
-
     @Test
     public void testExecuteWdcPlanetsSmall() throws Exception {
         algo = new FAIDACore(Arity.N_ARY, new IdentityRowSampler(), t, sampleGoal);
         RelationalInputGenerator[] inputs = new RelationalInputGenerator[1];
-        inputs[0] = new RelationalInputBuilder("planets_4row")
-                .setHeader("Domicile", "Detriment", "Exaltation", "Fall")
+        String[] header = {"Domicile", "Detriment", "Exaltation", "Fall"};
+        String tableName = "planets_4row";
+        inputs[0] = new RelationalInputBuilder(tableName)
+                .setHeader(header)
                 .addRow("Mars", "Venus", "Sun", "Moon")
                 .addRow("Venus", "Mars", "Moon", "Sun")
                 .addRow("Jupiter", "Mercury", "Pluto", "N/A")
                 .addRow("Mercury", "Mercury", "N/A", "N/A")
                 .build();
 
-
-        ResultCache resultCache = new ResultCache("FAIDA", Collections.emptyList());
+        ResultCache resultCache = this.buildResultCache(tableName, header);
         List<SimpleInd> inds = algo.execute(inputs, resultCache);
 
         assertThat(inds, containsInAnyOrder(
@@ -240,5 +251,11 @@ public class FAIDACoreTest {
         ));
     }
 
+    protected ResultCache buildResultCache(String tableName, String[] header) throws FileNotFoundException {
+    	List<ColumnIdentifier> columnIdentifiers = Arrays.stream(header)
+        		.map(column -> new ColumnIdentifier(tableName, column))
+        		.collect(Collectors.toList());
+        return new ResultCache("FAIDA", columnIdentifiers);
+    }
 
 }

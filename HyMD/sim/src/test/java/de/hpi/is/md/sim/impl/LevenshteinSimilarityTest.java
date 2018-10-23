@@ -15,7 +15,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class LevenshteinSimilarityTest {
 
-	private static final double ERROR = 1e-10;
+	private static final Double ERROR = Double.valueOf(1e-10);
 
 	@Parameter
 	public LevenshteinSimilarity similarityMeasure;

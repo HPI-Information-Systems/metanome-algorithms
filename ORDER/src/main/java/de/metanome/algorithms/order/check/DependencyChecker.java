@@ -1,12 +1,12 @@
 package de.metanome.algorithms.order.check;
 
-import it.unimi.dsi.fastutil.longs.LongOpenHashBigSet;
+import java.util.BitSet;
 
-import org.apache.lucene.util.OpenBitSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.metanome.algorithms.order.sorting.partitions.SortedPartition;
+import it.unimi.dsi.fastutil.longs.LongOpenHashBigSet;
 
 public class DependencyChecker {
 
@@ -15,9 +15,11 @@ public class DependencyChecker {
   public static boolean checkOrderDependencyStrictlySmaller(final SortedPartition A,
       final SortedPartition B) {
 
-    final long overlapping =
-        OpenBitSet.andNotCount(A.getEquivalenceSetsBitRepresentation(),
-            B.getEquivalenceSetsBitRepresentation());
+    BitSet andNotSet = (BitSet) A.getEquivalenceSetsBitRepresentation().clone();
+    andNotSet.andNot(B.getEquivalenceSetsBitRepresentation());
+    final long overlapping = andNotSet.cardinality();
+	//final long overlapping = OpenBitSet.andNotCount(A.getEquivalenceSetsBitRepresentation(), B.getEquivalenceSetsBitRepresentation()); // old OpenBitSet-version (is that even correct?)
+    
     if (overlapping > 0) {
       logger.trace("Returned checkOrderDependency early (bitset optimization): {} ~/~> {}", A, B);
       return false;
@@ -71,9 +73,12 @@ public class DependencyChecker {
 
     final boolean[] result = new boolean[2];
     boolean merge = false;
-    final long overlapping =
-        OpenBitSet.andNotCount(A.getEquivalenceSetsBitRepresentation(),
-            B.getEquivalenceSetsBitRepresentation());
+    
+    BitSet andNotSet = (BitSet) A.getEquivalenceSetsBitRepresentation().clone();
+    andNotSet.andNot(B.getEquivalenceSetsBitRepresentation());
+    final long overlapping = andNotSet.cardinality();
+	//final long overlapping = BitSet.andNotCount(A.getEquivalenceSetsBitRepresentation(), B.getEquivalenceSetsBitRepresentation()); // old OpenBitSet-version (is that even correct?)
+    
     if (overlapping > 0) {
       logger.trace(
           "Returned checkOrderDependency early (bitset optimization detected a merge): {} ~/~> {}",

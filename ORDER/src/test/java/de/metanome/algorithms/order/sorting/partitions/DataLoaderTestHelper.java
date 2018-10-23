@@ -77,7 +77,7 @@ public class DataLoaderTestHelper {
     switch (this.types.get(column).getSpecificType()) {
       case DOUBLE:
         this.dataByColumns.get(column).add(
-            new RowIndexedDoubleValue(tupleId, Double.parseDouble(currentRow.get(column))));
+            new RowIndexedDoubleValue(tupleId, Double.valueOf(currentRow.get(column))));
         break;
       case DATE:
         this.dataByColumns.get(column).add(
@@ -86,7 +86,7 @@ public class DataLoaderTestHelper {
         break;
       case LONG:
         this.dataByColumns.get(column).add(
-            new RowIndexedLongValue(tupleId, Long.parseLong(currentRow.get(column))));
+            new RowIndexedLongValue(tupleId, Long.valueOf(currentRow.get(column))));
         break;
       case STRING:
         this.dataByColumns.get(column).add(

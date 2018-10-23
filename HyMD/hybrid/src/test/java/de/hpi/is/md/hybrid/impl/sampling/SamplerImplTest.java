@@ -43,10 +43,10 @@ public class SamplerImplTest {
 			.build();
 		when(leftRecords.iterator()).thenReturn(left.iterator());
 		Sampler sampler = createSampler();
-		doReturn(1.0).when(col1).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
-		doReturn(0.0).when(col1).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
-		doReturn(0.5).when(col2).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
-		doReturn(0.3).when(col2).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
+		doReturn(Double.valueOf(1.0)).when(col1).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
+		doReturn(Double.valueOf(0.0)).when(col1).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
+		doReturn(Double.valueOf(0.5)).when(col2).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
+		doReturn(Double.valueOf(0.3)).when(col2).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
 		Optional<Set<SimilaritySet>> similaritySets = sampler.sample();
 		Assert.assertThat(similaritySets, isPresentAnd(hasSize(2)));
 		Assert.assertThat(similaritySets,
@@ -59,8 +59,8 @@ public class SamplerImplTest {
 	public void testDuplicateRecommendations() {
 		when(leftRecords.iterator()).thenReturn(Collections.emptyIterator());
 		Sampler sampler = createSampler();
-		doReturn(1.0).when(col1).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
-		doReturn(0.5).when(col2).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
+		doReturn(Double.valueOf(1.0)).when(col1).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
+		doReturn(Double.valueOf(0.5)).when(col2).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
 		Collection<SimilaritySet> similaritySets = sampler
 			.processRecommendations(
 				Arrays.asList(new IntArrayPair(new int[]{0, 0}, new int[]{0, 0}),
@@ -76,10 +76,10 @@ public class SamplerImplTest {
 			.build();
 		when(leftRecords.iterator()).thenReturn(left.iterator());
 		Sampler sampler = createSampler();
-		doReturn(1.0).when(col1).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
-		doReturn(0.0).when(col1).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
-		doReturn(0.5).when(col2).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
-		doReturn(0.3).when(col2).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
+		doReturn(Double.valueOf(1.0)).when(col1).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
+		doReturn(Double.valueOf(0.0)).when(col1).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
+		doReturn(Double.valueOf(0.5)).when(col2).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
+		doReturn(Double.valueOf(0.3)).when(col2).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
 		sampler.sample();
 		Optional<Set<SimilaritySet>> similaritySets = sampler.sample();
 		assertThat(similaritySets).isEmpty();
@@ -92,10 +92,10 @@ public class SamplerImplTest {
 			.build();
 		when(leftRecords.iterator()).thenReturn(left.iterator());
 		Sampler sampler = createSampler();
-		doReturn(1.0).when(col1).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
-		doReturn(0.0).when(col1).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
-		doReturn(0.5).when(col2).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
-		doReturn(0.3).when(col2).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
+		doReturn(Double.valueOf(1.0)).when(col1).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
+		doReturn(Double.valueOf(0.0)).when(col1).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
+		doReturn(Double.valueOf(0.5)).when(col2).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
+		doReturn(Double.valueOf(0.3)).when(col2).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
 		sampler.sample();
 		Collection<SimilaritySet> similaritySets = sampler
 			.processRecommendations(
@@ -108,10 +108,10 @@ public class SamplerImplTest {
 	public void testWithRecommendations() {
 		when(leftRecords.iterator()).thenReturn(Collections.emptyIterator());
 		Sampler sampler = createSampler();
-		doReturn(1.0).when(col1).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
-		doReturn(0.0).when(col1).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
-		doReturn(0.5).when(col2).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
-		doReturn(0.3).when(col2).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
+		doReturn(Double.valueOf(1.0)).when(col1).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
+		doReturn(Double.valueOf(0.0)).when(col1).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
+		doReturn(Double.valueOf(0.5)).when(col2).getSimilarity(new int[]{0, 0}, new int[]{0, 0});
+		doReturn(Double.valueOf(0.3)).when(col2).getSimilarity(new int[]{0, 0}, new int[]{1, 1});
 		Collection<SimilaritySet> similaritySets = sampler
 			.processRecommendations(
 				Arrays.asList(new IntArrayPair(new int[]{0, 0}, new int[]{0, 0}),

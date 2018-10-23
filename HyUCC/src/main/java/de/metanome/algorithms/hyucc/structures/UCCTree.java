@@ -1,9 +1,8 @@
 package de.metanome.algorithms.hyucc.structures;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
@@ -46,7 +45,7 @@ public class UCCTree extends UCCTreeElement {
 			this.children[attr] = new UCCTreeElement(this.numAttributes, true);
 	}
 
-	public UCCTreeElement addUniqueColumnCombination(OpenBitSet ucc) {
+	public UCCTreeElement addUniqueColumnCombination(BitSet ucc) {
 		UCCTreeElement currentNode = this;
 
 		int uccLength = 0;
@@ -69,7 +68,7 @@ public class UCCTree extends UCCTreeElement {
 		return currentNode;
 	}
 
-	public UCCTreeElement addUniqueColumnCombinationGetIfNew(OpenBitSet ucc) {
+	public UCCTreeElement addUniqueColumnCombinationGetIfNew(BitSet ucc) {
 		UCCTreeElement currentNode = this;
 
 		boolean isNew = false;
@@ -98,35 +97,35 @@ public class UCCTree extends UCCTreeElement {
 	}
 
 	public int addUniqueColumnCombinationsInto(UniqueColumnCombinationResultReceiver resultReceiver, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<PositionListIndex> plis) throws CouldNotReceiveResultException, ColumnNameMismatchException {
-		return this.addUniqueColumnCombinationsInto(resultReceiver, new OpenBitSet(), columnIdentifiers, plis);
+		return this.addUniqueColumnCombinationsInto(resultReceiver, new BitSet(), columnIdentifiers, plis);
 	}
 
-	public void removeUniqueColumnCombination(OpenBitSet ucc) {
+	public void removeUniqueColumnCombination(BitSet ucc) {
 		int currentUCCAttr = ucc.nextSetBit(0);
 		this.removeRecursive(ucc, currentUCCAttr);
 	}
 
-	public List<OpenBitSet> getUCCAndGeneralizations(OpenBitSet ucc) {
-		List<OpenBitSet> foundUCCs = new ArrayList<>();
-		OpenBitSet currentUCC = new OpenBitSet();
+	public List<BitSet> getUCCAndGeneralizations(BitSet ucc) {
+		List<BitSet> foundUCCs = new ArrayList<>();
+		BitSet currentUCC = new BitSet();
 		int nextUCCAttr = ucc.nextSetBit(0);
 		this.getUCCAndGeneralizations(ucc, nextUCCAttr, currentUCC, foundUCCs);
 		return foundUCCs;
 	}
 
-	public boolean containsUCCOrGeneralization(OpenBitSet ucc) {
+	public boolean containsUCCOrGeneralization(BitSet ucc) {
 		int nextUCCAttr = ucc.nextSetBit(0);
 		return this.containsUCCOrGeneralization(ucc, nextUCCAttr);
 	}
 	
-	public boolean containsUCCOrSpecialization(OpenBitSet ucc) {
+	public boolean containsUCCOrSpecialization(BitSet ucc) {
 		int nextUCCAttr = ucc.nextSetBit(0);
 		return this.containsUCCOrSpecialization(ucc, nextUCCAttr);
 	}
 
 	public List<UCCTreeElementUCCPair> getLevel(int level) {
 		List<UCCTreeElementUCCPair> result = new ArrayList<>();
-		OpenBitSet currentUCC = new OpenBitSet();
+		BitSet currentUCC = new BitSet();
 		int currentLevel = 0;
 		this.getLevel(level, currentLevel, currentUCC, result);
 		return result;

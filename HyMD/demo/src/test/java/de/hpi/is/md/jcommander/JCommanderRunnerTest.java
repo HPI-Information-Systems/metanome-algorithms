@@ -43,7 +43,6 @@ public class JCommanderRunnerTest {
 		assertThat(app.ran).isFalse();
 	}
 
-	@SuppressWarnings({"FieldMayBeFinal", "unused"})
 	private static class TestApplication implements Application {
 
 		@Parameter(names = "--help", help = true)

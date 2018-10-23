@@ -34,7 +34,7 @@ public class HyFDTest extends FDAlgorithmTest {
 	protected void executeAndVerifyWithFixture(AbstractAlgorithmTestFixture fixture) throws AlgorithmExecutionException {
 		HyFD hyFD = (HyFD) this.algo;
 		hyFD.setRelationalInputConfigurationValue(HyFD.Identifier.INPUT_GENERATOR.name(), fixture.getInputGenerator());
-		hyFD.setBooleanConfigurationValue(HyFD.Identifier.NULL_EQUALS_NULL.name(), this.nullEqualsNull );
+		hyFD.setBooleanConfigurationValue(HyFD.Identifier.NULL_EQUALS_NULL.name(), Boolean.valueOf(this.nullEqualsNull));
 		hyFD.setResultReceiver(fixture.getFunctionalDependencyResultReceiver());
         
 		// Execute algorithm
@@ -47,7 +47,7 @@ public class HyFDTest extends FDAlgorithmTest {
 	protected void executeAndVerifyWithFixture(AbaloneFixture fixture) throws AlgorithmExecutionException, UnsupportedEncodingException, FileNotFoundException {
 		HyFD hyFD = (HyFD) this.algo;
 		hyFD.setRelationalInputConfigurationValue(HyFD.Identifier.INPUT_GENERATOR.name(), fixture.getInputGenerator());
-		hyFD.setBooleanConfigurationValue(HyFD.Identifier.NULL_EQUALS_NULL.name(), this.nullEqualsNull );
+		hyFD.setBooleanConfigurationValue(HyFD.Identifier.NULL_EQUALS_NULL.name(), Boolean.valueOf(this.nullEqualsNull));
 		hyFD.setResultReceiver(fixture.getFdResultReceiver());
 		
 		// Execute functionality
@@ -60,7 +60,7 @@ public class HyFDTest extends FDAlgorithmTest {
 	protected void executeAndVerifyWithFixture(BridgesFixture fixture) throws AlgorithmExecutionException, UnsupportedEncodingException, FileNotFoundException {
 		HyFD hyFD = (HyFD) this.algo;
 		hyFD.setRelationalInputConfigurationValue(HyFD.Identifier.INPUT_GENERATOR.name(), fixture.getInputGenerator());
-		hyFD.setBooleanConfigurationValue(HyFD.Identifier.NULL_EQUALS_NULL.name(), this.nullEqualsNull );
+		hyFD.setBooleanConfigurationValue(HyFD.Identifier.NULL_EQUALS_NULL.name(), Boolean.valueOf(this.nullEqualsNull));
 		hyFD.setResultReceiver(fixture.getFdResultReceiver());
 		
 		// Execute functionality
@@ -73,7 +73,7 @@ public class HyFDTest extends FDAlgorithmTest {
 	protected void executeAndVerifyWithFixture(AlgorithmTestFixture fixture) throws AlgorithmExecutionException {
 		HyFD hyFD = (HyFD) this.algo;
 		hyFD.setRelationalInputConfigurationValue(HyFD.Identifier.INPUT_GENERATOR.name(), fixture.getInputGenerator());
-		hyFD.setBooleanConfigurationValue(HyFD.Identifier.NULL_EQUALS_NULL.name(), this.nullEqualsNull );
+		hyFD.setBooleanConfigurationValue(HyFD.Identifier.NULL_EQUALS_NULL.name(), Boolean.valueOf(this.nullEqualsNull));
 		hyFD.setResultReceiver(fixture.getFunctionalDependencyResultReceiver());
 		
 		// Execute functionality

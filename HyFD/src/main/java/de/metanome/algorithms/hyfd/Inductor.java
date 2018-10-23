@@ -1,8 +1,7 @@
 package de.metanome.algorithms.hyfd;
 
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithms.hyfd.structures.FDList;
 import de.metanome.algorithms.hyfd.structures.FDSet;
@@ -40,10 +39,10 @@ public class Inductor {
 			if (i >= nonFds.getFdLevels().size()) // If this level has been trimmed during iteration
 				continue;
 			
-			List<OpenBitSet> nonFdLevel = nonFds.getFdLevels().get(i);
-			for (OpenBitSet lhs : nonFdLevel) {
+			List<BitSet> nonFdLevel = nonFds.getFdLevels().get(i);
+			for (BitSet lhs : nonFdLevel) {
 				
-				OpenBitSet fullRhs = lhs.clone();
+				BitSet fullRhs = (BitSet) lhs.clone();
 				fullRhs.flip(0, this.posCover.getNumAttributes());
 				
 				for (int rhs = fullRhs.nextSetBit(0); rhs >= 0; rhs = fullRhs.nextSetBit(rhs + 1))
@@ -53,13 +52,13 @@ public class Inductor {
 		}
 	}
 	
-	protected int specializePositiveCover(OpenBitSet lhs, int rhs, FDList nonFds) {
+	protected int specializePositiveCover(BitSet lhs, int rhs, FDList nonFds) {
 		int numAttributes = this.posCover.getChildren().length;
 		int newFDs = 0;
-		List<OpenBitSet> specLhss;
+		List<BitSet> specLhss;
 		
 		if (!(specLhss = this.posCover.getFdAndGeneralizations(lhs, rhs)).isEmpty()) { // TODO: May be "while" instead of "if"?
-			for (OpenBitSet specLhs : specLhss) {
+			for (BitSet specLhs : specLhss) {
 				this.posCover.removeFunctionalDependency(specLhs, rhs);
 				
 				if ((this.posCover.getMaxDepth() > 0) && (specLhs.cardinality() >= this.posCover.getMaxDepth()))

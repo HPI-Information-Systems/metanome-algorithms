@@ -1,5 +1,10 @@
 package de.metanome.algorithms.dfd;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.ColumnCombination;
@@ -12,17 +17,10 @@ import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import fdiscovery.approach.runner.DFDMiner;
 import fdiscovery.columns.ColumnCollection;
 import fdiscovery.general.FunctionalDependencies;
 import fdiscovery.preprocessing.SVFileProcessor;
-import groovy.util.ObjectGraphBuilder.RelationNameResolver;
 
 public class DFDMetanome implements FunctionalDependencyAlgorithm,
                                     FileInputParameterAlgorithm {
@@ -79,12 +77,12 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
       List<String> columnNames = input.columnNames();
       
       for (ColumnCollection determining : fds.keySet()) {
-        for (Integer dependentColumn : fds.get(determining).getSetBits()) {
+        for (int dependentColumn : fds.get(determining).getSetBits()) {
           ColumnIdentifier[]
               determiningColumns =
               new ColumnIdentifier[determining.getSetBits().length];
           int i = 0;
-          for (Integer determiningColumn : determining.getSetBits()) {
+          for (int determiningColumn : determining.getSetBits()) {
             determiningColumns[i] =
                 new ColumnIdentifier(relationName, columnNames.get(determiningColumn));
             i++;

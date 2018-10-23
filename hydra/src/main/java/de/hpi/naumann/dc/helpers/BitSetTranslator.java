@@ -18,7 +18,7 @@ public class BitSetTranslator {
 		IBitSet valid = LongBitSet.FACTORY.create();
 		// TODO: check trivial
 		for (int i = bitset.nextSetBit(0); i >= 0; i = bitset.nextSetBit(i + 1)) {
-			valid.set(indexes[i]);
+			valid.set(indexes[i].intValue());
 		}
 		return valid;
 	}

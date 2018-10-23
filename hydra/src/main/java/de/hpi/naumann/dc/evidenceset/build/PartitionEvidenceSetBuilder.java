@@ -20,7 +20,7 @@ public class PartitionEvidenceSetBuilder extends EvidenceSetBuilder {
 	private Collection<ColumnPair> pairs;
 	private int[][] input2s;
 
-	public PartitionEvidenceSetBuilder(PredicateBuilder predicates2, Input input, int[][] values) {
+	public PartitionEvidenceSetBuilder(PredicateBuilder predicates2, int[][] values) {
 		super(predicates2);
 		pairs = predicates.getColumnPairs();
 		createSets(pairs);

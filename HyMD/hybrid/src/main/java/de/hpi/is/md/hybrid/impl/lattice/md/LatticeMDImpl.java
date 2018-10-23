@@ -44,7 +44,8 @@ class LatticeMDImpl implements LatticeMD {
 		int rhsAttr = element.getId();
 		MDSiteContext context = getRhsContext();
 		return context.with(new int[]{rhsAttr})
-			.disableAndDo(() -> isMinimal(element));
+			.disableAndDo(() -> Boolean.valueOf(isMinimal(element)))
+			.booleanValue();
 	}
 
 	@Override

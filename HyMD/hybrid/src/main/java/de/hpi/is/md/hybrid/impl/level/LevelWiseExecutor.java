@@ -49,16 +49,16 @@ public class LevelWiseExecutor {
 	}
 
 	private void logStatistics() {
-		MetricsUtils.registerGauge("mds", statistics.getFound());
+		MetricsUtils.registerGauge("mds", Integer.valueOf(statistics.getFound()));
 		log.info("Found {} MDs. Validated {} MDs in {} validations. {} not supported",
-			statistics.getFound(), statistics.getValidated(), statistics.getGroupedValidations(),
-			statistics.getNotSupported());
+			Integer.valueOf(statistics.getFound()), Integer.valueOf(statistics.getValidated()), Integer.valueOf(statistics.getGroupedValidations()),
+			Integer.valueOf(statistics.getNotSupported()));
 	}
 
 	private void updateStatistics(Statistics newStatistics) {
 		log.debug("Found {} MDs, deduced {} MDs. Validated {} MDs. {} invalid, {} not supported",
-			newStatistics.getFound(), newStatistics.getNewDeduced(), newStatistics.getValidated(),
-			newStatistics.getInvalid(), newStatistics.getNotSupported());
+			Integer.valueOf(newStatistics.getFound()), Integer.valueOf(newStatistics.getNewDeduced()), Integer.valueOf(newStatistics.getValidated()),
+			Integer.valueOf(newStatistics.getInvalid()), Integer.valueOf(newStatistics.getNotSupported()));
 		statistics.add(newStatistics);
 	}
 

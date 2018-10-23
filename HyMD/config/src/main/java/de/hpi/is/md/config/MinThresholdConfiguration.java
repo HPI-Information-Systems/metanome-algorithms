@@ -23,7 +23,7 @@ class MinThresholdConfiguration {
 	private double defaultMinThreshold = 0.7;
 
 	<T> double getMinThreshold(ColumnPair<T> pair) {
-		return fixed.getOrDefault(pair, defaultMinThreshold);
+		return fixed.getOrDefault(pair, Double.valueOf(defaultMinThreshold)).doubleValue();
 	}
 
 	private static class Converter extends

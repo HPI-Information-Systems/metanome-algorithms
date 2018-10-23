@@ -36,14 +36,13 @@ final class AddIfMinimalContext extends MDContext {
 	private Optional<LhsRhsPair> addIfMinimal(MDElement next) {
 		int id = next.getId();
 		int nextLhsAttr = id + 1;
-		boolean childContains = childContains(nextLhsAttr);
+		boolean childContains = childContains(nextLhsAttr).booleanValue();
 		if (childContains) {
 			return Optional.empty();
-		} else {
-			ThresholdNode child = children.getOrCreate(id);
-			double threshold = next.getThreshold();
-			return child.addIfMinimal(md, nextLhsAttr, threshold);
 		}
+		ThresholdNode child = children.getOrCreate(id);
+		double threshold = next.getThreshold();
+		return child.addIfMinimal(md, nextLhsAttr, threshold);
 	}
 
 	private Optional<LhsRhsPair> addToThis() {
@@ -68,7 +67,7 @@ final class AddIfMinimalContext extends MDContext {
 	private Boolean childContains(int nextLhsAttr) {
 		return getNext(nextLhsAttr)
 			.map(this::containsMdOrGeneralization)
-			.orElse(false);
+			.orElse(Boolean.FALSE);
 	}
 
 	private boolean containsMdOrGeneralization(MDElement next) {
@@ -76,8 +75,9 @@ final class AddIfMinimalContext extends MDContext {
 		int nextLhsAttrId = id + 1;
 		double threshold = next.getThreshold();
 		boolean childContains = children.get(id)
-			.map(child -> child.containsMdOrGeneralization(md, nextLhsAttrId, threshold))
-			.orElse(false);
+			.map(child -> Boolean.valueOf(child.containsMdOrGeneralization(md, nextLhsAttrId, threshold)))
+			.orElse(Boolean.FALSE)
+			.booleanValue();
 		return childContains || containsMdOrGeneralization(nextLhsAttrId);
 	}
 
@@ -85,7 +85,7 @@ final class AddIfMinimalContext extends MDContext {
 		if (isMd()) {
 			return true;
 		}
-		return childContains(currentLhsAttr);
+		return childContains(currentLhsAttr).booleanValue();
 	}
 
 	private OptionalDouble getThreshold() {
@@ -95,8 +95,9 @@ final class AddIfMinimalContext extends MDContext {
 
 	private double getUpdatedThreshold(int rhsAttr, double threshold) {
 		return rhs.get(rhsAttr)
-			.map(t -> Math.min(t, threshold))
-			.orElse(threshold);
+			.map(t -> Double.valueOf(Math.min(t, threshold)))
+			.orElse(Double.valueOf(threshold))
+			.doubleValue();
 	}
 
 	private boolean isAbove(double threshold) {
@@ -106,7 +107,8 @@ final class AddIfMinimalContext extends MDContext {
 	private boolean isMd() {
 		return getThreshold()
 			.map(this::isAbove)
-			.orElse(false);
+			.orElse(Boolean.FALSE)
+			.booleanValue();
 	}
 
 	private LhsRhsPair toPair(MDSite lhs) {

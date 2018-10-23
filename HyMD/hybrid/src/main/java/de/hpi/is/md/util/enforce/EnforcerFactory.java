@@ -1,6 +1,12 @@
 package de.hpi.is.md.util.enforce;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import com.google.common.collect.Iterables;
+
 import de.hpi.is.md.ColumnMapping;
 import de.hpi.is.md.MatchingDependency.ColumnMatchWithThreshold;
 import de.hpi.is.md.hybrid.DictionaryRecords;
@@ -8,12 +14,7 @@ import de.hpi.is.md.hybrid.PreprocessedColumnPair;
 import de.hpi.is.md.hybrid.impl.ColumnPairWithThreshold;
 import de.hpi.is.md.hybrid.impl.LhsSelector;
 import de.hpi.is.md.hybrid.impl.RecordGrouper;
-import de.hpi.is.md.hybrid.impl.RecordGrouperImpl;
 import de.hpi.is.md.util.StreamUtils;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import lombok.Builder;
 import lombok.NonNull;
 

@@ -1,11 +1,12 @@
 package de.hpi.is.md.util.enforce;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import de.hpi.is.md.hybrid.PositionListIndex;
 import de.hpi.is.md.hybrid.PositionListIndex.Cluster;
 import de.hpi.is.md.hybrid.PreprocessedColumnPair;
 import it.unimi.dsi.fastutil.ints.IntCollection;
-import java.util.ArrayList;
-import java.util.Collection;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

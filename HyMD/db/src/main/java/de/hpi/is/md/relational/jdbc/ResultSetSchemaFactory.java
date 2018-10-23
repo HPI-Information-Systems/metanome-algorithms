@@ -62,7 +62,7 @@ final class ResultSetSchemaFactory {
 			Optional<Class<?>> columnClass = JdbcUtils.getColumnClass(metaData, id);
 			if (!columnClass.isPresent()) {
 				String className = metaData.getColumnClassName(id);
-				log.warn("Class of column {} not found: {}", id, className);
+				log.warn("Class of column {} not found: {}", Integer.valueOf(id), className);
 			}
 			return columnClass;
 		}

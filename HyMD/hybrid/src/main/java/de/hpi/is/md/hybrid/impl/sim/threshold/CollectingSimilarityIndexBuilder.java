@@ -17,7 +17,6 @@ import lombok.NonNull;
 @Builder
 public class CollectingSimilarityIndexBuilder extends AbstractSimilarityIndexBuilder {
 
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	@NonNull
 	private SimilarityTableBuilder.Factory tableBuilderFactory = SimilarityTableBuilderImpl

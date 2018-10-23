@@ -65,13 +65,13 @@ public class Column {
 	}
 
 	public Long getLong(int line) {
-		Long l = new Long(Long.parseLong(values.get(line)));
-		return l == null ? Long.MIN_VALUE : l;
+		Long l = Long.valueOf(values.get(line));
+		return l == null ? Long.valueOf(Long.MIN_VALUE) : l;
 	}
 
 	public Double getDouble(int line) {
-		Double d = new Double(Double.parseDouble(values.get(line)));
-		return d == null ? Double.NaN : d;
+		Double d = Double.valueOf(values.get(line));
+		return d == null ? Double.valueOf(Double.NaN) : d;
 	}
 
 	public String getString(int line) {

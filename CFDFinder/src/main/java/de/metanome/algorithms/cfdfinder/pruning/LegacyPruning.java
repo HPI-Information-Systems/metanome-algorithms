@@ -77,7 +77,7 @@ public class LegacyPruning implements PruningStrategy {
             PatternEntry entry = c.getPatternEntries()[i];
             if (entry instanceof ConstantPatternEntry) {
                 HashMap<Integer, PatternEntry> copy = new HashMap<>(c.getAttributes());
-                copy.put(id, new VariablePatternEntry());
+                copy.put(Integer.valueOf(id), new VariablePatternEntry());
                 results.add(new Pattern(copy));
             }
         }

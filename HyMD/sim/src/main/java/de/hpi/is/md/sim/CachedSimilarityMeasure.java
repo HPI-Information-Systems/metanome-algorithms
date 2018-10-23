@@ -17,7 +17,6 @@ public class CachedSimilarityMeasure<T> implements SimilarityMeasure<T> {
 	private static final long serialVersionUID = 349046266421508632L;
 	@NonNull
 	private final SimilarityMeasure<T> similarityMeasure;
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	private int maximumSize = 100_000;
 	private transient LoadingCache<UnorderedPair<T>, Double> cache;
@@ -30,7 +29,7 @@ public class CachedSimilarityMeasure<T> implements SimilarityMeasure<T> {
 	@Override
 	public double calculateSimilarity(UnorderedPair<T> pair) {
 		LoadingCache<UnorderedPair<T>, Double> cache = getCache();
-		return cache.getUnchecked(pair);
+		return cache.getUnchecked(pair).doubleValue();
 	}
 
 	@Override

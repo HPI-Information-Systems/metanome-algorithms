@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
-@SuppressWarnings("UseOfSystemOutOrSystemErr")
 @RequiredArgsConstructor
 class ResultProcessor {
 
@@ -26,11 +25,11 @@ class ResultProcessor {
 
 	private static void print(MatchingDependencyResult result) {
 		Collection<Object> values = new ArrayList<>();
-		values.add(result.getSupport());
+		values.add(Long.valueOf(result.getSupport()));
 		MatchingDependency md = result.getDependency();
 		ColumnMatchWithThreshold<?> rhs = md.getRhs();
 		values.add(rhs.getMatch());
-		values.add(rhs.getThreshold());
+		values.add(Double.valueOf(rhs.getThreshold()));
 		values.addAll(md.getLhs());
 		System.out.println(StringUtils.join("\t", values));
 	}

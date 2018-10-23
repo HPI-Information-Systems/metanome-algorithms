@@ -18,16 +18,16 @@ public class SimilarityMeasureTest {
 
 	@Test
 	public void testWithPair() {
-		doReturn(0.5).when(similarityMeasure).calculateSimilarity(1, 2);
-		doCallRealMethod().when(similarityMeasure).calculateSimilarity(UnorderedPair.of(1, 2));
-		assertThat(similarityMeasure.calculateSimilarity(UnorderedPair.of(1, 2))).isEqualTo(0.5);
+		doReturn(Double.valueOf(0.5)).when(similarityMeasure).calculateSimilarity(Integer.valueOf(1), Integer.valueOf(2));
+		doCallRealMethod().when(similarityMeasure).calculateSimilarity(UnorderedPair.of(Integer.valueOf(1), Integer.valueOf(2)));
+		assertThat(similarityMeasure.calculateSimilarity(UnorderedPair.of(Integer.valueOf(1), Integer.valueOf(2)))).isEqualTo(0.5);
 	}
 
 	@Test
 	public void testWithPairOfSame() {
-		doReturn(0.5).when(similarityMeasure).calculateSimilarity(1, 1);
-		doCallRealMethod().when(similarityMeasure).calculateSimilarity(UnorderedPair.of(1, 1));
-		assertThat(similarityMeasure.calculateSimilarity(UnorderedPair.of(1, 1))).isEqualTo(0.5);
+		doReturn(Double.valueOf(0.5)).when(similarityMeasure).calculateSimilarity(Integer.valueOf(1), Integer.valueOf(1));
+		doCallRealMethod().when(similarityMeasure).calculateSimilarity(UnorderedPair.of(Integer.valueOf(1), Integer.valueOf(1)));
+		assertThat(similarityMeasure.calculateSimilarity(UnorderedPair.of(Integer.valueOf(1), Integer.valueOf(1)))).isEqualTo(0.5);
 	}
 
 }

@@ -23,7 +23,6 @@ public class MatchingDependency {
 
 		@NonNull
 		private final ColumnMapping<T> match;
-		@NonNull
 		private final double threshold;
 
 		@Override

@@ -1,9 +1,9 @@
 package de.metanome.algorithms.cfdfinder.expansion;
 
-import de.metanome.algorithms.cfdfinder.pattern.Pattern;
-import org.apache.lucene.util.OpenBitSet;
-
+import java.util.BitSet;
 import java.util.List;
+
+import de.metanome.algorithms.cfdfinder.pattern.Pattern;
 
 public abstract class ExpansionStrategy {
 
@@ -13,6 +13,6 @@ public abstract class ExpansionStrategy {
         this.values = values;
     }
 
-    public abstract Pattern generateNullPattern(OpenBitSet attributes);
+    public abstract Pattern generateNullPattern(BitSet attributes);
     public abstract List<Pattern> getChildPatterns(Pattern currentPattern);
 }

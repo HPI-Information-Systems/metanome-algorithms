@@ -1,27 +1,26 @@
 package de.metanome.algorithms.hyucc.structures;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 public class UCCSet {
 
-	private List<ObjectOpenHashSet<OpenBitSet>> uccLevels;
+	private List<ObjectOpenHashSet<BitSet>> uccLevels;
 	
 	private int depth = 0;
 	private int maxDepth;
 	
 	public UCCSet(int numAttributes, int maxDepth) {
 		this.maxDepth = maxDepth;
-		this.uccLevels = new ArrayList<ObjectOpenHashSet<OpenBitSet>>(numAttributes);
+		this.uccLevels = new ArrayList<ObjectOpenHashSet<BitSet>>(numAttributes);
 		for (int i = 0; i <= numAttributes; i++)
-			this.uccLevels.add(new ObjectOpenHashSet<OpenBitSet>());
+			this.uccLevels.add(new ObjectOpenHashSet<BitSet>());
 	}
 	
-	public List<ObjectOpenHashSet<OpenBitSet>> getUccLevels() {
+	public List<ObjectOpenHashSet<BitSet>> getUccLevels() {
 		return this.uccLevels;
 	}
 
@@ -33,8 +32,8 @@ public class UCCSet {
 		return this.maxDepth;
 	}
 
-	public boolean add(OpenBitSet ucc) {
-		int length = (int) ucc.cardinality();
+	public boolean add(BitSet ucc) {
+		int length = ucc.cardinality();
 		
 		if ((this.maxDepth > 0) && (length > this.maxDepth))
 			return false;
@@ -43,8 +42,8 @@ public class UCCSet {
 		return this.uccLevels.get(length).add(ucc);
 	}
 	
-	public boolean contains(OpenBitSet ucc) {
-		int length = (int) ucc.cardinality();
+	public boolean contains(BitSet ucc) {
+		int length = ucc.cardinality();
 		
 		if ((this.maxDepth > 0) && (length > this.maxDepth))
 			return false;
@@ -62,14 +61,14 @@ public class UCCSet {
 
 	public void clear() {
 		int numLevels = this.uccLevels.size();
-		this.uccLevels = new ArrayList<ObjectOpenHashSet<OpenBitSet>>(numLevels);
+		this.uccLevels = new ArrayList<ObjectOpenHashSet<BitSet>>(numLevels);
 		for (int i = 0; i <= numLevels; i++)
-			this.uccLevels.add(new ObjectOpenHashSet<OpenBitSet>());
+			this.uccLevels.add(new ObjectOpenHashSet<BitSet>());
 	}
 
 	public int size() {
 		int size = 0;
-		for (ObjectOpenHashSet<OpenBitSet> uccs : this.uccLevels)
+		for (ObjectOpenHashSet<BitSet> uccs : this.uccLevels)
 			size += uccs.size();
 		return size;
 	}

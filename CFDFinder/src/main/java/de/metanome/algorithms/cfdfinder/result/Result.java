@@ -1,12 +1,24 @@
 package de.metanome.algorithms.cfdfinder.result;
 
-import com.google.common.base.Joiner;
-import de.metanome.algorithms.cfdfinder.pattern.*;
-import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import com.google.common.base.Joiner;
+
+import de.metanome.algorithms.cfdfinder.pattern.ConstantPatternEntry;
+import de.metanome.algorithms.cfdfinder.pattern.NegativeConstantPatternEntry;
+import de.metanome.algorithms.cfdfinder.pattern.Pattern;
+import de.metanome.algorithms.cfdfinder.pattern.PatternEntry;
+import de.metanome.algorithms.cfdfinder.pattern.PatternTableau;
+import de.metanome.algorithms.cfdfinder.pattern.RangePatternEntry;
+import de.metanome.algorithms.cfdfinder.pattern.VariablePatternEntry;
+import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
 
 public class Result {
 
@@ -65,7 +77,7 @@ public class Result {
             Collections.sort(entries, new Comparator<Map.Entry<Integer, PatternEntry>>() {
                 @Override
                 public int compare(Map.Entry<Integer, PatternEntry> o1, Map.Entry<Integer, PatternEntry> o2) {
-                    return o1.getKey() - o2.getKey();
+                    return o1.getKey().intValue() - o2.getKey().intValue();
                 }
             });
             List<String> values = new LinkedList<>();
@@ -74,14 +86,14 @@ public class Result {
                 if (pe instanceof VariablePatternEntry) {
                     values.add(pe.toString());
                 } else if (pe instanceof RangePatternEntry) {
-                    String lowerBound = clusterMaps.get(entry.getKey()).get(((RangePatternEntry) pe).getLowerBound());
-                    String upperBound = clusterMaps.get(entry.getKey()).get(((RangePatternEntry) pe).getUpperBound());
+                    String lowerBound = clusterMaps.get(entry.getKey().intValue()).get(Integer.valueOf(((RangePatternEntry) pe).getLowerBound()));
+                    String upperBound = clusterMaps.get(entry.getKey().intValue()).get(Integer.valueOf(((RangePatternEntry) pe).getUpperBound()));
                     if (lowerBound == null) {lowerBound = NULL_REPRESENTATION;}
                     if (upperBound == null) {upperBound = NULL_REPRESENTATION;}
                     values.add("[" + lowerBound + " - " + upperBound + "]");
                 } else {
                     int value = ((ConstantPatternEntry) pe).getConstant();
-                    String s = clusterMaps.get(entry.getKey()).get(value);
+                    String s = clusterMaps.get(entry.getKey().intValue()).get(Integer.valueOf(value));
                     if (s == null) {
                         s = NULL_REPRESENTATION;
                     }

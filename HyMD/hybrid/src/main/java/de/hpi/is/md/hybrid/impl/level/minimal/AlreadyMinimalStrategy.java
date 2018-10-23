@@ -32,7 +32,7 @@ public final class AlreadyMinimalStrategy implements LevelStrategy {
 
 	@Override
 	public Collection<Candidate> getCurrentLevel() {
-		log.debug("Retrieved level {}", currentLevel);
+		log.debug("Retrieved level {}", Integer.valueOf(currentLevel));
 		Collection<LatticeMD> mds = fullLattice.getLevel(currentLevel);
 		Collection<Candidate> candidates = candidateBuilder.toCandidates(mds);
 		currentLevel++;

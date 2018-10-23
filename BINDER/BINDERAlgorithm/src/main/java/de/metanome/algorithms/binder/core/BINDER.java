@@ -18,11 +18,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Set;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
@@ -99,7 +96,7 @@ public class BINDER {
 	private String valueSeparator = "#";
 	private int numNaryINDs = 0;
 	
-	private OpenBitSet nullValueColumns;
+	private BitSet nullValueColumns;
 	
 	private long unaryStatisticTime = -1;
 	private long unaryLoadTime = -1;
@@ -174,7 +171,7 @@ public class BINDER {
 			"outputTime: " + this.outputTime;
 	}
 	
-	private String toString(OpenBitSet o) {
+	private String toString(BitSet o) {
 		StringBuilder builder = new StringBuilder("[");
 		for (int i = 0; i < o.length(); i++)
 			builder.append((o.get(i) == true) ? 1 : 0);
@@ -296,7 +293,7 @@ public class BINDER {
 		for (int bucketNumber = 0; bucketNumber < this.numBucketsPerColumn; bucketNumber++)
 			this.refinements[bucketNumber] = 0;
 		
-		this.nullValueColumns = new OpenBitSet(this.columnNames.size());
+		this.nullValueColumns = new BitSet(this.columnNames.size());
 		
 		this.pruningStatistics = new PruningStatistics();
 		
@@ -476,6 +473,7 @@ public class BINDER {
 		System.out.println();
 	}
 		
+	@SuppressWarnings("unused")
 	private void checkViaHashing() throws IOException {
 		/////////////////////////////////////////////////////////
 		// Phase 2.1: Pruning (Dismiss first candidates early) //
@@ -560,6 +558,7 @@ public class BINDER {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void checkViaSorting() throws IOException {
 		/////////////////////////////////////
 		// Phase 2: Pruning and Validation //
@@ -632,6 +631,7 @@ public class BINDER {
 				this.dep2ref.put(attribute.getAttributeId(), new IntSingleLinkedList(attribute.getReferenced()));
 	}
 	
+	@SuppressWarnings("unused")
 	private void checkViaTwoStageIndexAndBitSets() throws IOException {
 		/////////////////////////////////////////////////////////
 		// Phase 2.1: Pruning (Dismiss first candidates early) //
@@ -1210,6 +1210,7 @@ public class BINDER {
 		System.out.println();
 	}
 	
+	@SuppressWarnings("unused")
 	private void detectNaryViaSingleChecks() throws InputGenerationException, AlgorithmConfigurationException {
 		if (this.databaseConnectionGenerator == null)
 			throw new InputGenerationException("n-ary IND detection using De Marchi's MIND algorithm only possible on databases");
@@ -1458,6 +1459,7 @@ public class BINDER {
 		return true;
 	}
 	
+	@SuppressWarnings("unused")
 	private boolean validAttributeCombinationForNaryCandidates(AttributeCombination attributeCombination) {
 		// Attribute combinations of size > 1 are always valid for further extensions; their attributes have been checked before
 		if (attributeCombination.getAttributes().length > 1)
@@ -1467,6 +1469,7 @@ public class BINDER {
 		return this.validAttributeForNaryCandidates(depInCombination);
 	}
 	
+	@SuppressWarnings("unused")
 	private boolean isCombineable(AttributeCombination depAttributeCombination, int dep) {
 		// Do not combine attributes from different tables
 		if (depAttributeCombination.getTable() != this.column2table[dep])
@@ -1480,6 +1483,7 @@ public class BINDER {
 		return true;
 	}
 	
+	@SuppressWarnings("unused")
 	private boolean isCombineable(AttributeCombination depAttributeCombination, AttributeCombination refAttributeCombination, int ref) {
 		// Do not combine attributes from different tables
 		if (refAttributeCombination.getTable() != this.column2table[ref])

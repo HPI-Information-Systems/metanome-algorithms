@@ -1,6 +1,7 @@
 package de.metanome.algorithms.hyfd;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -8,8 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithms.hyfd.structures.FDSet;
@@ -49,9 +48,9 @@ public class Validator {
 	}
 	
 	private class FD {
-		public OpenBitSet lhs;
+		public BitSet lhs;
 		public int rhs;
-		public FD(OpenBitSet lhs, int rhs) {
+		public FD(BitSet lhs, int rhs) {
 			this.lhs = lhs;
 			this.rhs = rhs;
 		}
@@ -82,10 +81,10 @@ public class Validator {
 			ValidationResult result = new ValidationResult();
 			
 			FDTreeElement element = this.elementLhsPair.getElement();
-			OpenBitSet lhs = this.elementLhsPair.getLhs();
-			OpenBitSet rhs = element.getFds();
+			BitSet lhs = this.elementLhsPair.getLhs();
+			BitSet rhs = element.getFds();
 			
-			int rhsSize = (int) rhs.cardinality();
+			int rhsSize = rhs.cardinality();
 			if (rhsSize == 0)
 				return result;
 			result.validations = result.validations + rhsSize;
@@ -116,7 +115,7 @@ public class Validator {
 				int firstLhsAttr = lhs.nextSetBit(0);
 				
 				lhs.clear(firstLhsAttr);
-				OpenBitSet validRhs = Validator.this.plis.get(firstLhsAttr).refines(Validator.this.compressedRecords, lhs, rhs, result.comparisonSuggestions);
+				BitSet validRhs = Validator.this.plis.get(firstLhsAttr).refines(Validator.this.compressedRecords, lhs, rhs, result.comparisonSuggestions);
 				lhs.set(firstLhsAttr);
 				
 				result.intersections++;
@@ -185,7 +184,7 @@ public class Validator {
 		List<FDTreeElementLhsPair> currentLevel = null;
 		if (this.level == 0) {
 			currentLevel = new ArrayList<>();
-			currentLevel.add(new FDTreeElementLhsPair(this.posCover, new OpenBitSet(numAttributes)));
+			currentLevel.add(new FDTreeElementLhsPair(this.posCover, new BitSet(numAttributes)));
 		}
 		else {
 			currentLevel = this.posCover.getLevel(this.level);
@@ -217,7 +216,7 @@ public class Validator {
 			List<FDTreeElementLhsPair> nextLevel = new ArrayList<>();
 			for (FDTreeElementLhsPair elementLhsPair : currentLevel) {
 				FDTreeElement element = elementLhsPair.getElement();
-				OpenBitSet lhs = elementLhsPair.getLhs();
+				BitSet lhs = elementLhsPair.getLhs();
 
 				if (element.getChildren() == null)
 					continue;
@@ -226,7 +225,7 @@ public class Validator {
 					FDTreeElement child = element.getChildren()[childAttr];
 					
 					if (child != null) {
-						OpenBitSet childLhs = lhs.clone();
+						BitSet childLhs = (BitSet) lhs.clone();
 						childLhs.set(childAttr);
 						nextLevel.add(new FDTreeElementLhsPair(child, childLhs));
 					}
@@ -239,7 +238,7 @@ public class Validator {
 			int candidates = 0;
 			for (FD invalidFD : validationResult.invalidFDs) {
 				for (int extensionAttr = 0; extensionAttr < numAttributes; extensionAttr++) {
-					OpenBitSet childLhs = this.extendWith(invalidFD.lhs, invalidFD.rhs, extensionAttr);
+					BitSet childLhs = this.extendWith(invalidFD.lhs, invalidFD.rhs, extensionAttr);
 					if (childLhs != null) {
 						FDTreeElement child = this.posCover.addFunctionalDependencyGetIfNew(childLhs, invalidFD.rhs);
 						if (child != null) {
@@ -282,7 +281,7 @@ public class Validator {
 		return null;
 	}
 	
-	private OpenBitSet extendWith(OpenBitSet lhs, int rhs, int extensionAttr) {
+	private BitSet extendWith(BitSet lhs, int rhs, int extensionAttr) {
 		if (lhs.get(extensionAttr) || 											// Triviality: AA->C cannot be valid, because A->C is invalid
 			(rhs == extensionAttr) || 											// Triviality: AC->C cannot be valid, because A->C is invalid
 			this.posCover.containsFdOrGeneralization(lhs, extensionAttr) ||		// Pruning: If A->B, then AB->C cannot be minimal // TODO: this pruning is not used in the Inductor when inverting the negCover; so either it is useless here or it is useful in the Inductor?
@@ -290,7 +289,7 @@ public class Validator {
 																				// Pruning: If B->C, then AB->C cannot be minimal
 			return null;
 		
-		OpenBitSet childLhs = lhs.clone(); // TODO: This clone() could be avoided when done externally
+		BitSet childLhs = (BitSet) lhs.clone(); // TODO: This clone() could be avoided when done externally
 		childLhs.set(extensionAttr);
 		
 		// TODO: Add more pruning here

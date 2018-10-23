@@ -20,7 +20,6 @@ class EvaluationTask {
 	private final HashCode hash;
 	@NonNull
 	private final Collection<String> result;
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	@NonNull
 	private File directory = new File("gold/");
@@ -55,7 +54,7 @@ class EvaluationTask {
 		} else {
 			log.error("Results do not match gold standard: "
 					+ "{} only in result, {} only in gold standard, {} same",
-				diff.getOnlyA().size(), diff.getOnlyB().size(), diff.getCommon().size());
+				Integer.valueOf(diff.getOnlyA().size()), Integer.valueOf(diff.getOnlyB().size()), Integer.valueOf(diff.getCommon().size()));
 		}
 	}
 

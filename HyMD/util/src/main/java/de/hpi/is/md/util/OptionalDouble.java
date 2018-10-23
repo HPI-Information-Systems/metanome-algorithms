@@ -6,7 +6,6 @@ import java.util.function.DoubleFunction;
 import java.util.function.DoublePredicate;
 import lombok.NonNull;
 
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "ConstantConditions"})
 public final class OptionalDouble {
 
 	private static final OptionalDouble EMPTY = new OptionalDouble();
@@ -29,19 +28,18 @@ public final class OptionalDouble {
 	}
 
 	public static OptionalDouble ofNullable(Double value) {
-		return value == null ? empty() : of(value);
+		return value == null ? empty() : of(value.doubleValue());
 	}
 
 	public Optional<Double> boxed() {
-		return map(d -> d);
+		return map(d -> Double.valueOf(d));
 	}
 
 	public OptionalDouble filter(@NonNull DoublePredicate predicate) {
 		if (!optional.isPresent()) {
 			return this;
-		} else {
-			return predicate.test(optional.getAsDouble()) ? this : empty();
 		}
+		return predicate.test(optional.getAsDouble()) ? this : empty();
 	}
 
 	public double getAsDouble() {

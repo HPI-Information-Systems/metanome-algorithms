@@ -22,7 +22,7 @@ class CandidateProcessor {
 	}
 
 	Statistics validateAndAnalyze(Collection<Candidate> candidates) {
-		log.debug("Will perform {} validations", candidates.size());
+		log.debug("Will perform {} validations", Integer.valueOf(candidates.size()));
 		Iterable<AnalyzeTask> results = validator.validate(candidates);
 		results.forEach(violationHandler::addViolations);
 		return analyzer.analyze(results);

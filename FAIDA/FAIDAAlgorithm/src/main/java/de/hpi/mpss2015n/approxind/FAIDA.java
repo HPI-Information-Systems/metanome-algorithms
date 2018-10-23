@@ -1,7 +1,14 @@
 
 package de.hpi.mpss2015n.approxind;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.lang3.Validate;
+
 import com.google.common.base.Joiner;
+
 import de.hpi.mpss2015n.approxind.datastructures.HyperLogLog;
 import de.hpi.mpss2015n.approxind.inclusiontester.BloomFilterInclusionTester;
 import de.hpi.mpss2015n.approxind.inclusiontester.BottomKSketchTester;
@@ -11,16 +18,18 @@ import de.hpi.mpss2015n.approxind.sampler.IdentityRowSampler;
 import de.hpi.mpss2015n.approxind.utils.Arity;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
-import de.metanome.algorithm_integration.algorithm_types.*;
-import de.metanome.algorithm_integration.configuration.*;
+import de.metanome.algorithm_integration.algorithm_types.BooleanParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.InclusionDependencyAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.IntegerParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.RelationalInputParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.StringParameterAlgorithm;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirementBoolean;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirementInteger;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirementRelationalInput;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirementString;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.InclusionDependencyResultReceiver;
-import de.metanome.algorithm_integration.results.InclusionDependency;
-import org.apache.commons.lang3.Validate;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInputParameterAlgorithm,
         BooleanParameterAlgorithm, IntegerParameterAlgorithm, StringParameterAlgorithm {
@@ -74,44 +83,44 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
         ConfigurationRequirementInteger approximateTesterBytesRequirement = new ConfigurationRequirementInteger(
                 Identifier.APPROXIMATE_TESTER_BYTES.name()
         );
-        approximateTesterBytesRequirement.setDefaultValues(new Integer[]{this.approximateTesterBytes});
+        approximateTesterBytesRequirement.setDefaultValues(new Integer[]{Integer.valueOf(this.approximateTesterBytes)});
         approximateTesterBytesRequirement.setRequired(false);
         configs.add(approximateTesterBytesRequirement);
 
         ConfigurationRequirementBoolean ignoreNullRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_NULL.name());
-        ignoreNullRequirement.setDefaultValues(new Boolean[]{this.isIgnoreNullColumns});
+        ignoreNullRequirement.setDefaultValues(new Boolean[]{Boolean.valueOf(this.isIgnoreNullColumns)});
         ignoreNullRequirement.setRequired(true);
         configs.add(ignoreNullRequirement);
 
         ConfigurationRequirementBoolean combineNullRequirement = new ConfigurationRequirementBoolean(Identifier.COMBINE_NULL.name());
-        ignoreNullRequirement.setDefaultValues(new Boolean[]{this.isCombineNull});
+        ignoreNullRequirement.setDefaultValues(new Boolean[]{Boolean.valueOf(this.isCombineNull)});
         ignoreNullRequirement.setRequired(true);
         configs.add(combineNullRequirement);
 
         ConfigurationRequirementBoolean ignoreConstantRequirement = new ConfigurationRequirementBoolean(Identifier.IGNORE_CONSTANT.name());
-        ignoreConstantRequirement.setDefaultValues(new Boolean[]{this.isIgnoreConstantColumns});
+        ignoreConstantRequirement.setDefaultValues(new Boolean[]{Boolean.valueOf(this.isIgnoreConstantColumns)});
         ignoreConstantRequirement.setRequired(true);
         configs.add(ignoreConstantRequirement);
 
         ConfigurationRequirementBoolean detectNary = new ConfigurationRequirementBoolean(Identifier.DETECT_NARY.name());
-        detectNary.setDefaultValues(new Boolean[]{this.detectNary});
+        detectNary.setDefaultValues(new Boolean[]{Boolean.valueOf(this.detectNary)});
         detectNary.setRequired(true);
         configs.add(detectNary);
 
         ConfigurationRequirementBoolean reuseColumnStore = new ConfigurationRequirementBoolean(Identifier.REUSE_COLUMN_STORE.name());
-        reuseColumnStore.setDefaultValues(new Boolean[]{this.isReuseColumnStore});
+        reuseColumnStore.setDefaultValues(new Boolean[]{Boolean.valueOf(this.isReuseColumnStore)});
         reuseColumnStore.setRequired(false);
         configs.add(reuseColumnStore);
 
         ConfigurationRequirementBoolean virtualColumnStore = new ConfigurationRequirementBoolean(Identifier.VIRTUAL_COLUMN_STORE.name());
-        virtualColumnStore.setDefaultValues(new Boolean[]{this.isUseVirtualColumnStore});
+        virtualColumnStore.setDefaultValues(new Boolean[]{Boolean.valueOf(this.isUseVirtualColumnStore)});
         virtualColumnStore.setRequired(false);
         configs.add(virtualColumnStore);
 
         ConfigurationRequirementBoolean closeConnections = new ConfigurationRequirementBoolean(Identifier.CLOSE_CONNECTIONS_RIGOROUSLY.name());
-        virtualColumnStore.setDefaultValues(new Boolean[]{this.isCloseConnectionsRigorously});
+        virtualColumnStore.setDefaultValues(new Boolean[]{Boolean.valueOf(this.isCloseConnectionsRigorously)});
         virtualColumnStore.setRequired(false);
-        configs.add(virtualColumnStore);
+        configs.add(closeConnections);
 
         ConfigurationRequirementString hllRelativeStandardDeviation = new ConfigurationRequirementString(Identifier.HLL_REL_STD_DEV.name());
         hllRelativeStandardDeviation.setDefaultValues(new String[]{Double.toString(this.hllRelativeStddev)});
@@ -119,7 +128,7 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
         configs.add(hllRelativeStandardDeviation);
 
         ConfigurationRequirementInteger sampleGoal = new ConfigurationRequirementInteger(Identifier.SAMPLE_GOAL.name());
-        sampleGoal.setDefaultValues(new Integer[]{this.sampleGoal});
+        sampleGoal.setDefaultValues(new Integer[]{Integer.valueOf(this.sampleGoal)});
         sampleGoal.setRequired(true);
         configs.add(sampleGoal);
 
@@ -132,8 +141,8 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
         if ("HLL".equalsIgnoreCase(this.approximateTester)) {
             inclusionTester = new HLLInclusionTester(this.hllRelativeStddev);
             System.out.printf("HLL with relative stddev of %.4f needs %,d bytes.\n",
-                    this.hllRelativeStddev,
-                    HyperLogLog.getRequiredCapacityInBytes(this.hllRelativeStddev));
+                    Double.valueOf(this.hllRelativeStddev),
+                    Integer.valueOf(HyperLogLog.getRequiredCapacityInBytes(this.hllRelativeStddev)));
         } else if ("Bloom filter".equalsIgnoreCase(this.approximateTester)) {
             inclusionTester = new BloomFilterInclusionTester(this.approximateTesterBytes);
         } else if ("Bottom-k sketch".equalsIgnoreCase(this.approximateTester)) {
@@ -180,10 +189,10 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
     public void setIntegerConfigurationValue(String identifier, Integer... values) throws AlgorithmConfigurationException {
         if (Identifier.SAMPLE_GOAL.name().equals(identifier)) {
             Validate.inclusiveBetween(1, 1, values.length);
-            this.sampleGoal = values[0];
+            this.sampleGoal = values[0].intValue();
         } else if (Identifier.APPROXIMATE_TESTER_BYTES.name().equals(identifier)) {
             Validate.inclusiveBetween(1, 1, values.length);
-            this.approximateTesterBytes = values[0];
+            this.approximateTesterBytes = values[0].intValue();
         } else {
             this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
         }
@@ -193,19 +202,19 @@ public final class FAIDA implements InclusionDependencyAlgorithm, RelationalInpu
     @Override
     public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
         if (Identifier.DETECT_NARY.name().equals(identifier)) {
-            this.detectNary = values[0];
+            this.detectNary = values[0].booleanValue();
         } else if (Identifier.IGNORE_NULL.name().equals(identifier)) {
-            this.isIgnoreNullColumns = values[0];
+            this.isIgnoreNullColumns = values[0].booleanValue();
         } else if (Identifier.COMBINE_NULL.name().equals(identifier)) {
-            this.isCombineNull = values[0];
+            this.isCombineNull = values[0].booleanValue();
         } else if (Identifier.IGNORE_CONSTANT.name().equals(identifier)) {
-            this.isIgnoreConstantColumns = values[0];
+            this.isIgnoreConstantColumns = values[0].booleanValue();
         } else if (Identifier.VIRTUAL_COLUMN_STORE.name().equals(identifier)) {
-            this.isUseVirtualColumnStore = values[0];
+            this.isUseVirtualColumnStore = values[0].booleanValue();
         } else if (Identifier.REUSE_COLUMN_STORE.name().equals(identifier)) {
-            this.isReuseColumnStore = values[0];
+            this.isReuseColumnStore = values[0].booleanValue();
         } else if (Identifier.CLOSE_CONNECTIONS_RIGOROUSLY.name().equals(identifier)) {
-            this.isCloseConnectionsRigorously = values[0];
+            this.isCloseConnectionsRigorously = values[0].booleanValue();
         } else {
             this.handleUnknownConfiguration(identifier, Joiner.on(',').join(values));
         }

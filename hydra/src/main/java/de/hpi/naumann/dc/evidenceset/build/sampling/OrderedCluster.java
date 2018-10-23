@@ -7,7 +7,6 @@ import gnu.trove.list.array.TIntArrayList;
 
 class OrderedCluster {
 	private final TIntArrayList array;
-	private int next = 0;
 	
 	public OrderedCluster() {
 		this.array = new TIntArrayList();

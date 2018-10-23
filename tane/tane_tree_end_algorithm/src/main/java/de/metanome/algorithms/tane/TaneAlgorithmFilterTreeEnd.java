@@ -1,10 +1,5 @@
 package de.metanome.algorithms.tane;
 
-import it.unimi.dsi.fastutil.longs.LongBigArrayBigList;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectBigArrayBigList;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,9 +7,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
@@ -36,6 +30,10 @@ import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyRes
 import de.metanome.algorithm_integration.results.FunctionalDependency;
 import de.metanome.algorithms.tane.algorithm_helper.FDTree;
 import de.metanome.algorithms.tane.algorithm_helper.FDTreeElement;
+import it.unimi.dsi.fastutil.longs.LongBigArrayBigList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectBigArrayBigList;
 
 /**
  * This class implements the TANE algorithm with a small adaptation, to solve
@@ -69,9 +67,9 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
     private List<String> columnNames;
     private ObjectArrayList<ColumnIdentifier> columnIdentifiers;
     private FunctionalDependencyResultReceiver fdResultReceiver;
-    private Object2ObjectOpenHashMap<OpenBitSet, CombinationHelper> level0 = null;
-    private Object2ObjectOpenHashMap<OpenBitSet, CombinationHelper> level1 = null;
-    private Object2ObjectOpenHashMap<OpenBitSet, ObjectArrayList<OpenBitSet>> prefix_blocks = null;
+    private Object2ObjectOpenHashMap<BitSet, CombinationHelper> level0 = null;
+    private Object2ObjectOpenHashMap<BitSet, CombinationHelper> level1 = null;
+    private Object2ObjectOpenHashMap<BitSet, ObjectArrayList<BitSet>> prefix_blocks = null;
     private LongBigArrayBigList tTable;
 
     @Override
@@ -102,9 +100,9 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
     @Override
     public void execute() throws AlgorithmExecutionException {
 
-        level0 = new Object2ObjectOpenHashMap<OpenBitSet, CombinationHelper>();
-        level1 = new Object2ObjectOpenHashMap<OpenBitSet, CombinationHelper>();
-        prefix_blocks = new Object2ObjectOpenHashMap<OpenBitSet, ObjectArrayList<OpenBitSet>>();
+        level0 = new Object2ObjectOpenHashMap<BitSet, CombinationHelper>();
+        level1 = new Object2ObjectOpenHashMap<BitSet, CombinationHelper>();
+        prefix_blocks = new Object2ObjectOpenHashMap<BitSet, ObjectArrayList<BitSet>>();
 
         // Get information about table from database
         ObjectArrayList<Object2ObjectOpenHashMap<Object, LongBigArrayBigList>> partitions = loadData();
@@ -121,23 +119,23 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
 
         // Initialize Level 0
         CombinationHelper chLevel0 = new CombinationHelper();
-        OpenBitSet rhsCandidatesLevel0 = new OpenBitSet();
+        BitSet rhsCandidatesLevel0 = new BitSet();
         rhsCandidatesLevel0.set(1, numberAttributes + 1);
         chLevel0.setRhsCandidates(rhsCandidatesLevel0);
         StrippedPartition spLevel0 = new StrippedPartition(numberTuples);
         chLevel0.setPartition(spLevel0);
         spLevel0 = null;
-        level0.put(new OpenBitSet(), chLevel0);
+        level0.put(new BitSet(), chLevel0);
         chLevel0 = null;
 
 
         // Initialize Level 1
         for (int i = 1; i <= numberAttributes; i++) {
-            OpenBitSet combinationLevel1 = new OpenBitSet();
+            BitSet combinationLevel1 = new BitSet();
             combinationLevel1.set(i);
 
             CombinationHelper chLevel1 = new CombinationHelper();
-            OpenBitSet rhsCandidatesLevel1 = new OpenBitSet();
+            BitSet rhsCandidatesLevel1 = new BitSet();
             rhsCandidatesLevel1.set(1, numberAttributes + 1);
             chLevel1.setRhsCandidates(rhsCandidatesLevel0);
 
@@ -220,24 +218,24 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
      * Initialize Cplus (resp. rhsCandidates) for each combination of the level.
      */
     private void initializeCplusForLevel() {
-        for (OpenBitSet X : level1.keySet()) {
+        for (BitSet X : level1.keySet()) {
 
-            ObjectArrayList<OpenBitSet> CxwithoutA_list = new ObjectArrayList<OpenBitSet>();
+            ObjectArrayList<BitSet> CxwithoutA_list = new ObjectArrayList<BitSet>();
 
             // clone of X for usage in the following loop
-            OpenBitSet Xclone = (OpenBitSet) X.clone();
+            BitSet Xclone = (BitSet) X.clone();
             for (int A = X.nextSetBit(0); A >= 0; A = X.nextSetBit(A + 1)) {
                 Xclone.clear(A);
-                OpenBitSet CxwithoutA = level0.get(Xclone).getRhsCandidates();
+                BitSet CxwithoutA = level0.get(Xclone).getRhsCandidates();
                 CxwithoutA_list.add(CxwithoutA);
                 Xclone.set(A);
             }
 
-            OpenBitSet CforX = new OpenBitSet();
+            BitSet CforX = new BitSet();
 
             if (!CxwithoutA_list.isEmpty()) {
-                CforX.set(1, numberAttributes + 1); // = (OpenBitSet) CxwithoutA_list.get(0).clone(); // = level1.get(X).getRhsCandidates();
-                for (OpenBitSet CxwithoutA : CxwithoutA_list) {
+                CforX.set(1, numberAttributes + 1); // = (BitSet) CxwithoutA_list.get(0).clone(); // = level1.get(X).getRhsCandidates();
+                for (BitSet CxwithoutA : CxwithoutA_list) {
                     CforX.and(CxwithoutA);
                 }
             }
@@ -252,14 +250,14 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
         initializeCplusForLevel();
 
         // iterate through the combinations of the level
-        for (OpenBitSet X : level1.keySet()) {
+        for (BitSet X : level1.keySet()) {
             // Build the intersection between X and C_plus(X)
-            OpenBitSet C_plus = level1.get(X).getRhsCandidates();
-            OpenBitSet intersection = (OpenBitSet) X.clone();
-            intersection.intersect(C_plus);
+            BitSet C_plus = level1.get(X).getRhsCandidates();
+            BitSet intersection = (BitSet) X.clone();
+            intersection.and(C_plus);
 
             // clone of X for usage in the following loop
-            OpenBitSet Xclone = (OpenBitSet) X.clone();
+            BitSet Xclone = (BitSet) X.clone();
 
             // iterate through all elements (A) of the intersection
             for (int A = intersection.nextSetBit(0); A >= 0; A = intersection.nextSetBit(A + 1)) {
@@ -278,7 +276,7 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
                     level1.get(X).getRhsCandidates().clear(A);
 
                     // remove all B in R\X from C_plus(X)
-                    OpenBitSet RwithoutX = new OpenBitSet();
+                    BitSet RwithoutX = new BitSet();
                     // set to R
                     RwithoutX.set(1, numberAttributes + 1);
                     // remove X
@@ -301,8 +299,8 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
      * @throws AlgorithmExecutionException If the result receiver cannot handle the Functional dependency.
      */
     private void prune() throws AlgorithmExecutionException {
-        ObjectArrayList<OpenBitSet> elementsToRemove = new ObjectArrayList<OpenBitSet>();
-        for (OpenBitSet x : level1.keySet()) {
+        ObjectArrayList<BitSet> elementsToRemove = new ObjectArrayList<BitSet>();
+        for (BitSet x : level1.keySet()) {
             if (level1.get(x).getRhsCandidates().isEmpty()) {
                 elementsToRemove.add(x);
                 continue;
@@ -312,7 +310,7 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
             if (level1.get(x).getPartition().getError() == 0) {
 
                 // C+(X)\X
-                OpenBitSet rhsXwithoutX = (OpenBitSet) level1.get(x).getRhsCandidates().clone();
+                BitSet rhsXwithoutX = (BitSet) level1.get(x).getRhsCandidates().clone();
                 rhsXwithoutX.andNot(x);
                 for (int a = rhsXwithoutX.nextSetBit(0); a >= 0; a = rhsXwithoutX.nextSetBit(a + 1)) {
                     dependencies.addFunctionalDependency(x, a);
@@ -320,7 +318,7 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
                 elementsToRemove.add(x);
             }
         }
-        for (OpenBitSet x : elementsToRemove) {
+        for (BitSet x : elementsToRemove) {
             level1.remove(x);
         }
     }
@@ -349,19 +347,19 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
         for (long i = 0; i < pt2List.size64(); i++) {
             for (long t_id : pt2List.get(i)) {
                 // tuple is also in an equivalence class of pt1
-                if (tTable.get(t_id) != -1) {
-                    partition.get(tTable.get(t_id)).add(t_id);
+                if (tTable.get(t_id).longValue() != -1) {
+                    partition.get(tTable.get(t_id).longValue()).add(t_id);
                 }
             }
             for (long tId : pt2List.get(i)) {
                 // if condition not in the paper;
-                if (tTable.get(tId) != -1) {
-                    if (partition.get(tTable.get(tId)).size64() > 1) {
-                        LongBigArrayBigList eqClass = partition.get(tTable.get(tId));
+                if (tTable.get(tId).longValue() != -1) {
+                    if (partition.get(tTable.get(tId).longValue()).size64() > 1) {
+                        LongBigArrayBigList eqClass = partition.get(tTable.get(tId).longValue());
                         result.add(eqClass);
                         noOfElements += eqClass.size64();
                     }
-                    partition.set(tTable.get(tId), new LongBigArrayBigList());
+                    partition.set(tTable.get(tId).longValue(), new LongBigArrayBigList());
                 }
             }
         }
@@ -374,7 +372,7 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
         return new StrippedPartition(result, noOfElements);
     }
 
-    private long getLastSetBitIndex(OpenBitSet bitset) {
+    private int getLastSetBitIndex(BitSet bitset) {
         int lastSetBit = 0;
         for (int A = bitset.nextSetBit(0); A >= 0; A = bitset.nextSetBit(A + 1)) {
             lastSetBit = A;
@@ -383,13 +381,13 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
     }
 
     /**
-     * Get prefix of OpenBitSet by copying it and removing the last Bit.
+     * Get prefix of BitSet by copying it and removing the last Bit.
      *
      * @param bitset
      * @return
      */
-    private OpenBitSet getPrefix(OpenBitSet bitset) {
-        OpenBitSet prefix = (OpenBitSet) bitset.clone();
+    private BitSet getPrefix(BitSet bitset) {
+        BitSet prefix = (BitSet) bitset.clone();
         prefix.clear(getLastSetBitIndex(prefix));
         return prefix;
     }
@@ -401,13 +399,13 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
     private void buildPrefixBlocks() {
 //		System.out.println("Start BuildPrefixBlocks");
         this.prefix_blocks.clear();
-        for (OpenBitSet level_iter : level0.keySet()) {
-            OpenBitSet prefix = getPrefix(level_iter);
+        for (BitSet level_iter : level0.keySet()) {
+            BitSet prefix = getPrefix(level_iter);
 
             if (prefix_blocks.containsKey(prefix)) {
                 prefix_blocks.get(prefix).add(level_iter);
             } else {
-                ObjectArrayList<OpenBitSet> list = new ObjectArrayList<OpenBitSet>();
+                ObjectArrayList<BitSet> list = new ObjectArrayList<BitSet>();
                 list.add(level_iter);
                 prefix_blocks.put(prefix, list);
             }
@@ -421,11 +419,11 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
      * @param list
      * @return
      */
-    private ObjectArrayList<OpenBitSet[]> getListCombinations(ObjectArrayList<OpenBitSet> list) {
-        ObjectArrayList<OpenBitSet[]> combinations = new ObjectArrayList<OpenBitSet[]>();
+    private ObjectArrayList<BitSet[]> getListCombinations(ObjectArrayList<BitSet> list) {
+        ObjectArrayList<BitSet[]> combinations = new ObjectArrayList<BitSet[]>();
         for (int a = 0; a < list.size(); a++) {
             for (int b = a + 1; b < list.size(); b++) {
-                OpenBitSet[] combi = new OpenBitSet[2];
+                BitSet[] combi = new BitSet[2];
                 combi[0] = list.get(a);
                 combi[1] = list.get(b);
                 combinations.add(combi);
@@ -441,11 +439,11 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
      * @param X
      * @return
      */
-    private boolean checkSubsets(OpenBitSet X) {
+    private boolean checkSubsets(BitSet X) {
         boolean xIsValid = true;
 
         // clone of X for usage in the following loop
-        OpenBitSet Xclone = (OpenBitSet) X.clone();
+        BitSet Xclone = (BitSet) X.clone();
 
         for (int l = X.nextSetBit(0); l >= 0; l = X.nextSetBit(l + 1)) {
             Xclone.clear(l);
@@ -465,25 +463,25 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
         level1 = null;
         System.gc();
 
-        Object2ObjectOpenHashMap<OpenBitSet, CombinationHelper> new_level = new Object2ObjectOpenHashMap<OpenBitSet, CombinationHelper>();
+        Object2ObjectOpenHashMap<BitSet, CombinationHelper> new_level = new Object2ObjectOpenHashMap<BitSet, CombinationHelper>();
 
         buildPrefixBlocks();
 
-        for (ObjectArrayList<OpenBitSet> prefix_block_list : prefix_blocks.values()) {
+        for (ObjectArrayList<BitSet> prefix_block_list : prefix_blocks.values()) {
 
             // continue only, if the prefix_block contains at least 2 elements
             if (prefix_block_list.size() < 2) {
                 continue;
             }
 
-            ObjectArrayList<OpenBitSet[]> combinations = getListCombinations(prefix_block_list);
-            for (OpenBitSet[] c : combinations) {
-                OpenBitSet X = (OpenBitSet) c[0].clone();
+            ObjectArrayList<BitSet[]> combinations = getListCombinations(prefix_block_list);
+            for (BitSet[] c : combinations) {
+                BitSet X = (BitSet) c[0].clone();
                 X.or(c[1]);
 
                 if (checkSubsets(X)) {
                     StrippedPartition st = multiply(level0.get(c[0]).getPartition(), level0.get(c[1]).getPartition());
-                    OpenBitSet rhsCandidates = new OpenBitSet();
+                    BitSet rhsCandidates = new BitSet();
 //					 rhsCandidates.set(1, numberAttributes+1);
 
                     CombinationHelper ch = new CombinationHelper();
@@ -501,23 +499,23 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
     /**
      * Add the functional dependency to the ResultReceiver.
      *
-     * @param X: A OpenBitSet representing the Columns of the determinant.
+     * @param X: A BitSet representing the Columns of the determinant.
      * @param a: The number of the dependent column (starting from 1).
      * @throws CouldNotReceiveResultException
      * @throws ColumnNameMismatchException 
      */
     @SuppressWarnings("unused")
-    private void addDependencyToResultReceiver(OpenBitSet X, int a) throws CouldNotReceiveResultException, ColumnNameMismatchException {
+    private void addDependencyToResultReceiver(BitSet X, int a) throws CouldNotReceiveResultException, ColumnNameMismatchException {
         if (this.fdResultReceiver == null) {
             return;
         }
-        ColumnIdentifier[] columns = new ColumnIdentifier[(int) X.cardinality()];
+        ColumnIdentifier[] columns = new ColumnIdentifier[X.cardinality()];
         int j = 0;
         for (int i = X.nextSetBit(0); i >= 0; i = X.nextSetBit(i + 1)) {
             columns[j++] = this.columnIdentifiers.get(i - 1);
         }
         ColumnCombination colCombination = new ColumnCombination(columns);
-        de.metanome.algorithm_integration.results.FunctionalDependency fdResult = new de.metanome.algorithm_integration.results.FunctionalDependency(colCombination, columnIdentifiers.get((int) a - 1));
+        de.metanome.algorithm_integration.results.FunctionalDependency fdResult = new de.metanome.algorithm_integration.results.FunctionalDependency(colCombination, columnIdentifiers.get(a - 1));
         this.fdResultReceiver.receiveResult(fdResult);
     }
 
@@ -528,7 +526,7 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
         }
     }
 
-    public void serialize_attribute(OpenBitSet bitset, CombinationHelper ch) {
+    public void serialize_attribute(BitSet bitset, CombinationHelper ch) {
         String file_name = bitset.toString();
         ObjectOutputStream oos;
         try {
@@ -542,7 +540,7 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
         }
     }
 
-    public CombinationHelper deserialize_attribute(OpenBitSet bitset) {
+    public CombinationHelper deserialize_attribute(BitSet bitset) {
         String file_name = bitset.toString();
         ObjectInputStream is = null;
         CombinationHelper ch = null;
@@ -574,19 +572,19 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
      * @throws CouldNotReceiveResultException
      * @throws ColumnNameMismatchException 
      */
-    private void addAllDependenciesToResultReceiver(FDTreeElement fds, OpenBitSet activePath) throws CouldNotReceiveResultException, ColumnNameMismatchException {
+    private void addAllDependenciesToResultReceiver(FDTreeElement fds, BitSet activePath) throws CouldNotReceiveResultException, ColumnNameMismatchException {
         if (this.fdResultReceiver == null) {
             return;
         }
         for (int attr = 1; attr <= numberAttributes; attr++) {
             if (fds.isFd(attr - 1)) {
                 int j = 0;
-                ColumnIdentifier[] columns = new ColumnIdentifier[(int) activePath.cardinality()];
+                ColumnIdentifier[] columns = new ColumnIdentifier[activePath.cardinality()];
                 for (int i = activePath.nextSetBit(0); i >= 0; i = activePath.nextSetBit(i + 1)) {
                     columns[j++] = this.columnIdentifiers.get(i - 1);
                 }
                 ColumnCombination colCombination = new ColumnCombination(columns);
-                FunctionalDependency fdResult = new FunctionalDependency(colCombination, columnIdentifiers.get((int) attr - 1));
+                FunctionalDependency fdResult = new FunctionalDependency(colCombination, columnIdentifiers.get(attr - 1));
 //				System.out.println(fdResult.toString());
                 fdResultReceiver.receiveResult(fdResult);
             }
@@ -612,7 +610,7 @@ public class TaneAlgorithmFilterTreeEnd implements FunctionalDependencyAlgorithm
         if (this.fdResultReceiver == null) {
             return;
         }
-        this.addAllDependenciesToResultReceiver(dependencies, new OpenBitSet());
+        this.addAllDependenciesToResultReceiver(dependencies, new BitSet());
     }
 
 	@Override

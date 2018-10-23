@@ -44,11 +44,10 @@ public class INDDetectionWorker implements Runnable {
 
         if (refValueSet.containsAll(depValueSet)) {
             return true;
-        } else {
-            if (countFP)
-                this.falsePositives++;
-            return false;
         }
+		if (countFP)
+		    this.falsePositives++;
+		return false;
     }
 
     private boolean filterRefLowCoverage(int ref, int dep) throws Exception {
@@ -96,15 +95,15 @@ public class INDDetectionWorker implements Runnable {
             }
 
             return true;
-        } else
-            return false;
+        }
+		return false;
     }
 
     @Override
     public void run() {
 
         indLoop: for (int colId = this.colStart; colId < this.colEnd; colId++) {
-            logger.trace("working on column {}", colId);
+            logger.trace("working on column {}", Integer.valueOf(colId));
             if (!this.parent.isStrategyRef2Deps) {
                 if (!this.parent.depCandidates.get(resolveColumn(colId))) {
                     continue indLoop;
@@ -219,13 +218,13 @@ public class INDDetectionWorker implements Runnable {
         }
         this.parent.numUnaryINDs.addAndGet(truePositives);
         this.parent.falsePositives.addAndGet(falsePositives);
-        logger.debug("worker done (inds: {}, fp:{})", truePositives, falsePositives);
+        logger.debug("worker done (inds: {}, fp:{})", Long.valueOf(truePositives), Long.valueOf(falsePositives));
     }
 
     private int resolveColumn(int col) {
         if (this.parent.condenseMatrix) {
             return this.parent.condensedMatrixMapping[col];
-        } else
-            return col;
+        }
+		return col;
     }
 }

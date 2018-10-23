@@ -1,13 +1,17 @@
 package de.metanome.algorithms.cfdfinder.expansion;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import de.metanome.algorithms.cfdfinder.pattern.ConstantPatternEntry;
 import de.metanome.algorithms.cfdfinder.pattern.Pattern;
 import de.metanome.algorithms.cfdfinder.pattern.PatternEntry;
 import de.metanome.algorithms.cfdfinder.pattern.VariablePatternEntry;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.apache.lucene.util.OpenBitSet;
-
-import java.util.*;
 
 public class ConstantPatternExpansionStrategy extends ExpansionStrategy {
 
@@ -20,10 +24,10 @@ public class ConstantPatternExpansionStrategy extends ExpansionStrategy {
     }
 
     @Override
-    public Pattern generateNullPattern(OpenBitSet attributes) {
+    public Pattern generateNullPattern(BitSet attributes) {
         Map<Integer, PatternEntry> allVariables = new HashMap<>();
         for (int i = attributes.nextSetBit(0); i >= 0; i = attributes.nextSetBit(i + 1)) {
-            allVariables.put(i, new VariablePatternEntry());
+            allVariables.put(Integer.valueOf(i), new VariablePatternEntry());
         }
         return new Pattern(allVariables);
     }
@@ -53,7 +57,7 @@ public class ConstantPatternExpansionStrategy extends ExpansionStrategy {
     protected List<Pattern> specializeVariablePatternEntry(Pattern parent, int id, int value) {
         ArrayList<Pattern> result = new ArrayList<>();
         HashMap<Integer, PatternEntry> copy = new HashMap<>(parent.getAttributes());
-        copy.put(id, new ConstantPatternEntry(value));
+        copy.put(Integer.valueOf(id), new ConstantPatternEntry(value));
         result.add(new Pattern(copy));
         return result;
     }

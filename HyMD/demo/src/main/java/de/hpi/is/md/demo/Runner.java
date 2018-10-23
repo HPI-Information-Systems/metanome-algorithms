@@ -28,7 +28,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@SuppressWarnings({"FieldMayBeFinal", "CanBeFinal", "FieldCanBeLocal", "UseOfSystemOutOrSystemErr"})
 @Slf4j
 public class Runner {
 
@@ -75,7 +74,6 @@ public class Runner {
 		}
 	}
 
-	@SuppressWarnings("UnusedReturnValue")
 	@RequiredArgsConstructor
 	public class MDConnection extends AbstractResultEmitter<MatchingDependencyResult> implements
 		AutoCloseable {

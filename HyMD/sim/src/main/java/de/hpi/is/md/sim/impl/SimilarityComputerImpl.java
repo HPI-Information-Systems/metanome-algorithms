@@ -25,7 +25,6 @@ public final class SimilarityComputerImpl<T> implements SimilarityComputer<T> {
 	private static final boolean DEFAULT_PARALLEL = true;
 	@NonNull
 	private PairGenerator<T> generator;
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	private boolean parallel = DEFAULT_PARALLEL;
 

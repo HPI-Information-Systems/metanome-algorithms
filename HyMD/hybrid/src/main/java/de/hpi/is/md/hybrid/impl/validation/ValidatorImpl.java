@@ -33,7 +33,7 @@ public class ValidatorImpl implements Validator {
 	@Override
 	@Timed
 	public ValidationResult validate(MDSite lhs, Collection<Rhs> rhs) {
-		log.trace("Will validate {} RHSs for {}: {}", rhs.size(), lhs,
+		log.trace("Will validate {} RHSs for {}: {}", Integer.valueOf(rhs.size()), lhs,
 			StreamUtils.seq(rhs).toString(","));
 		ValidationTask task = createTask(lhs, rhs);
 		return task.validate();

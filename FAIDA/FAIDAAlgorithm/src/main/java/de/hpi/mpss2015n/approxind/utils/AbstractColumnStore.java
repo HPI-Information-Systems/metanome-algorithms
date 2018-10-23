@@ -122,7 +122,7 @@ public abstract class AbstractColumnStore {
     protected Path prepareDirectory(String dataset, int table, RelationalInput input) {
         String tableName = makeFileName(input.relationName());
         Path dir = Paths.get(DIRECTORY, dataset, tableName);
-        logger.info("writing table {} to {}", table, dir.toAbsolutePath());
+        logger.info("writing table {} to {}", Integer.valueOf(table), dir.toAbsolutePath());
         try {
             Files.createDirectories(dir);
         } catch (IOException e) {
@@ -185,7 +185,7 @@ public abstract class AbstractColumnStore {
             for (List<String> row : rows) {
                 Long[] hashes = new Long[row.size()];
                 for (int i = 0; i < row.size(); i++) {
-                    hashes[i] = getHash(row.get(i), i);
+                    hashes[i] = Long.valueOf(getHash(row.get(i), i));
                 }
                 writer.write(Joiner.on(',').join(hashes));
                 writer.newLine();
@@ -261,19 +261,18 @@ public abstract class AbstractColumnStore {
     protected static long hash(String string, AOCacheMap<String, Long> hashCache) {
         if (string == null || string.isEmpty()) {
             return NULLHASH;
-        } else {
-            Long hash = hashCache == null ? null : hashCache.get(string);
-            if (hash == null) {
-                long h = HASH_FUNCTION.hashString(string, Charsets.UTF_8).asLong();
-                if (h == NULLHASH)
-                    h = NULLHASH + 1; // avoid this very hash collision as NULLHASH has specific implications
-                if (hashCache != null && hashCache.size() < CACHE_THRESHOLD) {
-                    hashCache.put(string, h);
-                }
-                return h;
-            } else
-                return hash;
         }
+        Long hash = hashCache == null ? null : hashCache.get(string);
+        if (hash == null) {
+            long h = HASH_FUNCTION.hashString(string, Charsets.UTF_8).asLong();
+            if (h == NULLHASH)
+                h = NULLHASH + 1; // avoid this very hash collision as NULLHASH has specific implications
+            if (hashCache != null && hashCache.size() < CACHE_THRESHOLD) {
+                hashCache.put(string, Long.valueOf(h));
+            }
+            return h;
+        }
+        return hash.longValue();
     }
 
     public int getNumberOfColumns() {

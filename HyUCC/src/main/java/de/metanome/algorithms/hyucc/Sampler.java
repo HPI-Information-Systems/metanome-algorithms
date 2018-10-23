@@ -1,13 +1,12 @@
 package de.metanome.algorithms.hyucc;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithms.hyucc.structures.IntegerPair;
 import de.metanome.algorithms.hyucc.structures.PositionListIndex;
@@ -45,12 +44,12 @@ public class Sampler {
 		
 		Logger.getInstance().writeln("Investigating comparison suggestions ... ");
 		UCCList newNonUCCs = new UCCList(numAttributes, this.negCover.getMaxDepth());
-		OpenBitSet equalAttrs = new OpenBitSet(this.posCover.getNumAttributes());
+		BitSet equalAttrs = new BitSet(this.posCover.getNumAttributes());
 		for (IntegerPair comparisonSuggestion : comparisonSuggestions) {
 			this.match(equalAttrs, comparisonSuggestion.a(), comparisonSuggestion.b());
 			
 			if (!this.negCover.contains(equalAttrs)) {
-				OpenBitSet equalAttrsCopy = equalAttrs.clone();
+				BitSet equalAttrsCopy = (BitSet) equalAttrs.clone();
 				this.negCover.add(equalAttrsCopy);
 				newNonUCCs.add(equalAttrsCopy);
 				
@@ -185,7 +184,7 @@ public class Sampler {
 			this.windowDistance++;
 			int numNewNonFds = 0;
 			int numComparisons = 0;
-			OpenBitSet equalAttrs = new OpenBitSet(this.posCover.getNumAttributes());
+			BitSet equalAttrs = new BitSet(this.posCover.getNumAttributes());
 			
 			int previousNewNonFdsSize = newNonUCCs.size();
 			Iterator<IntArrayList> clusterIterator = this.clusters.iterator();
@@ -204,7 +203,7 @@ public class Sampler {
 					this.sampler.match(equalAttrs, compressedRecords[recordId], compressedRecords[partnerRecordId]);
 					
 					if (!this.negCover.contains(equalAttrs)) {
-						OpenBitSet equalAttrsCopy = equalAttrs.clone();
+						BitSet equalAttrsCopy = (BitSet) equalAttrs.clone();
 						this.negCover.add(equalAttrsCopy);
 						newNonUCCs.add(equalAttrsCopy);
 						
@@ -221,11 +220,11 @@ public class Sampler {
 		}
 	}
 	
-	private void match(OpenBitSet equalAttrs, int t1, int t2) {
+	private void match(BitSet equalAttrs, int t1, int t2) {
 		this.match(equalAttrs, this.compressedRecords[t1], this.compressedRecords[t2]);
 	}
 	
-	private void match(OpenBitSet equalAttrs, int[] t1, int[] t2) {
+	private void match(BitSet equalAttrs, int[] t1, int[] t2) {
 		equalAttrs.clear(0, t1.length);
 		for (int i = 0; i < t1.length; i++)
 			if (this.valueComparator.isEqual(t1[i], t2[i]))

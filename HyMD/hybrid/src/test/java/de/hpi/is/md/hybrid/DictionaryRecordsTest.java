@@ -20,7 +20,7 @@ public abstract class DictionaryRecordsTest {
 	public void testGetAll() {
 		DictionaryRecords records = createRecords();
 		assertThat(records.getAll()).hasSize(3);
-		assertThat(records.getAll()).contains(0, 1, 2);
+		assertThat(records.getAll()).contains(Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2));
 	}
 
 	@Test

@@ -1,12 +1,17 @@
 package de.metanome.algorithms.cfdfinder.expansion;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import de.metanome.algorithms.cfdfinder.pattern.Pattern;
 import de.metanome.algorithms.cfdfinder.pattern.PatternEntry;
 import de.metanome.algorithms.cfdfinder.pattern.RangePatternEntry;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.apache.lucene.util.OpenBitSet;
-
-import java.util.*;
 
 public class RangePatternExpansionStrategy extends ExpansionStrategy {
 
@@ -34,7 +39,7 @@ public class RangePatternExpansionStrategy extends ExpansionStrategy {
             for (Map.Entry<Integer, String> entry : mappings) {
                 sortedClusters.add(entry.getKey());
             }
-            sortedClusterMaps.put(index, sortedClusters);
+            sortedClusterMaps.put(Integer.valueOf(index), sortedClusters);
             index += 1;
         }
     }
@@ -44,11 +49,11 @@ public class RangePatternExpansionStrategy extends ExpansionStrategy {
     }
 
     @Override
-    public Pattern generateNullPattern(OpenBitSet attributes) {
-        Map<Integer, PatternEntry> allVariables = new HashMap<>((int) attributes.cardinality());
+    public Pattern generateNullPattern(BitSet attributes) {
+        Map<Integer, PatternEntry> allVariables = new HashMap<>(attributes.cardinality());
         for (int i = attributes.nextSetBit(0); i >= 0; i = attributes.nextSetBit(i + 1)) {
-            List<Integer> clusterMap = sortedClusterMaps.get(i);
-            allVariables.put(i, new RangePatternEntry(clusterMap, 0, clusterMap.size() - 1));
+            List<Integer> clusterMap = sortedClusterMaps.get(Integer.valueOf(i));
+            allVariables.put(Integer.valueOf(i), new RangePatternEntry(clusterMap, 0, clusterMap.size() - 1));
         }
         return new Pattern(allVariables);
     }
@@ -57,7 +62,7 @@ public class RangePatternExpansionStrategy extends ExpansionStrategy {
     public List<Pattern> getChildPatterns(Pattern currentPattern) {
         List<Pattern> result = new LinkedList<>();
         for (int i = 0; i < currentPattern.getIds().length; i+= 1) {
-            int id = currentPattern.getIds()[i];
+            Integer id = Integer.valueOf(currentPattern.getIds()[i]);
 
             HashMap<Integer, PatternEntry> lcopy = new HashMap<>(currentPattern.getAttributes());
             RangePatternEntry newEntry = ((RangePatternEntry) lcopy.get(id)).copy();

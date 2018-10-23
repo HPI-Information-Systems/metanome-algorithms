@@ -13,13 +13,15 @@ public final class HyMDProperties {
 	public static boolean isSamplingEnabled() {
 		return getSystemProperty(SAMPLING_ENABLED)
 			.map(Boolean::parseBoolean)
-			.orElse(true);
+			.orElse(Boolean.TRUE)
+			.booleanValue();
 	}
 
 	public static boolean isTraversalEnabled() {
 		return getSystemProperty(TRAVERSAL_ENABLED)
 			.map(Boolean::parseBoolean)
-			.orElse(true);
+			.orElse(Boolean.TRUE)
+			.booleanValue();
 	}
 
 	private static Optional<String> getSystemProperty(String key) {

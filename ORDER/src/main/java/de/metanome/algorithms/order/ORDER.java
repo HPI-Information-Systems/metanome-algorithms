@@ -174,7 +174,7 @@ public class ORDER implements OrderDependencyAlgorithm, RelationalInputParameter
     final String stringValue = currentRow.get(column);
     switch (this.types.get(column).getSpecificType()) {
       case DOUBLE:
-        final Double doubleValue = (stringValue == null) ? null : Double.parseDouble(stringValue);
+        final Double doubleValue = (stringValue == null) ? null : Double.valueOf(stringValue);
         this.dataByColumns.get(column).add(new RowIndexedDoubleValue(tupleId, doubleValue));
         break;
       case DATE:
@@ -184,7 +184,7 @@ public class ORDER implements OrderDependencyAlgorithm, RelationalInputParameter
         this.dataByColumns.get(column).add(new RowIndexedDateValue(tupleId, dateValue));
         break;
       case LONG:
-        final Long longValue = (stringValue == null) ? null : Long.parseLong(stringValue);
+        final Long longValue = (stringValue == null) ? null : Long.valueOf(stringValue);
         this.dataByColumns.get(column).add(new RowIndexedLongValue(tupleId, longValue));
         break;
       case STRING:

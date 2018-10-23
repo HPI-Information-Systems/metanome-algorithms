@@ -93,7 +93,7 @@ public class AlgorithmTestFixture {
 //			}
 //		}).when(uccResultReceiver).receiveResult(isA(UniqueColumnCombination.class));
 
-    doAnswer(new Answer() {
+    doAnswer(new Answer<Object>() {
       public Object answer(InvocationOnMock invocation) {
         Object[] args = invocation.getArguments();
         System.out.println(args[0]);

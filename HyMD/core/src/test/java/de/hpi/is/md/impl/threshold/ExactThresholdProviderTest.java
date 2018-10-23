@@ -20,9 +20,9 @@ public class ExactThresholdProviderTest {
 	public void testGetNext() {
 		ThresholdFilter thresholdFilter = new ExactThresholdFilter();
 		Iterable<Double> thresholds = thresholdFilter
-			.filter(new DoubleOpenHashSet(Sets.newHashSet(0.7, 0.6)));
+			.filter(new DoubleOpenHashSet(Sets.newHashSet(Double.valueOf(0.7), Double.valueOf(0.6))));
 		assertThat(thresholds).hasSize(2);
-		assertThat(thresholds).contains(0.7, 0.6);
+		assertThat(thresholds).contains(Double.valueOf(0.7), Double.valueOf(0.6));
 	}
 
 }

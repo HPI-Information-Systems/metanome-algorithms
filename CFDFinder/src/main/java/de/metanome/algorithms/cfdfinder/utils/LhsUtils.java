@@ -1,26 +1,26 @@
 package de.metanome.algorithms.cfdfinder.utils;
 
-import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
-import org.apache.lucene.util.OpenBitSet;
-
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
+
 public class LhsUtils {
 
     public static void addSubsetsTo(FDTreeElement.InternalFunctionalDependency fd, Collection<FDTreeElement.InternalFunctionalDependency> collection) {
-        List<OpenBitSet> subsets = generateLhsSubsets(fd.lhs);
-        for (OpenBitSet subset : subsets) {
-            collection.add(new FDTreeElement.InternalFunctionalDependency(subset, fd.rhs));
+        List<BitSet> subsets = generateLhsSubsets(fd.lhs);
+        for (BitSet subset : subsets) {
+            collection.add(new FDTreeElement.InternalFunctionalDependency(subset, fd.rhs, fd.numAttributes));
         }
     }
 
-    public static List<OpenBitSet> generateLhsSubsets(OpenBitSet lhs) {
-        List<OpenBitSet> results = new LinkedList<>();
+    public static List<BitSet> generateLhsSubsets(BitSet lhs) {
+        List<BitSet> results = new LinkedList<>();
         for (int i = lhs.nextSetBit(0); i >= 0; i = lhs.nextSetBit(i + 1)) {
-            OpenBitSet subset = lhs.clone();
-            subset.fastFlip(i);
+            BitSet subset = (BitSet) lhs.clone();
+            subset.flip(i);
             if (subset.cardinality() > 0) {
                 results.add(subset);
             }
@@ -28,12 +28,12 @@ public class LhsUtils {
         return results;
     }
 
-    public static List<OpenBitSet> generateLhsSupersets(OpenBitSet lhs) {
-        List<OpenBitSet> results = new LinkedList<>();
-        for (long i = 0; i < lhs.bits().length(); i += 1) {
+    public static List<BitSet> generateLhsSupersets(BitSet lhs, int numAttributes) {
+        List<BitSet> results = new LinkedList<>();
+        for (int i = 0; i < numAttributes; i += 1) {
             if (!lhs.get(i)) {
-                OpenBitSet superset = lhs.clone();
-                superset.flip(i);
+                BitSet superset = (BitSet) lhs.clone();
+                superset.set(i);
                 results.add(superset);
             }
         }

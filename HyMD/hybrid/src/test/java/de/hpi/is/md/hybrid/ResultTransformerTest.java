@@ -36,7 +36,6 @@ public class ResultTransformerTest {
 	@Mock
 	private SimilarityComputer<Integer> computer;
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void test() {
 		ResultTransformer transformer = createConsumer();

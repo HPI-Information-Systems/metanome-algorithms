@@ -65,7 +65,7 @@ public class DFDMiner extends Miner implements Runnable {
 			DFDMiner dfdRunner = new DFDMiner(inputFileProcessor);
 
 			dfdRunner.run();
-			System.out.println(String.format("Number of dependencies:\t%d", dfdRunner.minimalDependencies.getCount()));
+			System.out.println(String.format("Number of dependencies:\t%d", Integer.valueOf(dfdRunner.minimalDependencies.getCount())));
 			long timeFindFDs = System.currentTimeMillis();
 			System.out.println("Total time:\t" + (timeFindFDs - timeStart) / 1000 + "s");
 			System.out.println(dfdRunner.getDependencies());
@@ -96,10 +96,10 @@ public class DFDMiner extends Miner implements Runnable {
 			resultFile = cli.getOptionValue("result");
 		}
 		if (cli.hasOption("columns")) {
-			numberOfColumns = Integer.valueOf(cli.getOptionValue("columns"));
+			numberOfColumns = Integer.valueOf(cli.getOptionValue("columns")).intValue();
 		}
 		if (cli.hasOption("rows")) {
-			numberOfRows = Integer.valueOf(cli.getOptionValue("rows"));
+			numberOfRows = Integer.valueOf(cli.getOptionValue("rows")).intValue();
 		}
 		ColumnFiles columnFiles = new ColumnFiles(new File(columnFileDirectory), numberOfColumns, numberOfRows);
 		long timeStart = System.currentTimeMillis();
@@ -116,24 +116,24 @@ public class DFDMiner extends Miner implements Runnable {
 
 	private void writeOutputSuccessful(String outputFile, long time, String inputFileName) {
 
-		String timeString = (time != -1) ? String.format("%.1f", (double) (time) / 1000) : "-1";
+		String timeString = (time != -1) ? String.format("%.1f", Double.valueOf((double) (time) / 1000)) : "-1";
 		StringBuilder outputBuilder = new StringBuilder();
 		if (!inputFileName.isEmpty()) {
 			outputBuilder.append(String.format("%s\t", inputFileName));
 		}
-		outputBuilder.append(String.format("%d\t", this.numberOfRows));
-		outputBuilder.append(String.format("%d\t", this.numberOfColumns));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.numberOfRows)));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.numberOfColumns)));
 		outputBuilder.append(String.format("%s\t", timeString));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCount()));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(2)));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(3)));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(4)));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(5)));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(6)));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeGreaterThan(5)));
-		outputBuilder.append(String.format("%d\t", this.joinedPartitions.getCount()));
-		outputBuilder.append(String.format("%d\t", this.joinedPartitions.getTotalCount()));
-		outputBuilder.append(String.format("%d\n", Runtime.getRuntime().totalMemory()));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCount())));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(2))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(3))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(4))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(5))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(6))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeGreaterThan(5))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.joinedPartitions.getCount())));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.joinedPartitions.getTotalCount())));
+		outputBuilder.append(String.format("%d\n", Long.valueOf(Runtime.getRuntime().totalMemory())));
 		outputBuilder.append(String.format("#Memory: %s\n", Miner.humanReadableByteCount(Runtime.getRuntime().totalMemory(), false)));
 
 		try {
@@ -227,7 +227,7 @@ public class DFDMiner extends Miner implements Runnable {
 			currentRHS.set(currentRHSIndex);
 
 			// generate seeds
-			for (Integer partitionIndex : columnOrder.getOrderHighDistinctCount(currentRHS.complementCopy())) {
+			for (int partitionIndex : columnOrder.getOrderHighDistinctCount(currentRHS.complementCopy())) {
 				if (partitionIndex != currentRHSIndex) {
 					FileBasedPartition lhsPartition = this.fileBasedPartitions.get(partitionIndex);
 					this.seeds.push(new Seed(lhsPartition.getIndices()));
@@ -290,7 +290,7 @@ public class DFDMiner extends Miner implements Runnable {
 		// this.joinedPartitions.getCount()));
 	}
 
-	private Observation checkDependencyAndStoreIt(Seed seed, Integer currentRHSIndex) {
+	private Observation checkDependencyAndStoreIt(Seed seed, int currentRHSIndex) {
 		if (nonDependencies.isRepresented(seed.getIndices())) {
 			// System.out.println("Skip because of nonDependency");
 			Observation observationOfLHS = this.observations.updateNonDependencyType(seed.getIndices(), currentRHSIndex);
@@ -356,12 +356,11 @@ public class DFDMiner extends Miner implements Runnable {
 			this.observations.put(seed.getIndices(), observationOfLHS);
 			this.dependencies.add(seed.getIndices());
 			return observationOfLHS;
-		} else {
-			Observation observationOfLHS = this.observations.updateNonDependencyType(seed.getIndices(), currentRHSIndex);
-			this.observations.put(seed.getIndices(), observationOfLHS);
-			this.nonDependencies.add(seed.getIndices());
-			return observationOfLHS;
 		}
+		Observation observationOfLHS = this.observations.updateNonDependencyType(seed.getIndices(), currentRHSIndex);
+		this.observations.put(seed.getIndices(), observationOfLHS);
+		this.nonDependencies.add(seed.getIndices());
+		return observationOfLHS;
 	}
 
 	private Stack<Seed> nextSeeds(int currentRHSIndex) {
@@ -405,7 +404,7 @@ public class DFDMiner extends Miner implements Runnable {
 			ColumnCollection complement = maximalNonDependency.setCopy(currentRHSIndex).complement();
 			if (deps.isEmpty()) {
 				ColumnCollection emptyColumnIndices = new ColumnCollection(numberOfColumns);
-				for (Integer complementColumnIndex : complement.getSetBits()) {
+				for (int complementColumnIndex : complement.getSetBits()) {
 					deps.add(emptyColumnIndices.setCopy(complementColumnIndex));
 				}
 			} else {
@@ -478,7 +477,7 @@ public class DFDMiner extends Miner implements Runnable {
 		return null;
 	}
 
-	private Seed randomWalkStep(Seed currentSeed, Integer currentRHSIndex) {
+	private Seed randomWalkStep(Seed currentSeed, int currentRHSIndex) {
 		Observation observationOfSeed = this.observations.get(currentSeed.getIndices());
 
 		if (observationOfSeed == Observation.CANDIDATE_MINIMAL_DEPENDENCY) {

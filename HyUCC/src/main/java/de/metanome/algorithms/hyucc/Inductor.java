@@ -1,8 +1,7 @@
 package de.metanome.algorithms.hyucc;
 
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithms.hyucc.structures.UCCList;
 import de.metanome.algorithms.hyucc.structures.UCCSet;
@@ -24,9 +23,9 @@ public class Inductor {
 	public void updatePositiveCover(UCCList nonUCCs) {
 		// Sort the negative cover
 /*		Logger.getInstance().writeln("Sorting UCC-violations ...");
-		Collections.sort(nonUCCs, new Comparator<OpenBitSet>() {
+		Collections.sort(nonUCCs, new Comparator<BitSet>() {
 			@Override
-			public int compare(OpenBitSet o1, OpenBitSet o2) {
+			public int compare(BitSet o1, BitSet o2) {
 				return (int)(o1.cardinality() - o2.cardinality());
 			}
 		});
@@ -37,20 +36,20 @@ public class Inductor {
 			if (i >= nonUCCs.getUccLevels().size()) // If this level has been trimmed during iteration
 				continue;
 			
-			List<OpenBitSet> nonUCCLevel = nonUCCs.getUccLevels().get(i);
-			for (OpenBitSet nonUCC : nonUCCLevel)
+			List<BitSet> nonUCCLevel = nonUCCs.getUccLevels().get(i);
+			for (BitSet nonUCC : nonUCCLevel)
 				this.specializePositiveCover(nonUCC, nonUCCs);
 			nonUCCLevel.clear();
 		}
 	}
 	
-	protected int specializePositiveCover(OpenBitSet nonUCC, UCCList nonUCCs) {
+	protected int specializePositiveCover(BitSet nonUCC, UCCList nonUCCs) {
 		int numAttributes = this.posCover.getChildren().length;
 		int newUCCs = 0;
-		List<OpenBitSet> specUCCs;
+		List<BitSet> specUCCs;
 		
 		if (!(specUCCs = this.posCover.getUCCAndGeneralizations(nonUCC)).isEmpty()) { // TODO: May be "while" instead of "if"?
-			for (OpenBitSet specUCC : specUCCs) {
+			for (BitSet specUCC : specUCCs) {
 				this.posCover.removeUniqueColumnCombination(specUCC);
 				
 				if ((this.posCover.getMaxDepth() > 0) && (specUCC.cardinality() >= this.posCover.getMaxDepth()))

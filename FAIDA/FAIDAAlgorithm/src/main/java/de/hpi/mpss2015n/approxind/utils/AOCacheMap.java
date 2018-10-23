@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
  */
 public class AOCacheMap<K, V> extends LinkedHashMap<K, V>{
 
+	private static final long serialVersionUID = 2130793095028407165L;
+	
 	private int maxCapacity;
 
 	public AOCacheMap(int maxCapacity) {

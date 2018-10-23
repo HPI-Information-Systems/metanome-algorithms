@@ -31,11 +31,9 @@ public class PreprocessorImpl implements Preprocessor {
 	private final Relation left;
 	@NonNull
 	private final Relation right;
-	@SuppressWarnings("FieldMayBeFinal")
 	@NonNull
 	@Default
 	private DictionaryRecords.Builder leftBuilder = ArrayDictionaryRecords.builder();
-	@SuppressWarnings("FieldMayBeFinal")
 	@NonNull
 	@Default
 	private DictionaryRecords.Builder rightBuilder = ArrayDictionaryRecords.builder();

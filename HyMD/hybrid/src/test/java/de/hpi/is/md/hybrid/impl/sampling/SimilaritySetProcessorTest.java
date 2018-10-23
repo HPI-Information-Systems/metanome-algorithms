@@ -39,10 +39,10 @@ public class SimilaritySetProcessorTest {
 		int rhsAttr = 0;
 		MDElement rhs = new MDElementImpl(rhsAttr, 0.5);
 		when(latticeMD.getRhs()).thenReturn(Collections.singletonList(rhs));
-		when(similaritySet.isViolated(rhs)).thenReturn(true);
-		when(similaritySet.get(rhsAttr)).thenReturn(0.4);
+		when(Boolean.valueOf(similaritySet.isViolated(rhs))).thenReturn(Boolean.TRUE);
+		when(Double.valueOf(similaritySet.get(rhsAttr))).thenReturn(Double.valueOf(0.4));
 		when(specializer.specialize(lhs, rhs, similaritySet)).thenReturn(Collections.emptyList());
-		when(latticeMD.wouldBeMinimal(new MDElementImpl(rhsAttr, 0.4))).thenReturn(false);
+		when(Boolean.valueOf(latticeMD.wouldBeMinimal(new MDElementImpl(rhsAttr, 0.4)))).thenReturn(Boolean.FALSE);
 		processor.process(similaritySet);
 		verify(latticeMD).removeRhs(rhsAttr);
 		verify(lattice, never()).addIfMinimalAndSupported(any());

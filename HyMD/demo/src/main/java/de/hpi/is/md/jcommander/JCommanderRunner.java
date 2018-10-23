@@ -33,7 +33,7 @@ public class JCommanderRunner {
 	private static boolean isHelpField(AnnotatedElement annotatedElement) {
 		return ReflectionUtils.getAnnotationIfPresent(annotatedElement, Parameter.class)
 			.map(JCommanderRunner::isHelpParameter)
-			.orElse(false);
+			.orElse(Boolean.FALSE).booleanValue();
 	}
 
 	private static boolean isHelpParameter(Parameter parameter) {
@@ -64,7 +64,8 @@ public class JCommanderRunner {
 			.filter(JCommanderRunner::isHelpField)
 			.findFirst()
 			.flatMap(this::getBoolean)
-			.orElse(false);
+			.orElse(Boolean.FALSE)
+			.booleanValue();
 	}
 
 	private boolean parse(String[] args) {
@@ -84,7 +85,6 @@ public class JCommanderRunner {
 		out.println(usage);
 	}
 
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	@Accessors(fluent = true)
 	@Setter
 	@RequiredArgsConstructor

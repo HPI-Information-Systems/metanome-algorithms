@@ -95,7 +95,7 @@ public class TestFileInputGenerator implements FileInputGenerator {
     this.separator = setting.getSeparatorChar().toCharArray()[0];
     this.quotechar = setting.getQuoteChar().toCharArray()[0];
     this.escape = setting.getEscapeChar().toCharArray()[0];
-    this.skipLines = setting.getSkipLines();
+    this.skipLines = setting.getSkipLines().intValue();
     this.strictQuotes = setting.isStrictQuotes();
     this.ignoreLeadingWhiteSpace = setting.isIgnoreLeadingWhiteSpace();
     this.hasHeader = setting.hasHeader();

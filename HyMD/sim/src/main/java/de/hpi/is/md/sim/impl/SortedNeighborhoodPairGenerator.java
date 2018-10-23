@@ -37,7 +37,7 @@ public class SortedNeighborhoodPairGenerator<T> implements PairGenerator<T> {
 	@Override
 	public Result<T> generate(Collection<T> left, Collection<T> right) {
 		int expectedComputations = left.size() * Math.min(windowSize, right.size());
-		log.info("Will compute approximately {} similarities", expectedComputations);
+		log.info("Will compute approximately {} similarities", Integer.valueOf(expectedComputations));
 		Collection<T> sortedLeft = sort(left);
 		Collection<T> sortedRight = sort(right);
 		Stream<Tuple2<T, Collection<T>>> pairs = new Task(sortedLeft, sortedRight).generate();
@@ -115,8 +115,9 @@ public class SortedNeighborhoodPairGenerator<T> implements PairGenerator<T> {
 
 		private boolean needsShift(T leftValue) {
 			return getCurrent()
-				.map(c -> comparator.compare(c.getValue(), leftValue) < 0)
-				.orElse(false);
+				.map(c -> Boolean.valueOf(comparator.compare(c.getValue(), leftValue) < 0))
+				.orElse(Boolean.FALSE)
+				.booleanValue();
 		}
 
 		private void shift() {

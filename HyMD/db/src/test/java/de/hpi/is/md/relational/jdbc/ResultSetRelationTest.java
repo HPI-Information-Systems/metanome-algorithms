@@ -72,7 +72,6 @@ public class ResultSetRelationTest extends JdbcTest {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test(expected = InputOpenException.class)
 	public void testOpenException() throws SQLException, InputOpenException, InputCloseException {
 		Statement statement = Mockito.mock(Statement.class);

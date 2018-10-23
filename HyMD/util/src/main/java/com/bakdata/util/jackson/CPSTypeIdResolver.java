@@ -83,7 +83,7 @@ public class CPSTypeIdResolver implements TypeIdResolver {
 			.matchClassesWithAnnotation(CPSBase.class, bases::add)
 			.scan();
 
-		log.debug("Scanned: {} classes in classpath", scanRes.getNamesOfAllClasses().size());
+		log.debug("Scanned: {} classes in classpath", Integer.valueOf(scanRes.getNamesOfAllClasses().size()));
 
 		GLOBAL_MAP = new HashMap<>();
 		for (Class<?> type : types) {
@@ -146,9 +146,8 @@ public class CPSTypeIdResolver implements TypeIdResolver {
 			throw new IllegalStateException(
 				"There is no id for the class " + suggestedType + " for " + baseType.getTypeName()
 					+ ".");
-		} else {
-			return result;
 		}
+		return result;
 	}
 
 	@Override
@@ -163,9 +162,8 @@ public class CPSTypeIdResolver implements TypeIdResolver {
 			throw new IllegalStateException(
 				"There is no type " + id + " for " + baseType.getTypeName() + ". Try: "
 					+ getDescForKnownTypeIds());
-		} else {
-			return TypeFactory.defaultInstance().constructSpecializedType(baseType, result);
 		}
+		return TypeFactory.defaultInstance().constructSpecializedType(baseType, result);
 	}
 
 	@Override

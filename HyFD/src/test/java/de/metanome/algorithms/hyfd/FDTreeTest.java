@@ -4,7 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.lucene.util.OpenBitSet;
+import java.util.BitSet;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +19,7 @@ public class FDTreeTest {
 	@Before
 	public void setUp() throws Exception {
 		this.fdtree = new FDTree(5, -1);
-		OpenBitSet lhs = new OpenBitSet();
+		BitSet lhs = new BitSet();
 		lhs.set(0);
 		lhs.set(1);
 		lhs.set(3);
@@ -31,7 +32,7 @@ public class FDTreeTest {
 	
 /*	@Test
 	public void testContainsSpecialization() {
-		OpenBitSet lhs = new OpenBitSet();
+		BitSet lhs = new BitSet();
 		lhs.set(0);
 		lhs.set(1);
 		assertTrue(this.fdtree.containsFdOrSpecialization(lhs, 2));
@@ -39,7 +40,7 @@ public class FDTreeTest {
 */	
 	@Test
 	public void testContainsGeneralization() {
-		OpenBitSet lhs = new OpenBitSet();
+		BitSet lhs = new BitSet();
 		lhs.set(0);
 		lhs.set(1);
 		assertFalse(this.fdtree.containsFdOrGeneralization(lhs, 2));
@@ -50,12 +51,12 @@ public class FDTreeTest {
 	
 /*	@Test
 	public void testGetSpecialization() {
-		OpenBitSet lhs = new OpenBitSet();
+		BitSet lhs = new BitSet();
 		lhs.set(0);
 		lhs.set(1);
-		OpenBitSet specLhs = new OpenBitSet();
+		BitSet specLhs = new BitSet();
 		assertTrue(this.fdtree.getSpecialization(lhs, 2, 0, specLhs));
-		OpenBitSet expResult = new OpenBitSet();
+		BitSet expResult = new BitSet();
 		
 		expResult.set(0);
 		expResult.set(1);
@@ -66,14 +67,14 @@ public class FDTreeTest {
 */	
 	@Test 
 	public void testGetGeneralizationAndDelete() {
-		OpenBitSet lhs = new OpenBitSet();
+		BitSet lhs = new BitSet();
 		lhs.set(0);
 		lhs.set(1);
 		lhs.set(3);
 		lhs.set(4);
-		OpenBitSet specLhs = this.fdtree.getFdOrGeneralization(lhs, 2);
+		BitSet specLhs = this.fdtree.getFdOrGeneralization(lhs, 2);
 		
-		OpenBitSet expResult = new OpenBitSet();
+		BitSet expResult = new BitSet();
 		
 		expResult.set(0);
 		expResult.set(1);
@@ -83,14 +84,14 @@ public class FDTreeTest {
 	
 /*	@Test
 	public void testFilterSpecialization() {
-		OpenBitSet lhs = new OpenBitSet();
+		BitSet lhs = new BitSet();
 		lhs.set(0);
 		lhs.set(3);
 		this.fdtree.addFunctionalDependency(lhs, 2);
 		
 		this.fdtree.filterSpecializations();
 		
-		OpenBitSet expResult = new OpenBitSet();
+		BitSet expResult = new BitSet();
 		expResult.set(0);
 		expResult.set(1);
 		expResult.set(3);
@@ -100,7 +101,7 @@ public class FDTreeTest {
 	@Test
 	public void testDeleteGeneralizations() {
 		fdtree = new FDTree(4, -1);
-		OpenBitSet lhs = new OpenBitSet();
+		BitSet lhs = new BitSet();
 		lhs.set(0);
 		lhs.set(1);
 		
@@ -117,7 +118,7 @@ public class FDTreeTest {
 /*	@Test 
 	public void testContainsSpezialization() {
 		FDTree fdtree = new FDTree(5);
-		OpenBitSet lhs = new OpenBitSet();
+		BitSet lhs = new BitSet();
 		lhs.set(0);
 		lhs.set(2);
 		lhs.set(4);

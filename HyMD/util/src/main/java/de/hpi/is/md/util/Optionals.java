@@ -6,7 +6,6 @@ import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Optionals {
 

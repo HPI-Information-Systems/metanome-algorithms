@@ -1,8 +1,7 @@
 package de.metanome.algorithms.hyfd.structures;
 
 import java.util.ArrayList;
-
-import org.apache.lucene.util.OpenBitSet;
+import java.util.BitSet;
 
 import de.metanome.algorithms.hyfd.utils.ValueComparator;
 
@@ -33,11 +32,11 @@ public class NonFDTreeElement {
 		return this.children[attribute].addMatches(t1, t2, valueComparator, attribute, newNonFD);
 	}
 
-	public void asBitSets(ArrayList<OpenBitSet> bitsets, OpenBitSet bitset, int thisAttribute) {
+	public void asBitSets(ArrayList<BitSet> bitsets, BitSet bitset, int thisAttribute) {
 		bitset.set(thisAttribute);
 		
 		if (this.end)
-			bitsets.add(bitset.clone());
+			bitsets.add((BitSet) bitset.clone());
 		
 		for (int i = thisAttribute; i < this.children.length; i++)
 			if (this.children[i] != null)

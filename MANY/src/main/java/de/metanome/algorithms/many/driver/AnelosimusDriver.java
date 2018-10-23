@@ -110,7 +110,8 @@ public class AnelosimusDriver {
 
     }
 
-    public static void run(InclusionDependencyResultReceiver resultReceiver, String[] tableNames, int inputRowLimit,
+    @SuppressWarnings("unused")
+	public static void run(InclusionDependencyResultReceiver resultReceiver, String[] tableNames, int inputRowLimit,
             String n_est_strategy, int p, int m, int k, int passes, String[] nullValues, int dop,
             int refCoverageMinPercentage, boolean verify, boolean output, boolean filterNonUniqueRefs,
             boolean filterNullCols, boolean filterNumericAndShortCols, boolean filterDependentRefs,
@@ -122,28 +123,28 @@ public class AnelosimusDriver {
 
         anelosimus.setResultReceiver(resultReceiver);
 
-        anelosimus.setIntegerConfigurationValue(MANY.Identifier.INPUT_ROW_LIMIT.name(), inputRowLimit);
+        anelosimus.setIntegerConfigurationValue(MANY.Identifier.INPUT_ROW_LIMIT.name(), Integer.valueOf(inputRowLimit));
 
-        anelosimus.setIntegerConfigurationValue(MANY.Identifier.HASH_FUNCTION_COUNT.name(), k);
-        anelosimus.setIntegerConfigurationValue(MANY.Identifier.BIT_VECTOR_SIZE.name(), m);
-        anelosimus.setIntegerConfigurationValue(MANY.Identifier.DEGREE_OF_PARALLELISM.name(), dop);
-        anelosimus.setIntegerConfigurationValue(MANY.Identifier.PASSES.name(), passes);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.VERIFY.name(), verify);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.OUTPUT.name(), output);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NON_UNIQUE_REFS.name(), filterNonUniqueRefs);
-        anelosimus.setIntegerConfigurationValue(MANY.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name(), refCoverageMinPercentage);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NULL_COLS.name(), filterNullCols);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NUMERIC_AND_SHORT_COLS.name(), filterNumericAndShortCols);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_DEPENDENT_REFS.name(), filterDependentRefs);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FASTVECTOR.name(), useFastVector);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.CONDENSE_MATRIX.name(), condenseMatrix);
-        anelosimus.setBooleanConfigurationValue(MANY.Identifier.STRATEGY_REF2DEPS.name(), strategyRef2Deps);
+        anelosimus.setIntegerConfigurationValue(MANY.Identifier.HASH_FUNCTION_COUNT.name(), Integer.valueOf(k));
+        anelosimus.setIntegerConfigurationValue(MANY.Identifier.BIT_VECTOR_SIZE.name(), Integer.valueOf(m));
+        anelosimus.setIntegerConfigurationValue(MANY.Identifier.DEGREE_OF_PARALLELISM.name(), Integer.valueOf(dop));
+        anelosimus.setIntegerConfigurationValue(MANY.Identifier.PASSES.name(), Integer.valueOf(passes));
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.VERIFY.name(), Boolean.valueOf(verify));
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.OUTPUT.name(), Boolean.valueOf(output));
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NON_UNIQUE_REFS.name(), Boolean.valueOf(filterNonUniqueRefs));
+        anelosimus.setIntegerConfigurationValue(MANY.Identifier.REF_COVERAGE_MIN_PERCENTAGE.name(), Integer.valueOf(refCoverageMinPercentage));
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NULL_COLS.name(), Boolean.valueOf(filterNullCols));
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_NUMERIC_AND_SHORT_COLS.name(), Boolean.valueOf(filterNumericAndShortCols));
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FILTER_DEPENDENT_REFS.name(), Boolean.valueOf(filterDependentRefs));
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.FASTVECTOR.name(), Boolean.valueOf(useFastVector));
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.CONDENSE_MATRIX.name(), Boolean.valueOf(condenseMatrix));
+        anelosimus.setBooleanConfigurationValue(MANY.Identifier.STRATEGY_REF2DEPS.name(), Boolean.valueOf(strategyRef2Deps));
 
         long start = System.currentTimeMillis();
 
         logger.debug("start: {}", DateFormatUtils.formatUTC(start, "MM/dd/yy HH:mm:ss"));
         anelosimus.execute();
         logger.debug("end: {}", DateFormatUtils.formatUTC(System.currentTimeMillis(), "MM/dd/yy HH:mm:ss"));
-        logger.info("took: {} seconds", (System.currentTimeMillis() - start) / 1000f);
+        logger.info("took: {} seconds", Float.valueOf((System.currentTimeMillis() - start) / 1000f));
     }
 }

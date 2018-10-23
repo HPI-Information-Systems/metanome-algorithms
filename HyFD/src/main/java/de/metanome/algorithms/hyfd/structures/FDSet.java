@@ -1,27 +1,26 @@
 package de.metanome.algorithms.hyfd.structures;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 public class FDSet {
 
-	private List<ObjectOpenHashSet<OpenBitSet>> fdLevels;
+	private List<ObjectOpenHashSet<BitSet>> fdLevels;
 	
 	private int depth = 0;
 	private int maxDepth;
 	
 	public FDSet(int numAttributes, int maxDepth) {
 		this.maxDepth = maxDepth;
-		this.fdLevels = new ArrayList<ObjectOpenHashSet<OpenBitSet>>(numAttributes);
+		this.fdLevels = new ArrayList<ObjectOpenHashSet<BitSet>>(numAttributes);
 		for (int i = 0; i <= numAttributes; i++)
-			this.fdLevels.add(new ObjectOpenHashSet<OpenBitSet>());
+			this.fdLevels.add(new ObjectOpenHashSet<BitSet>());
 	}
 
-	public List<ObjectOpenHashSet<OpenBitSet>> getFdLevels() {
+	public List<ObjectOpenHashSet<BitSet>> getFdLevels() {
 		return this.fdLevels;
 	}
 
@@ -33,8 +32,8 @@ public class FDSet {
 		return this.maxDepth;
 	}
 
-	public boolean add(OpenBitSet fd) {
-		int length = (int) fd.cardinality();
+	public boolean add(BitSet fd) {
+		int length = fd.cardinality();
 		
 		if ((this.maxDepth > 0) && (length > this.maxDepth))
 			return false;
@@ -43,8 +42,8 @@ public class FDSet {
 		return this.fdLevels.get(length).add(fd);
 	}
 
-	public boolean contains(OpenBitSet fd) {
-		int length = (int) fd.cardinality();
+	public boolean contains(BitSet fd) {
+		int length = fd.cardinality();
 		
 		if ((this.maxDepth > 0) && (length > this.maxDepth))
 			return false;
@@ -62,14 +61,14 @@ public class FDSet {
 
 	public void clear() {
 		int numLevels = this.fdLevels.size();
-		this.fdLevels = new ArrayList<ObjectOpenHashSet<OpenBitSet>>(numLevels);
+		this.fdLevels = new ArrayList<ObjectOpenHashSet<BitSet>>(numLevels);
 		for (int i = 0; i <= numLevels; i++)
-			this.fdLevels.add(new ObjectOpenHashSet<OpenBitSet>());
+			this.fdLevels.add(new ObjectOpenHashSet<BitSet>());
 	}
 
 	public int size() {
 		int size = 0;
-		for (ObjectOpenHashSet<OpenBitSet> uccs : this.fdLevels)
+		for (ObjectOpenHashSet<BitSet> uccs : this.fdLevels)
 			size += uccs.size();
 		return size;
 	}

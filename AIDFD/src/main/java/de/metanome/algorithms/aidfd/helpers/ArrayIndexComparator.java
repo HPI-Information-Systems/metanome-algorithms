@@ -22,7 +22,7 @@ public class ArrayIndexComparator implements Comparator<Integer>
 		Integer[] indexes = new Integer[array.length];
 		for (int i = 0; i < array.length; i++)
 		{
-			indexes[i] = i; // Autoboxing
+			indexes[i] = Integer.valueOf(i);
 		}
 		return indexes;
 	}
@@ -30,12 +30,11 @@ public class ArrayIndexComparator implements Comparator<Integer>
 	@Override
 	public int compare(Integer index1, Integer index2)
 	{
-		 // Autounbox from Integer to int to use as array indexes
 		switch(order) {
 			case ASCENDING:
-				return Integer.compare(array[index1], array[index2]);
+				return Integer.compare(array[index1.intValue()], array[index2.intValue()]);
 			case DESCENDING:
-				return Integer.compare(array[index2], array[index1]);
+				return Integer.compare(array[index2.intValue()], array[index1.intValue()]);
 		}
 
 		return 0;

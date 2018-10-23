@@ -38,8 +38,8 @@ public abstract class MDTest {
 		site.clear(0);
 		site.clear(1);
 		assertThat(site.cardinality()).isEqualTo(0);
-		assertThat(clone.get(0).boxed()).hasValue(0.4);
-		assertThat(clone.get(1).boxed()).hasValue(0.5);
+		assertThat(clone.get(0).boxed()).hasValue(Double.valueOf(0.4));
+		assertThat(clone.get(1).boxed()).hasValue(Double.valueOf(0.5));
 		assertThat(clone.get(2).boxed()).isEmpty();
 		assertThat(clone.get(3).boxed()).isEmpty();
 		assertThat(clone.get(4).boxed()).isEmpty();
@@ -50,8 +50,8 @@ public abstract class MDTest {
 		MDSite site = createMDSite(4)
 			.set(0, 0.4)
 			.set(1, 0.5);
-		assertThat(site.get(0).boxed()).hasValue(0.4);
-		assertThat(site.get(1).boxed()).hasValue(0.5);
+		assertThat(site.get(0).boxed()).hasValue(Double.valueOf(0.4));
+		assertThat(site.get(1).boxed()).hasValue(Double.valueOf(0.5));
 		assertThat(site.get(2).boxed()).isEmpty();
 		assertThat(site.get(3).boxed()).isEmpty();
 		assertThat(site.get(4).boxed()).isEmpty();

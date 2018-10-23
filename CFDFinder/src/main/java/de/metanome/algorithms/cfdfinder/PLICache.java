@@ -1,26 +1,26 @@
 package de.metanome.algorithms.cfdfinder;
 
-import de.metanome.algorithms.cfdfinder.structures.PositionListIndex;
-import org.apache.lucene.util.OpenBitSet;
-
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
+
+import de.metanome.algorithms.cfdfinder.structures.PositionListIndex;
 
 public class PLICache {
 
     private long size = 0;
     private long limit = 0;
-    private Map<OpenBitSet, PositionListIndex> cache = new HashMap<>();
+    private Map<BitSet, PositionListIndex> cache = new HashMap<>();
 
     public PLICache(long limit) {
         this.limit = limit;
     }
 
-    public PositionListIndex get(OpenBitSet columns) {
+    public PositionListIndex get(BitSet columns) {
         return cache.get(columns);
     }
 
-    public void put(OpenBitSet columns, PositionListIndex pli) {
+    public void put(BitSet columns, PositionListIndex pli) {
         if (size >= limit) {
             System.out.println("Limit reached");
             return;
@@ -38,10 +38,10 @@ class DisabledPLICache extends PLICache {
     }
 
     @Override
-    public PositionListIndex get(OpenBitSet columns) {
+    public PositionListIndex get(BitSet columns) {
         return null;
     }
 
     @Override
-    public void put(OpenBitSet columns, PositionListIndex pli) {}
+    public void put(BitSet columns, PositionListIndex pli) {}
 }

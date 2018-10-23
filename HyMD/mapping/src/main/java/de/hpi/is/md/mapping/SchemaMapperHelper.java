@@ -15,9 +15,8 @@ public final class SchemaMapperHelper {
 			Column<T> rightT = (Column<T>) right;
 			ColumnPair<T> pair = new ColumnPair<>(left, rightT);
 			return Optional.of(pair);
-		} else {
-			return Optional.empty();
 		}
+		return Optional.empty();
 	}
 
 	private static boolean ofSameType(Column<?> left, Column<?> right) {

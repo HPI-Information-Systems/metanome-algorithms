@@ -1,25 +1,24 @@
 package de.metanome.algorithms.hyucc.structures;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 public class UCCList {
 
-	private List<List<OpenBitSet>> uccLevels;
+	private List<List<BitSet>> uccLevels;
 	
 	private int depth = 0;
 	private int maxDepth;
 	
 	public UCCList(int numAttributes, int maxDepth) {
 		this.maxDepth = maxDepth;
-		this.uccLevels = new ArrayList<List<OpenBitSet>>(numAttributes);
+		this.uccLevels = new ArrayList<List<BitSet>>(numAttributes);
 		for (int i = 0; i <= numAttributes; i++)
-			this.uccLevels.add(new ArrayList<OpenBitSet>());
+			this.uccLevels.add(new ArrayList<BitSet>());
 	}
 	
-	public List<List<OpenBitSet>> getUccLevels() {
+	public List<List<BitSet>> getUccLevels() {
 		return this.uccLevels;
 	}
 
@@ -31,8 +30,8 @@ public class UCCList {
 		return this.maxDepth;
 	}
 
-	public boolean add(OpenBitSet ucc) {
-		int length = (int) ucc.cardinality();
+	public boolean add(BitSet ucc) {
+		int length = ucc.cardinality();
 		
 		if ((this.maxDepth > 0) && (length > this.maxDepth))
 			return false;
@@ -51,14 +50,14 @@ public class UCCList {
 
 	public void clear() {
 		int numLevels = this.uccLevels.size();
-		this.uccLevels = new ArrayList<List<OpenBitSet>>(numLevels);
+		this.uccLevels = new ArrayList<List<BitSet>>(numLevels);
 		for (int i = 0; i <= numLevels; i++)
-			this.uccLevels.add(new ArrayList<OpenBitSet>());
+			this.uccLevels.add(new ArrayList<BitSet>());
 	}
 
 	public int size() {
 		int size = 0;
-		for (List<OpenBitSet> uccs : this.uccLevels)
+		for (List<BitSet> uccs : this.uccLevels)
 			size += uccs.size();
 		return size;
 	}

@@ -18,9 +18,8 @@ public class SupportBasedFactory implements Factory {
 	public AnalyzeStrategy create(LhsResult lhsResult) {
 		if (isSupported(lhsResult)) {
 			return supportedFactory.create(lhsResult);
-		} else {
-			return notSupportedFactory.create(lhsResult);
 		}
+		return notSupportedFactory.create(lhsResult);
 	}
 
 	private boolean isSupported(LhsResult lhsResult) {

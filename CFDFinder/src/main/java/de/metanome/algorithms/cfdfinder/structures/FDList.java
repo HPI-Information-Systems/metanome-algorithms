@@ -1,25 +1,24 @@
 package de.metanome.algorithms.cfdfinder.structures;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 public class FDList {
 
-	private List<List<OpenBitSet>> fdLevels;
+	private List<List<BitSet>> fdLevels;
 	
 	private int depth = 0;
 	private int maxDepth;
 	
 	public FDList(int numAttributes, int maxDepth) {
 		this.maxDepth = maxDepth;
-		this.fdLevels = new ArrayList<List<OpenBitSet>>(numAttributes);
+		this.fdLevels = new ArrayList<List<BitSet>>(numAttributes);
 		for (int i = 0; i <= numAttributes; i++)
-			this.fdLevels.add(new ArrayList<OpenBitSet>());
+			this.fdLevels.add(new ArrayList<BitSet>());
 	}
 
-	public List<List<OpenBitSet>> getFdLevels() {
+	public List<List<BitSet>> getFdLevels() {
 		return this.fdLevels;
 	}
 
@@ -31,8 +30,8 @@ public class FDList {
 		return this.maxDepth;
 	}
 
-	public boolean add(OpenBitSet fd) {
-		int length = (int) fd.cardinality();
+	public boolean add(BitSet fd) {
+		int length = fd.cardinality();
 		
 		if ((this.maxDepth > 0) && (length > this.maxDepth))
 			return false;
@@ -51,14 +50,14 @@ public class FDList {
 
 	public void clear() {
 		int numLevels = this.fdLevels.size();
-		this.fdLevels = new ArrayList<List<OpenBitSet>>(numLevels);
+		this.fdLevels = new ArrayList<List<BitSet>>(numLevels);
 		for (int i = 0; i <= numLevels; i++)
-			this.fdLevels.add(new ArrayList<OpenBitSet>());
+			this.fdLevels.add(new ArrayList<BitSet>());
 	}
 
 	public int size() {
 		int size = 0;
-		for (List<OpenBitSet> uccs : this.fdLevels)
+		for (List<BitSet> uccs : this.fdLevels)
 			size += uccs.size();
 		return size;
 	}

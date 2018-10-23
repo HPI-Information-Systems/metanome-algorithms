@@ -27,11 +27,11 @@ public class MultiThresholdProviderTest {
 	@Test
 	public void testGetNext() {
 		List<DoubleSet> similarities = Arrays
-			.asList(new DoubleOpenHashSet(Sets.newHashSet(0.7, 0.6)),
-				new DoubleOpenHashSet(Sets.newHashSet(0.8)));
+			.asList(new DoubleOpenHashSet(Sets.newHashSet(Double.valueOf(0.7), Double.valueOf(0.6))),
+				new DoubleOpenHashSet(Sets.newHashSet(Double.valueOf(0.8))));
 		ThresholdProvider provider = create(similarities);
-		assertThat(provider.getNext(0, 0.5).boxed()).hasValue(0.6);
-		assertThat(provider.getNext(0, 0.6).boxed()).hasValue(0.7);
+		assertThat(provider.getNext(0, 0.5).boxed()).hasValue(Double.valueOf(0.6));
+		assertThat(provider.getNext(0, 0.6).boxed()).hasValue(Double.valueOf(0.7));
 		assertThat(provider.getNext(1, 0.8).boxed()).isEmpty();
 	}
 

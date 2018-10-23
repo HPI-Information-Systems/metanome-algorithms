@@ -27,9 +27,9 @@ public class ThresholdLowerer {
 		boolean nonTrivial = isNonTrivial(rhs);
 		if (minimal && nonTrivial) {
 			latticeMd.setRhs(rhsAttr, threshold);
-			log.trace("{}->{} lowered threshold to {}", latticeMd.getLhs(), rhsAttr, threshold);
+			log.trace("{}->{} lowered threshold to {}", latticeMd.getLhs(), Integer.valueOf(rhsAttr), Double.valueOf(threshold));
 		} else {
-			log.trace("{}->{} removed", latticeMd.getLhs(), rhsAttr);
+			log.trace("{}->{} removed", latticeMd.getLhs(), Integer.valueOf(rhsAttr));
 			latticeMd.removeRhs(rhsAttr);
 		}
 	}

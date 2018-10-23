@@ -37,7 +37,7 @@ public class JoinedPartitions extends HashMap<ColumnCollection, Partition> {
 	public ArrayList<Partition> getBestMatchingPartitionsLazy(ColumnCollection path) {
 		ArrayList<Partition> bestMatchingPartitions = new ArrayList<>();
 
-		for (Integer columnIndex : path.getSetBits()) {
+		for (int columnIndex : path.getSetBits()) {
 			bestMatchingPartitions.add(this.getAtomicPartition(columnIndex));
 		}
 		

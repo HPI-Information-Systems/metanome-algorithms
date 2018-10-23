@@ -13,17 +13,15 @@ public final class IteratorUtils {
 		if (it.hasNext()) {
 			T entry = it.next();
 			return Optional.of(entry);
-		} else {
-			return Optional.empty();
 		}
+		return Optional.empty();
 	}
 
 	public static OptionalDouble next(OfDouble it) {
 		if (it.hasNext()) {
 			double higher = it.nextDouble();
 			return OptionalDouble.of(higher);
-		} else {
-			return OptionalDouble.empty();
 		}
+		return OptionalDouble.empty();
 	}
 }

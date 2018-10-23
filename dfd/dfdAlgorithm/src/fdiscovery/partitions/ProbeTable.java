@@ -23,8 +23,8 @@ public class ProbeTable extends TIntIntHashMap {
 	public String toString() {
 		StringBuilder outputBuilder = new StringBuilder();
 		outputBuilder.append("ProbeTable:\n");
-		for (Integer key : this.keys()) {
-			outputBuilder.append(String.format("%d\t->\t%d\n", key, this.get(key)));
+		for (int key : this.keys()) {
+			outputBuilder.append(String.format("%d\t->\t%d\n", Integer.valueOf(key), Integer.valueOf(this.get(key))));
 		}
 		
 		return outputBuilder.toString();

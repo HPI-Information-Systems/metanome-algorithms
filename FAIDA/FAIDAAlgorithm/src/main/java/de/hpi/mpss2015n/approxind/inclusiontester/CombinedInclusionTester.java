@@ -20,7 +20,8 @@ import java.util.Map.Entry;
  */
 abstract public class CombinedInclusionTester<AD> implements InclusionTester {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    @SuppressWarnings("unused")
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * Nested IND test via an inverted index as proposed by DeMarchi et al.
@@ -147,20 +148,17 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
         if (isACovered) {
             this.numCertainChecks++;
             return this.sampledInvertedIndex.isIncludedIn(dep, ref);
-        } else {
-            if (isBCovered) {
-                this.numCertainChecks++;
-                return false;
-            } else {
-                if (!sampledInvertedIndex.isIncludedIn(dep, ref)) {
-                    this.numCertainChecks++;
-                    return false;
-                } else {
-                    this.numUncertainChecks++;
-                    return this.testWithAds(dep, ref);
-                }
-            }
         }
+		if (isBCovered) {
+		    this.numCertainChecks++;
+		    return false;
+		}
+		if (!sampledInvertedIndex.isIncludedIn(dep, ref)) {
+		    this.numCertainChecks++;
+		    return false;
+		}
+		this.numUncertainChecks++;
+		return this.testWithAds(dep, ref);
     }
 
     private boolean testWithAds(SimpleColumnCombination dep, SimpleColumnCombination ref) {
@@ -172,10 +170,10 @@ abstract public class CombinedInclusionTester<AD> implements InclusionTester {
 
     protected abstract boolean testWithAds(AD adA, AD adB);
 
-    private int[] getRegisterSetBits(HyperLogLog hll) {
+    @SuppressWarnings("unused")
+	private int[] getRegisterSetBits(HyperLogLog hll) {
         return hll.registerSet().readOnlyBits();
     }
-
 
     @SuppressWarnings("unchecked")
     @Override

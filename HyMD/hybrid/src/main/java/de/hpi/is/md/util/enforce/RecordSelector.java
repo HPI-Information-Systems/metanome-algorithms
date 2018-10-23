@@ -14,7 +14,6 @@ class RecordSelector {
 	@NonNull
 	private final DictionaryRecords records;
 
-	@SuppressWarnings("TypeMayBeWeakened")
 	Iterable<int[]> getRecords(IntCollection ids) {
 		int size = ids.size();
 		Collection<int[]> result = new ArrayList<>(size);

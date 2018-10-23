@@ -81,7 +81,7 @@ public class CorrectnessMetanomeResultReceiver extends MetanomeResultReceiver {
 			return;
 		}
 		IBitSet newBS = LongBitSet.FACTORY.create(current.currentBS);
-		newBS.set(indexes[pos]);
+		newBS.set(indexes[pos].intValue());
 		check(current.getNew(newBS), pos + 1);
 		if (nextPos < fds.size()
 				&& current.currentBS.isSubSetOf(fds.get(nextPos).lhs))

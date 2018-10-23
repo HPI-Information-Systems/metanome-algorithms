@@ -1,12 +1,12 @@
 package de.metanome.algorithms.cfdfinder.result;
 
+import java.util.BitSet;
+import java.util.LinkedList;
+import java.util.List;
+
 import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
 import de.metanome.algorithms.cfdfinder.utils.LhsUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectAVLTreeMap;
-import org.apache.lucene.util.OpenBitSet;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class ResultLattice {
 
@@ -24,7 +24,7 @@ public class ResultLattice {
 
     public boolean insert(Result node) {
         if (valid(node)) {
-            int l = (int) node.getEmbeddedFD().lhs.cardinality();
+            int l = node.getEmbeddedFD().lhs.cardinality();
             if (! layers.containsKey(l)) {
                 layers.put(l, new LinkedList<Result>());
             }
@@ -48,13 +48,13 @@ public class ResultLattice {
         return size;
     }
 
-    public boolean contains(OpenBitSet lhs, int rhs) {
-        return valid(rhs) && layerContains((int) lhs.cardinality(), lhs, rhs);
+    public boolean contains(BitSet lhs, int rhs) {
+        return valid(rhs) && layerContains(lhs.cardinality(), lhs);
     }
 
     public boolean contains(Result node) {
         FDTreeElement.InternalFunctionalDependency fd = node.getEmbeddedFD();
-        return valid(node) && layerContains((int) fd.lhs.cardinality(), fd.lhs, fd.rhs);
+        return valid(node) && layerContains(fd.lhs.cardinality(), fd.lhs);
     }
 
     private boolean valid(int rhs) {
@@ -65,7 +65,7 @@ public class ResultLattice {
         return valid(node.getEmbeddedFD().rhs);
     }
 
-    private boolean layerContains(int n, OpenBitSet lhs, int rhs) {
+    private boolean layerContains(int n, BitSet lhs) {
         List<Result> layer = layers.get(n);
         if (layer != null) {
             for (Result result : layer) {
@@ -79,9 +79,9 @@ public class ResultLattice {
 
     public List<Result> getParents(Result child) {
         List<Result> results = new LinkedList<>();
-        int l = (int) child.getEmbeddedFD().lhs.cardinality() + 1;
+        int l = child.getEmbeddedFD().lhs.cardinality() + 1;
         if (layers.containsKey(l)) {
-            for (OpenBitSet lhs : LhsUtils.generateLhsSupersets(child.getEmbeddedFD().lhs)) {
+            for (BitSet lhs : LhsUtils.generateLhsSupersets(child.getEmbeddedFD().lhs, child.getEmbeddedFD().numAttributes)) {
                 for (Result r : layers.get(l)) {
                     if (r.getEmbeddedFD().lhs.equals(lhs)) {
                         results.add(r);
@@ -94,9 +94,9 @@ public class ResultLattice {
 
     public List<Result> getChildren(Result node) {
         List<Result> results = new LinkedList<>();
-        int l = (int) node.getEmbeddedFD().lhs.cardinality() - 1;
+        int l = node.getEmbeddedFD().lhs.cardinality() - 1;
         if (layers.containsKey(l)) {
-            for (OpenBitSet lhs : LhsUtils.generateLhsSubsets(node.getEmbeddedFD().lhs)) {
+            for (BitSet lhs : LhsUtils.generateLhsSubsets(node.getEmbeddedFD().lhs)) {
                 for (Result r : layers.get(l)) {
                     if (r.getEmbeddedFD().lhs.equals(lhs)) {
                         results.add(r);

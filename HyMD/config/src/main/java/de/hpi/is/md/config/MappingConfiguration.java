@@ -53,7 +53,7 @@ public class MappingConfiguration {
 			.map(this::toMapping)
 			.flatMap(Collection::stream)
 			.collect(Collectors.toList());
-		log.info("Created {} mappings: {}", mappings.size(), mappings);
+		log.info("Created {} mappings: {}", Integer.valueOf(mappings.size()), mappings);
 		return new MDMapping(mappings);
 	}
 

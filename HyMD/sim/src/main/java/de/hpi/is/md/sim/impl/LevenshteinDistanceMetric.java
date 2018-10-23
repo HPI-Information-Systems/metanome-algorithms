@@ -16,7 +16,7 @@ public enum LevenshteinDistanceMetric implements DistanceMetric<String> {
 
 	@Override
 	public long computeDistance(String obj1, String obj2) {
-		return LEVENSHTEIN.apply(obj1, obj2);
+		return LEVENSHTEIN.apply(obj1, obj2).longValue();
 	}
 
 

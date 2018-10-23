@@ -1,10 +1,10 @@
 package de.metanome.algorithms.tane.algorithm_helper;
 
-import org.apache.lucene.util.OpenBitSet;
+import java.util.BitSet;
 
 public class FDTreeElement {
     protected FDTreeElement[] children;
-    protected OpenBitSet rhsAttributes;
+    protected BitSet rhsAttributes;
     protected boolean[] isfd;
     protected int maxAttributeNumber;
 
@@ -12,7 +12,7 @@ public class FDTreeElement {
         this.maxAttributeNumber = maxAttributeNumber;
         children = new FDTreeElement[maxAttributeNumber];
         isfd = new boolean[maxAttributeNumber];
-        rhsAttributes = new OpenBitSet();
+        rhsAttributes = new BitSet();
     }
 
 
@@ -47,7 +47,7 @@ public class FDTreeElement {
      *
      * @return The right-hand-side attributes.
      */
-    public OpenBitSet getRhsAttributes() {
+    public BitSet getRhsAttributes() {
         return rhsAttributes;
     }
 
@@ -79,9 +79,8 @@ public class FDTreeElement {
                 }
             }
             return true;
-        } else {
-            return false;
         }
+		return false;
     }
 
     /**
@@ -96,7 +95,7 @@ public class FDTreeElement {
      * @return true, if the element contains a specialization of the functional dependency lhs -> a.
      * false otherwise.
      */
-    public boolean containsSpecialization(OpenBitSet lhs, int a, int currentAttr) {
+    public boolean containsSpecialization(BitSet lhs, int a, int currentAttr) {
         if (!rhsAttributes.get(a)) {
             return false;
         }
@@ -136,7 +135,7 @@ public class FDTreeElement {
      * @return true, if the tree element contains generalization,
      * false otherwise.
      */
-    public boolean containsGeneralization(OpenBitSet lhs, int a, int currentAttr) {
+    public boolean containsGeneralization(BitSet lhs, int a, int currentAttr) {
         if (this.isfd[a - 1]) {
             return true;
         }
@@ -154,9 +153,8 @@ public class FDTreeElement {
         }
         if (!found) {
             return this.containsGeneralization(lhs, a, nextSetAttr);
-        } else {
-            return true;
         }
+		return true;
     }
 
     /**
@@ -166,11 +164,11 @@ public class FDTreeElement {
      * @param lhs
      * @param a
      * @param currentAttr
-     * @param specLhsOut  The OpenBitSet for the result. It must be empty.
+     * @param specLhsOut  The BitSet for the result. It must be empty.
      * @return true, if the tree contains a specialization,
      * false otherwise.
      */
-    public boolean getSpecialization(OpenBitSet lhs, int a, int currentAttr, OpenBitSet specLhsOut) {
+    public boolean getSpecialization(BitSet lhs, int a, int currentAttr, BitSet specLhsOut) {
         int nextSetAttr, attr;
         boolean found = false;
 //		if (!specLhsOut.isEmpty()) {
@@ -231,7 +229,7 @@ public class FDTreeElement {
      * @return true, if a generalization has been found and deleted. </br>
      * false otherwise.
      */
-    public boolean deleteGeneralizations(OpenBitSet lhs, int a, int currentAttr) {
+    public boolean deleteGeneralizations(BitSet lhs, int a, int currentAttr) {
         boolean found = false;
         int nextSetAttr;
         if (this.isfd[a - 1]) {
@@ -267,7 +265,7 @@ public class FDTreeElement {
     }
 
 
-    public boolean getGeneralizationAndDelete(OpenBitSet lhs, int a, int currentAttr, OpenBitSet specLhs) {
+    public boolean getGeneralizationAndDelete(BitSet lhs, int a, int currentAttr, BitSet specLhs) {
         boolean found = false;
         int nextSetAttr;
         if (this.isfd[a - 1]) {
@@ -298,7 +296,7 @@ public class FDTreeElement {
         return found;
     }
 
-    public void filterSpecializations(FDTree filteredTree, OpenBitSet activePath) {
+    public void filterSpecializations(FDTree filteredTree, BitSet activePath) {
         int attr;
         for (attr = 1; attr <= maxAttributeNumber; attr++) {
             if (children[attr - 1] != null) {
@@ -311,7 +309,7 @@ public class FDTreeElement {
         for (attr = 1; attr <= maxAttributeNumber; attr++) {
             if (this.isfd[attr - 1]) {
                 // TODO: containsSpecialization should be enough
-                if (!filteredTree.getSpecialization(activePath, attr, 0, new OpenBitSet())) {
+                if (!filteredTree.getSpecialization(activePath, attr, 0, new BitSet())) {
                     filteredTree.addFunctionalDependency(activePath, attr);
                 }
             }
@@ -319,7 +317,7 @@ public class FDTreeElement {
     }
 
     // Only keep the most general dependencies in the tree
-    public void filterGeneralizations(FDTree filteredTree, OpenBitSet activePath) {
+    public void filterGeneralizations(FDTree filteredTree, BitSet activePath) {
         int attr;
         for (attr = 1; attr <= maxAttributeNumber; attr++) {
             if (isfd[attr - 1]) {
@@ -337,7 +335,7 @@ public class FDTreeElement {
         }
     }
 
-    public void printDependencies(OpenBitSet activePath) {
+    public void printDependencies(BitSet activePath) {
 
         for (int attr = 1; attr <= maxAttributeNumber; attr++) {
             if (isfd[attr - 1]) {

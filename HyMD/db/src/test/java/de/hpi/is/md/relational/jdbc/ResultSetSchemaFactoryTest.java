@@ -21,7 +21,7 @@ public class ResultSetSchemaFactoryTest {
 
 	@Test
 	public void test() throws SQLException {
-		when(metaData.getColumnCount()).thenReturn(2);
+		when(Integer.valueOf(metaData.getColumnCount())).thenReturn(Integer.valueOf(2));
 		doReturn(String.class.getName()).when(metaData).getColumnClassName(1);
 		doReturn(Integer.class.getName()).when(metaData).getColumnClassName(2);
 		doReturn("a").when(metaData).getColumnName(1);
@@ -34,7 +34,7 @@ public class ResultSetSchemaFactoryTest {
 
 	@Test
 	public void testClassNotFound() throws SQLException {
-		when(metaData.getColumnCount()).thenReturn(1);
+		when(Integer.valueOf(metaData.getColumnCount())).thenReturn(Integer.valueOf(1));
 		when(metaData.getColumnClassName(1)).thenReturn("foo.bar.Baz");
 		Schema schema = ResultSetSchemaFactory.createSchema(metaData);
 		assertThat(schema.getColumns()).isEmpty();
@@ -42,7 +42,7 @@ public class ResultSetSchemaFactoryTest {
 
 	@Test
 	public void testTableName() throws SQLException {
-		when(metaData.getColumnCount()).thenReturn(1);
+		when(Integer.valueOf(metaData.getColumnCount())).thenReturn(Integer.valueOf(1));
 		when(metaData.getColumnClassName(1)).thenReturn(String.class.getName());
 		when(metaData.getColumnName(1)).thenReturn("a");
 		when(metaData.getTableName(1)).thenReturn("t");

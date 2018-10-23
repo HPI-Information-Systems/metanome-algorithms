@@ -1,22 +1,21 @@
 package de.metanome.algorithms.order.sorting.partitions;
 
+import java.util.BitSet;
+
+import de.metanome.algorithms.order.check.DependencyChecker;
 import it.unimi.dsi.fastutil.BigList;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashBigSet;
 import it.unimi.dsi.fastutil.objects.ObjectBigArrayBigList;
 
-import org.apache.lucene.util.OpenBitSet;
-
-import de.metanome.algorithms.order.check.DependencyChecker;
-
 public class SortedPartition {
   private final ObjectBigArrayBigList<LongOpenHashBigSet> orderedEquivalenceClasses;
   private boolean isUnique;
   private Long2LongOpenHashMap rowIndexToPosition;
 
-  private final OpenBitSet equivalenceSetsBitRepresentation;
-  private long currentBitSetIndex;
+  private final BitSet equivalenceSetsBitRepresentation;
+  private int currentBitSetIndex;
   private int numRows;
 
   // In the rowIndexToPosition hash map, indicates whether a row index is mapped
@@ -45,12 +44,12 @@ public class SortedPartition {
     this.orderedEquivalenceClasses = new ObjectBigArrayBigList<LongOpenHashBigSet>();
     this.isUnique = false;
     this.rowIndexToPosition = null;
-    this.equivalenceSetsBitRepresentation = new OpenBitSet(numRows);
+    this.equivalenceSetsBitRepresentation = new BitSet(numRows);
     this.numRows = numRows;
     this.currentBitSetIndex = 0;
   }
 
-  public OpenBitSet getEquivalenceSetsBitRepresentation() {
+  public BitSet getEquivalenceSetsBitRepresentation() {
     return this.equivalenceSetsBitRepresentation;
   }
 

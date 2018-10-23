@@ -63,6 +63,7 @@ public class MemoryManagedJoinedPartitions extends TLongObjectHashMap<HashMap<Co
 		return cumulatedCount;
 	}
 	
+	@SuppressWarnings("unused")
 	public Partition get(ColumnCollection key) {
 		Partition result = this.get(key.cardinality()).get(key);
 		if (USE_MEMORY_MANAGEMENT && result != null) {

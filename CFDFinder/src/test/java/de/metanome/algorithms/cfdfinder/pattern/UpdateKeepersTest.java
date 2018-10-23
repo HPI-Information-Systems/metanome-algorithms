@@ -27,9 +27,9 @@ public class UpdateKeepersTest {
         cover.add(new IntArrayList(clusters));
 
         Map<Integer, PatternEntry> attributes = new HashMap<>();
-        attributes.put(0, new VariablePatternEntry());
-        attributes.put(1, new ConstantPatternEntry(2));
-        attributes.put(2, new ConstantPatternEntry(4));
+        attributes.put(Integer.valueOf(0), new VariablePatternEntry());
+        attributes.put(Integer.valueOf(1), new ConstantPatternEntry(2));
+        attributes.put(Integer.valueOf(2), new ConstantPatternEntry(4));
 
         pattern = new Pattern(attributes);
         pattern.setCover(cover);

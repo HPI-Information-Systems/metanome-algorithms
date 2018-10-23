@@ -2,6 +2,7 @@ package de.metanome.algorithms.hyfd.deprecated;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -9,8 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
@@ -445,7 +444,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		
 		System.out.println("Calculate negative cover ...");
 		// Idee BitSets: @ Tobias Bleifuss
-		Set<OpenBitSet> negCover = new HashSet<>(this.numAttributes);
+		Set<BitSet> negCover = new HashSet<>(this.numAttributes);
 //		NonFDTree negCover = new NonFDTree(this.numAttributes);
 		
 		// 0. Take the first record from each cluster and compare it against all other records of its clusters
@@ -465,19 +464,19 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		
 		compressedRecords = null;
 		
-		OpenBitSet emptySet = new OpenBitSet(this.numAttributes);
+		BitSet emptySet = new BitSet(this.numAttributes);
 		negCover.remove(emptySet);
 		
 //		System.out.println("Compress negative cover ...");
-//		ArrayList<OpenBitSet> sortedNegCover = negCover.asBitSets();
+//		ArrayList<BitSet> sortedNegCover = negCover.asBitSets();
 //		negCover = null;
 		
 		System.out.println("Sort negative cover ...");
-		ArrayList<OpenBitSet> sortedNegCover = new ArrayList<>(negCover);
+		ArrayList<BitSet> sortedNegCover = new ArrayList<>(negCover);
 		negCover = null;
-/*		Collections.sort(sortedNegCover, new Comparator<OpenBitSet>() {
+/*		Collections.sort(sortedNegCover, new Comparator<BitSet>() {
 			@Override
-			public int compare(OpenBitSet o1, OpenBitSet o2) {
+			public int compare(BitSet o1, BitSet o2) {
 				for (int i = 0; i < o1.length(); i++) {
 					if (o1.get(i) && !o2.get(i))
 						return 1;
@@ -488,14 +487,14 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 			}
 		});
 */		
-		Collections.sort(sortedNegCover, new Comparator<OpenBitSet>() {
+		Collections.sort(sortedNegCover, new Comparator<BitSet>() {
 			@Override
-			public int compare(OpenBitSet o1, OpenBitSet o2) {
-				return (int)(o1.cardinality() - o2.cardinality());
+			public int compare(BitSet o1, BitSet o2) {
+				return o1.cardinality() - o2.cardinality();
 			}
 		});
 		
-/*		for (OpenBitSet c : sortedNegCover) {
+/*		for (BitSet c : sortedNegCover) {
 			for (int i = 0; i < this.numAttributes; i++)
 				if (c.get(i))
 					System.out.print(1 + " ");
@@ -504,9 +503,9 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 			System.out.println();
 		}
 */		
-/*		List<OpenBitSet> c = new ArrayList<>(sortedNegCover.size());
+/*		List<BitSet> c = new ArrayList<>(sortedNegCover.size());
 		for (int i = 0; i < sortedNegCover.size() - 1; i++) {
-			OpenBitSet x = sortedNegCover.get(i).clone();
+			BitSet x = sortedNegCover.get(i).clone();
 			x.andNot(sortedNegCover.get(i + 1));
 			if (!x.isEmpty())
 				c.add(sortedNegCover.get(i));
@@ -518,7 +517,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		//////////////////////////////////////////////////
 		
 		System.out.println("Calculate positive cover ...");
-		//TODO		List<List<OpenBitSet>> posCover = this.calculatePositiveCoverForest(sortedNegCover);
+		//TODO		List<List<BitSet>> posCover = this.calculatePositiveCoverForest(sortedNegCover);
 		this.posCover = this.calculatePositiveCover(sortedNegCover);
 		sortedNegCover = null;
 		
@@ -543,7 +542,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		System.out.println("... done! (" + numFDs + " FDs)");
 	}
 
-	private void fetchNonFdsSPIDER(Set<OpenBitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
+	private void fetchNonFdsSPIDER(Set<BitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
 		System.out.println("\tSPIDERing over clusters ...");
 		for (PositionListIndex pli : plis) {
 			for (IntArrayList cluster : pli.getClusters()) {
@@ -581,7 +580,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		}
 	}
 	
-	private void spider(IntArrayList[] clusters, int pivotRecord, Set<OpenBitSet> negCover) {
+	private void spider(IntArrayList[] clusters, int pivotRecord, Set<BitSet> negCover) {
 		PriorityQueue<Marker> queue = new PriorityQueue<>(this.numAttributes);
 		for (int i = 0; i < clusters.length; i++)
 			if (clusters[i] != null)
@@ -598,7 +597,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 				while ((queue.peek() != null ) && (queue.peek().getValue() == first.getValue()));
 				
 				if (first.getValue() != pivotRecord) {
-					OpenBitSet equalAttrs = new OpenBitSet(this.numAttributes);
+					BitSet equalAttrs = new BitSet(this.numAttributes);
 					equalAttrs.set(first.attribute);
 					for (Marker other : others)
 						equalAttrs.set(other.attribute);
@@ -741,7 +740,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		}
 	}
 	
-	private void fetchNonFdsWindowingOverClustersProgressive(Set<OpenBitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
+	private void fetchNonFdsWindowingOverClustersProgressive(Set<BitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
 		System.out.print("\tMoving window over clusters ... ");
 		
 		long time = System.currentTimeMillis();
@@ -857,7 +856,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 //			return o.getNumNewNonFds() - this.getNumNewNonFds();		
 			return (int)Math.signum(o.getEfficiency() - this.getEfficiency());
 		}
-		public boolean runNext(Set<OpenBitSet> negCover, int[][] compressedRecords) {
+		public boolean runNext(Set<BitSet> negCover, int[][] compressedRecords) {
 			this.windowDistance++;
 			int numNewNonFds = 0;
 			int numComparisons = 0;
@@ -888,9 +887,9 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 				return false;
 			return true;
 		}
-		private OpenBitSet getViolatedFds(int[] t1, int[] t2) {
+		private BitSet getViolatedFds(int[] t1, int[] t2) {
 			// NOTE: This is a copy of the same function in HyFD
-			OpenBitSet equalAttrs = new OpenBitSet(t1.length);
+			BitSet equalAttrs = new BitSet(t1.length);
 			for (int i = 0; i < t1.length; i++)
 				if (this.valueComparator.isEqual(t1[i], t2[i]))
 					equalAttrs.set(i);
@@ -898,7 +897,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		}
 	}
 	
-	private void fetchNonFdsWindowingOverClustersProgressiveAttributesParallel(Set<OpenBitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
+	private void fetchNonFdsWindowingOverClustersProgressiveAttributesParallel(Set<BitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
 		System.out.print("\tMoving window over clusters ... ");
 		
 		long time = System.currentTimeMillis();
@@ -969,7 +968,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		}
 	}
 	
-	private void fetchNonFdsWindowingOverClustersProgressiveAveraging(Set<OpenBitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
+	private void fetchNonFdsWindowingOverClustersProgressiveAveraging(Set<BitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
 		System.out.print("\tMoving window over clusters ... ");
 		
 		long time = System.currentTimeMillis();
@@ -1160,7 +1159,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		System.out.println();
 	}
 	
-	private void fetchNonFdsWindowingOverClustersProgressive2(Set<OpenBitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
+	private void fetchNonFdsWindowingOverClustersProgressive2(Set<BitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
 		System.out.print("\tMoving window over clusters ... ");
 		
 		// If a cluster is small, compare all its records
@@ -1228,7 +1227,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		System.out.println();
 	}
 
-	private void fetchNonFdsFromClustersTopsAndBottomsProgressive(Set<OpenBitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
+	private void fetchNonFdsFromClustersTopsAndBottomsProgressive(Set<BitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
 		System.out.println("\tComparing window on clusters tops and bottoms ...");
 		for (PositionListIndex pli : plis) {
 			int currentWindowDistance = 1;
@@ -1256,7 +1255,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		}
 	}
 
-	private void fetchNonFdsWindowingOverRecordsProgressive(Set<OpenBitSet> negCover, int[][] compressedRecords) {
+	private void fetchNonFdsWindowingOverRecordsProgressive(Set<BitSet> negCover, int[][] compressedRecords) {
 		System.out.println("\tMoving window over records ...");
 		int numRecords = compressedRecords.length;
 		int currentWindowDistance = 1;
@@ -1279,7 +1278,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		while (newNonFDs > this.progressiveThreshold);
 	}
 
-	private void fetchNonFdsWindowingOverRecords(Set<OpenBitSet> negCover, int[][] compressedRecords) {
+	private void fetchNonFdsWindowingOverRecords(Set<BitSet> negCover, int[][] compressedRecords) {
 		System.out.println("\tMoving window over records ...");
 		int numRecords = compressedRecords.length;
 		for (int recordId = 0; recordId < numRecords; recordId++) {
@@ -1289,7 +1288,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		}
 	}
 
-	private void fetchNonFdsWindowingOverClusters(Set<OpenBitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
+	private void fetchNonFdsWindowingOverClusters(Set<BitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
 		System.out.println("\tMoving window over small clusters ...");
 		for (PositionListIndex pli : plis) {
 			boolean selectSmallClustersOnly = pli.getClusters().size() < this.attributeThreshold; 	// If there are too few clusters, then the clusters are large and we have already executed sufficient comparisons between the records of these clusters
@@ -1311,7 +1310,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		}
 	}
 
-	private void fetchNonFdsFromClustersTopsAndBottoms(Set<OpenBitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
+	private void fetchNonFdsFromClustersTopsAndBottoms(Set<BitSet> negCover, int[][] compressedRecords, List<PositionListIndex> plis) {
 		System.out.println("\tComparing window on clusters tops and bottoms ...");
 		for (PositionListIndex pli : plis) {
 			for (IntArrayList cluster : pli.getClusters()) {
@@ -1593,15 +1592,15 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		}
 	}
 */	
-	private OpenBitSet getViolatedFds(int[] t1, int[] t2) {
-		OpenBitSet equalAttrs = new OpenBitSet(t1.length);
+	private BitSet getViolatedFds(int[] t1, int[] t2) {
+		BitSet equalAttrs = new BitSet(t1.length);
 		for (int i = 0; i < t1.length; i++)
 			if (this.valueComparator.isEqual(t1[i], t2[i]))
 				equalAttrs.set(i);
 		return equalAttrs;
 	}
 	
-	private FDTree calculatePositiveCover(ArrayList<OpenBitSet> negCover) {
+	private FDTree calculatePositiveCover(ArrayList<BitSet> negCover) {
 		FDTree posCover = new FDTree(this.numAttributes, this.maxLhsSize);
 		posCover.addMostGeneralDependencies();
 		
@@ -1610,10 +1609,10 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		//long t = System.currentTimeMillis();
 		//
 		
-//		OpenBitSet previous1Lhs = null;
-//		OpenBitSet previous2Lhs = null;
+//		BitSet previous1Lhs = null;
+//		BitSet previous2Lhs = null;
 		for (int i = negCover.size() - 1; i >= 0; i--) {
-			OpenBitSet lhs = negCover.remove(i);
+			BitSet lhs = negCover.remove(i);
 
 			//
 			//bitsetCounter++;
@@ -1623,7 +1622,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 			//}
 			//
 			
-			OpenBitSet fullRhs = lhs.clone();
+			BitSet fullRhs = (BitSet) lhs.clone();
 			fullRhs.flip(0, fullRhs.size());
 			
 			for (int rhs = fullRhs.nextSetBit(0); rhs >= 0; rhs = fullRhs.nextSetBit(rhs + 1)) {
@@ -1645,7 +1644,7 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		return posCover;
 	}
 	
-/*	private boolean subsumes(OpenBitSet subLhs, OpenBitSet superLhs, int rhs) {
+/*	private boolean subsumes(BitSet subLhs, BitSet superLhs, int rhs) {
 		if (superLhs.get(rhs))
 			return false;
 		
@@ -1655,10 +1654,10 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		return true;
 	}
 */
-	protected int specializePositiveCover(FDTree posCoverTree, OpenBitSet lhs, int rhs) {
+	protected int specializePositiveCover(FDTree posCoverTree, BitSet lhs, int rhs) {
 		int newFDs = 0;
-		List<OpenBitSet> specLhss = posCoverTree.getFdAndGeneralizations(lhs, rhs);
-		for (OpenBitSet specLhs : specLhss) {
+		List<BitSet> specLhss = posCoverTree.getFdAndGeneralizations(lhs, rhs);
+		for (BitSet specLhs : specLhss) {
 			posCoverTree.removeFunctionalDependency(specLhs, rhs);
 			
 			if (specLhs.cardinality() == posCoverTree.getMaxDepth())
@@ -1678,22 +1677,22 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 		return newFDs;
 	}
 /*
-	private List<List<OpenBitSet>> calculatePositiveCoverForest(List<OpenBitSet> negCover) {
-		List<List<OpenBitSet>> posCover = new ArrayList<List<OpenBitSet>>(this.numAttributes);
+	private List<List<BitSet>> calculatePositiveCoverForest(List<BitSet> negCover) {
+		List<List<BitSet>> posCover = new ArrayList<List<BitSet>>(this.numAttributes);
 		for (int rhs = 0; rhs < this.numAttributes; rhs++) {
 			LhsTrie posCoverTrie = new LhsTrie(this.numAttributes);
 			
-			for (OpenBitSet lhs : negCover) {
+			for (BitSet lhs : negCover) {
 				if (lhs.get(rhs))
 					continue;
 				
 				this.specializePositiveCover(posCoverTrie, lhs, rhs);
 			}
 			
-			List<OpenBitSet> posCoverBitSets = posCoverTrie.asBitSetList();
-			Collections.sort(posCoverBitSets, new Comparator<OpenBitSet>() {
+			List<BitSet> posCoverBitSets = posCoverTrie.asBitSetList();
+			Collections.sort(posCoverBitSets, new Comparator<BitSet>() {
 				@Override
-				public int compare(OpenBitSet o1, OpenBitSet o2) {		
+				public int compare(BitSet o1, BitSet o2) {		
 					if (o1.cardinality() == o2.cardinality()) {
 						for (int i = 0; i < o1.length(); i++) {
 							if (o1.get(i) && !o2.get(i))
@@ -1716,10 +1715,10 @@ public class HyFD implements FunctionalDependencyAlgorithm, BooleanParameterAlgo
 	}
 
 	//public static int fdCounter = 0;
-	private void specializePositiveCover(LhsTrie posCoverTrie, OpenBitSet lhs, int rhs) {
-		List<OpenBitSet> specLhss = null;
+	private void specializePositiveCover(LhsTrie posCoverTrie, BitSet lhs, int rhs) {
+		List<BitSet> specLhss = null;
 		specLhss = posCoverTrie.getLhsAndGeneralizations(lhs);
-		for (OpenBitSet specLhs : specLhss) {
+		for (BitSet specLhs : specLhss) {
 			posCoverTrie.removeLhs(specLhs);
 			
 		//	if (specLhs.cardinality() == this.maxLhsSize)

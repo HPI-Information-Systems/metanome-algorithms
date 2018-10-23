@@ -41,16 +41,16 @@ public abstract class SimilarityIndexTest {
 	public void testGetSimilarRecords() {
 		SimilarityIndex index = createSimilarityIndex();
 		assertThat(index.getSimilarRecords(1, 1.0 / 4)).hasSize(4);
-		assertThat(index.getSimilarRecords(1, 1.0 / 4)).contains(13, 14, 15, 17);
+		assertThat(index.getSimilarRecords(1, 1.0 / 4)).contains(Integer.valueOf(13), Integer.valueOf(14), Integer.valueOf(15), Integer.valueOf(17));
 		assertThat(index.getSimilarRecords(1, 1.0 / 3)).hasSize(2);
-		assertThat(index.getSimilarRecords(1, 1.0 / 3)).contains(13, 17);
+		assertThat(index.getSimilarRecords(1, 1.0 / 3)).contains(Integer.valueOf(13), Integer.valueOf(17));
 	}
 
 	@Test
 	public void testGetSimilarities() {
 		SimilarityIndex index = createSimilarityIndex();
 		assertThat(index.getSimilarities()).hasSize(3);
-		assertThat(index.getSimilarities()).contains(1.0 / 3, 1.0 / 4, 1.0 / 6);
+		assertThat(index.getSimilarities()).contains(Double.valueOf(1.0 / 3), Double.valueOf(1.0 / 4), Double.valueOf(1.0 / 6));
 	}
 
 	@Test
@@ -66,29 +66,29 @@ public abstract class SimilarityIndexTest {
 	private SimilarityIndex createSimilarityIndex() {
 		SimilarityComputer<Integer> similarityComputer = Mockito.mock(SimilarityComputer.class);
 		SimilarityMeasure<Integer> similarityMeasure = Mockito.mock(SimilarityMeasure.class);
-		Collection<Integer> leftValues = Arrays.asList(1, 2);
-		Collection<Integer> rightValues = Arrays.asList(3, 4, 5, 6);
+		Collection<Integer> leftValues = Arrays.asList(Integer.valueOf(1), Integer.valueOf(2));
+		Collection<Integer> rightValues = Arrays.asList(Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5), Integer.valueOf(6));
 		when(similarityComputer.compute(similarityMeasure, leftValues, rightValues))
-			.thenReturn(new Result<>(Stream.of(new Similarity<>(1, Arrays.asList(
-				new To<>(3, 1.0 / 3),
-				new To<>(4, 1.0 / 4),
-				new To<>(5, 1.0 / 4),
-				new To<>(6, 1.0 / 6)
+			.thenReturn(new Result<>(Stream.of(new Similarity<>(Integer.valueOf(1), Arrays.asList(
+				new To<>(Integer.valueOf(3), 1.0 / 3),
+				new To<>(Integer.valueOf(4), 1.0 / 4),
+				new To<>(Integer.valueOf(5), 1.0 / 4),
+				new To<>(Integer.valueOf(6), 1.0 / 6)
 			))), true));
 		SimilarityIndexBuilder builder = createBuilder();
 		when(leftDictionary.values()).thenReturn(leftValues);
-		when(leftDictionary.size()).thenReturn(3);
+		when(Integer.valueOf(leftDictionary.size())).thenReturn(Integer.valueOf(3));
 		when(rightDictionary.values()).thenReturn(rightValues);
-		when(rightDictionary.size()).thenReturn(7);
-		when(leftDictionary.getOrAdd(1)).thenReturn(1);
-		doReturn(new IntOpenHashSet(Arrays.asList(13, 17))).when(rightIndex).get(3);
+		when(Integer.valueOf(rightDictionary.size())).thenReturn(Integer.valueOf(7));
+		when(Integer.valueOf(leftDictionary.getOrAdd(Integer.valueOf(1)))).thenReturn(Integer.valueOf(1));
+		doReturn(new IntOpenHashSet(Arrays.asList(Integer.valueOf(13), Integer.valueOf(17)))).when(rightIndex).get(3);
 		doReturn(IntSets.singleton(14)).when(rightIndex).get(4);
 		doReturn(IntSets.singleton(15)).when(rightIndex).get(5);
 		doReturn(IntSets.singleton(16)).when(rightIndex).get(6);
-		doReturn(3).when(rightDictionary).getOrAdd(3);
-		doReturn(4).when(rightDictionary).getOrAdd(4);
-		doReturn(5).when(rightDictionary).getOrAdd(5);
-		doReturn(6).when(rightDictionary).getOrAdd(6);
+		doReturn(Integer.valueOf(3)).when(rightDictionary).getOrAdd(Integer.valueOf(3));
+		doReturn(Integer.valueOf(4)).when(rightDictionary).getOrAdd(Integer.valueOf(4));
+		doReturn(Integer.valueOf(5)).when(rightDictionary).getOrAdd(Integer.valueOf(5));
+		doReturn(Integer.valueOf(6)).when(rightDictionary).getOrAdd(Integer.valueOf(6));
 		return builder
 			.create(leftDictionary, rightDictionary, similarityMeasure, similarityComputer, 0.0,
 				rightIndex);

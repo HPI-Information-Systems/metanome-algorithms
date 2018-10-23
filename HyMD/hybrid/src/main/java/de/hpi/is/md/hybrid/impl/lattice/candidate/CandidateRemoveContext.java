@@ -16,7 +16,7 @@ final class CandidateRemoveContext extends LhsContext {
 	private final boolean specialized;
 
 	@Builder
-	private CandidateRemoveContext(@NonNull MDSite lhs, @NonNull int rhsAttr,
+	private CandidateRemoveContext(@NonNull MDSite lhs, int rhsAttr,
 		@NonNull MDSite rhs,
 		boolean specialized,
 		@NonNull LazyArray<CandidateThresholdNode> children) {
@@ -42,8 +42,9 @@ final class CandidateRemoveContext extends LhsContext {
 	private void removeNoCheck(int initial) {
 		int maxChild = getNext(initial)
 			.map(MDElement::getId)
-			.map(i -> i + 1)
-			.orElseGet(children::size);
+			.map(i -> Integer.valueOf(i.intValue() + 1))
+			.orElseGet(children::size)
+			.intValue();
 		for (int currentLhsAttr = initial; currentLhsAttr < maxChild; currentLhsAttr++) {
 			double threshold = lhs.getOrDefault(currentLhsAttr);
 			int nextLhsAttrId = currentLhsAttr + 1;

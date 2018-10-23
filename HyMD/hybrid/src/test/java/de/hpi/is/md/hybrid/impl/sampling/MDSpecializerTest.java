@@ -45,7 +45,7 @@ public class MDSpecializerTest {
 			.specialize(lhs, 2, similaritySet.get(2));
 		doReturn(Optional.of(new MDSiteImpl(columnPairs).set(3, 0.9))).when(lhsSpecializer)
 			.specialize(lhs, 3, similaritySet.get(3));
-		when(specializationFilter.filter(any(), any())).thenReturn(true);
+		when(Boolean.valueOf(specializationFilter.filter(any(), any()))).thenReturn(Boolean.TRUE);
 		int rhsAttr = 3;
 		MDElement rhs = new MDElementImpl(rhsAttr, 0.8);
 		Collection<MD> specialized = specializer.specialize(lhs, rhs, similaritySet);

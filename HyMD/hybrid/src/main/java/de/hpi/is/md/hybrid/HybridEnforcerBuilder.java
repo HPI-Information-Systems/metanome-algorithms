@@ -16,10 +16,8 @@ public class HybridEnforcerBuilder implements EnforcerBuilder {
 
 	@NonNull
 	private final MDMapping mappings;
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	private boolean store = true;
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	@NonNull
 	private File cacheDirectory = new File("preprocessed/");

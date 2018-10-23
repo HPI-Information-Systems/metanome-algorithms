@@ -21,7 +21,6 @@ public final class MinimizingLevelStrategy implements LevelStrategy {
 	private int currentLevel = 0;
 
 	public static LevelStrategy of(FullLattice fullLattice, double minThreshold) {
-		int size = fullLattice.size();
 		Minimizer minimizer = new SimpleMinimizer();
 		CandidateBuilder candidateBuilder = new CandidateBuilder(minThreshold, minimizer);
 		return new MinimizingLevelStrategy(fullLattice, candidateBuilder);
@@ -34,7 +33,7 @@ public final class MinimizingLevelStrategy implements LevelStrategy {
 
 	@Override
 	public Collection<Candidate> getCurrentLevel() {
-		log.debug("Retrieved level {}", currentLevel);
+		log.debug("Retrieved level {}", Integer.valueOf(currentLevel));
 		Collection<LatticeMD> mds = fullLattice.getLevel(currentLevel);
 		Collection<Candidate> candidates = candidateBuilder.toCandidates(mds);
 		if (candidates.isEmpty()) {
@@ -44,7 +43,7 @@ public final class MinimizingLevelStrategy implements LevelStrategy {
 	}
 
 	private void finishLevel() {
-		log.debug("Finished level {}", currentLevel);
+		log.debug("Finished level {}", Integer.valueOf(currentLevel));
 		currentLevel++;
 		candidateBuilder.clear();
 	}

@@ -255,7 +255,7 @@ public class AIDFD implements FunctionalDependencyAlgorithm,
 		if (negCoverThresh >= 0.0) {
 			int index = k % negCoverWindowSize;
 			lastNegCoverRatios[index] = negCoverRatio;
-			double averageRatio = (DoubleStream.of(lastNegCoverRatios).sum()) / (double)negCoverWindowSize;
+			double averageRatio = (DoubleStream.of(lastNegCoverRatios).sum()) / negCoverWindowSize;
 			if (averageRatio <= negCoverThresh) {
 				System.out.println("Termination criterion met: neg-cover growth ratio");
 				return true;
@@ -306,11 +306,11 @@ public class AIDFD implements FunctionalDependencyAlgorithm,
 		}
 
 		if (identifier.equals(INPUT_USE_BLOOMFILTER)) {
-			this.useBloomfilter = values[0];
+			this.useBloomfilter = values[0].booleanValue();
 		}
 
 		if (identifier.equals(INPUT_CHECK_CORRECTNESS)) {
-			this.checkCorrectness = values[0];
+			this.checkCorrectness = values[0].booleanValue();
 		}
 	}
 
@@ -322,19 +322,19 @@ public class AIDFD implements FunctionalDependencyAlgorithm,
 		}
 
 		if (identifier.equals(INPUT_UNTIL_ITERATION_K)) {
-			this.untilIterationK = values[0];
+			this.untilIterationK = values[0].intValue();
 		}
 
 		if (identifier.equals(INPUT_TIMEOUT)) {
-			this.timeout = values[0];
+			this.timeout = values[0].intValue();
 		}
 
 		if (identifier.equals(INPUT_NEG_COVER_THRESH)) {
-			this.negCoverThresh = (double)values[0] / 1000000.0;
+			this.negCoverThresh = values[0].doubleValue() / 1000000.0;
 		}
 
 		if (identifier.equals(INPUT_NEG_COVER_WINDOW_SIZE)) {
-			this.negCoverWindowSize = values[0];
+			this.negCoverWindowSize = values[0].intValue();
 		}
 	}
 

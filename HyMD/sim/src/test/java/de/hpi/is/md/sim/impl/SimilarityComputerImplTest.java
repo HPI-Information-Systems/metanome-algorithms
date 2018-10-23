@@ -17,7 +17,7 @@ public class SimilarityComputerImplTest extends SimilarityComputerTest {
 
 	@Parameters
 	public static Collection<Boolean> data() {
-		return Arrays.asList(true, false);
+		return Arrays.asList(Boolean.TRUE, Boolean.FALSE);
 	}
 
 	@Override

@@ -28,8 +28,8 @@ public class FD implements Comparable<FD> {
 	public void setSort(Integer[] indexes) {
 		lhsSort = LongBitSet.FACTORY.create();
 		for (Integer i : indexes) {
-			if (lhs.get(indexes[i])) {
-				lhsSort.set(i);
+			if (lhs.get(indexes[i.intValue()].intValue())) {
+				lhsSort.set(i.intValue());
 			}
 		}
 	}

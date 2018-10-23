@@ -23,7 +23,7 @@ final class CandidateAddContext extends LhsContext {
 	private final Consumer<LatticeMD> callback;
 
 	@Builder
-	private CandidateAddContext(@NonNull LatticeMD latticeMD,
+	private CandidateAddContext(LatticeMD latticeMD,
 		@NonNull MDElement rhsElem,
 		@NonNull LazyArray<CandidateThresholdNode> children,
 		@NonNull Consumer<LatticeMD> callback,

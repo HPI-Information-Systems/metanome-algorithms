@@ -22,8 +22,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
     </plugins>
@@ -54,11 +54,6 @@
 		<groupId>org.javatuples</groupId>
 		<artifactId>javatuples</artifactId>
 		<version>1.2</version>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.lucene</groupId>
-		<artifactId>lucene-core</artifactId>
-		<version>3.0.3</version>
 	</dependency>
 	<dependency>
 		<groupId>log4j</groupId>

@@ -17,10 +17,10 @@ public class BloomFilterTest {
     @Test
     public void testBloomFilter() {
         BloomFilter<Integer> filter1 = new BloomFilter<>(10, 2, bitVectorFactory);
-        filter1.add(5);
-        assertTrue(filter1.contains(5));
+        filter1.add(Integer.valueOf(5));
+        assertTrue(filter1.contains(Integer.valueOf(5)));
 
-        assertFalse(filter1.contains(4));
+        assertFalse(filter1.contains(Integer.valueOf(4)));
     }
 
     @Test

@@ -131,12 +131,12 @@ class HybridExecutorBuilder {
 			.mapToLong(Collection::size)
 			.map(MathUtils::increment)
 			.reduce(1, MathUtils::multiply);
-		MetricsUtils.registerGauge("possibleLHS", numLhs);
-		MetricsUtils.registerGauge("minSupport", minSupport);
+		MetricsUtils.registerGauge("possibleLHS", Long.valueOf(numLhs));
+		MetricsUtils.registerGauge("minSupport", Long.valueOf(minSupport));
 		MetricsUtils.registerGauge("thresholds", thresholds);
-		log.info("{} possible LHSs", numLhs);
-		log.info("minSupport: {}", minSupport);
-		log.info("minThreshold: {}", minThreshold);
+		log.info("{} possible LHSs", Long.valueOf(numLhs));
+		log.info("minSupport: {}", Long.valueOf(minSupport));
+		log.info("minThreshold: {}", Double.valueOf(minThreshold));
 		log.info("thresholds: {}", thresholds);
 	}
 

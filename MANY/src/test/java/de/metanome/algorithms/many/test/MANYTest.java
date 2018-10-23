@@ -30,7 +30,6 @@ import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.results.Result;
 import de.metanome.algorithms.many.driver.AnelosimusDriver;
 import de.metanome.backend.result_receiver.ResultCache;
-import de.metanome.backend.result_receiver.ResultReceiver;
 
 public class MANYTest {
 

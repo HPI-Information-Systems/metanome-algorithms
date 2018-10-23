@@ -23,7 +23,7 @@ public class CollectingThresholdMapTest {
 
 	@Parameters
 	public static Collection<Boolean> data() {
-		return Arrays.asList(true, false);
+		return Arrays.asList(Boolean.TRUE, Boolean.FALSE);
 	}
 
 	@Before
@@ -34,7 +34,7 @@ public class CollectingThresholdMapTest {
 	@Test
 	public void test() {
 		Collection<To> row1 = Arrays.asList(
-			To.builder().similarity(0.5).records(new IntOpenHashSet(Arrays.asList(1, 2))).build(),
+			To.builder().similarity(0.5).records(new IntOpenHashSet(Arrays.asList(Integer.valueOf(1), Integer.valueOf(2)))).build(),
 			To.builder().similarity(0.6).records(IntSets.singleton(3)).build());
 		Collection<To> row2 = Collections.singletonList(
 			To.builder().similarity(0.4).records(IntSets.singleton(1)).build());
@@ -43,12 +43,12 @@ public class CollectingThresholdMapTest {
 			.add(2, row2)
 			.build();
 		assertThat(map.greaterOrEqual(1, 0.5)).hasSize(3);
-		assertThat(map.greaterOrEqual(1, 0.5)).contains(1, 2, 3);
+		assertThat(map.greaterOrEqual(1, 0.5)).contains(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3));
 		assertThat(map.greaterOrEqual(1, 0.6)).hasSize(1);
-		assertThat(map.greaterOrEqual(1, 0.6)).contains(3);
+		assertThat(map.greaterOrEqual(1, 0.6)).contains(Integer.valueOf(3));
 		assertThat(map.greaterOrEqual(1, 0.7)).isEmpty();
 		assertThat(map.greaterOrEqual(2, 0.4)).hasSize(1);
-		assertThat(map.greaterOrEqual(2, 0.4)).contains(1);
+		assertThat(map.greaterOrEqual(2, 0.4)).contains(Integer.valueOf(1));
 	}
 
 }

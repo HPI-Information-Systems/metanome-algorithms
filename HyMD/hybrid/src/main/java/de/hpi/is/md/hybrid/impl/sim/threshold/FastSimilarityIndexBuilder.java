@@ -25,11 +25,9 @@ public final class FastSimilarityIndexBuilder extends AbstractSimilarityIndexBui
 		.factory();
 	private static final SimilarityTableBuilder.Factory DEFAULT_TABLE_BUILDER_FACTORY = SimilarityTableBuilderImpl
 		.factory(new SimilarityArrayTableFactory(), SimilarityMapRowBuilder.factory());
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	@NonNull
 	private ThresholdMapFlattener.Factory flattenerFactory = DEFAULT_FLATTENER_FACTORY;
-	@SuppressWarnings("FieldMayBeFinal")
 	@Default
 	@NonNull
 	private SimilarityTableBuilder.Factory tableBuilderFactory = DEFAULT_TABLE_BUILDER_FACTORY;

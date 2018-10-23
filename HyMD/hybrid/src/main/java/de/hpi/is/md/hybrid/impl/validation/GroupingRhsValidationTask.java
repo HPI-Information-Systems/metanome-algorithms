@@ -71,7 +71,6 @@ public final class GroupingRhsValidationTask extends AbstractRhsValidationTask {
 			}
 		}
 
-		@SuppressWarnings("TypeMayBeWeakened")
 		private Int2ObjectMultimap<int[]> groupByValue(IntIterable matching) {
 			Int2ObjectMultimap<int[]> map = new Int2ObjectHashMultimap<>();
 			OfInt it = matching.iterator();

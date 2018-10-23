@@ -19,7 +19,7 @@ public class UniformTrimmerTest {
 		DoubleSet similarities = new DoubleOpenHashSet(new double[]{0.2, 0.3, 0.4, 0.5});
 		Iterable<Double> thresholds = thresholdFilter.filter(similarities);
 		assertThat(thresholds).hasSize(3);
-		assertThat(thresholds).contains(0.2, 0.3, 0.5);
+		assertThat(thresholds).contains(Double.valueOf(0.2), Double.valueOf(0.3), Double.valueOf(0.5));
 	}
 
 	@Test
@@ -29,7 +29,7 @@ public class UniformTrimmerTest {
 		DoubleSet similarities = new DoubleOpenHashSet(new double[]{0.2, 0.3, 0.4, 0.5, 0.6});
 		Iterable<Double> thresholds = thresholdFilter.filter(similarities);
 		assertThat(thresholds).hasSize(3);
-		assertThat(thresholds).contains(0.2, 0.4, 0.6);
+		assertThat(thresholds).contains(Double.valueOf(0.2), Double.valueOf(0.4), Double.valueOf(0.6));
 	}
 
 }

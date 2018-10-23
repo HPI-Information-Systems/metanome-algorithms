@@ -98,7 +98,7 @@ public class ResultCompletion {
 		ClusterPair startPartition = StrippedPartition.getFullParition(input.getLineCount());
 		int[][] values = input.getInts();
 		IEJoin iejoin = new IEJoin(values);
-		PartitionEvidenceSetBuilder builder = new PartitionEvidenceSetBuilder(predicates, input, values);
+		PartitionEvidenceSetBuilder builder = new PartitionEvidenceSetBuilder(predicates, values);
 
 		long startTime = System.nanoTime();
 		walker.walk((inter) -> {

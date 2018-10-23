@@ -48,18 +48,18 @@ public abstract class ValidatorTest {
 	public void test() {
 		MDSite lhs = new MDSiteImpl(4)
 			.set(0, 0.6);
-		doReturn(new IntOpenHashSet(Arrays.asList(0, 1))).when(column0)
+		doReturn(new IntOpenHashSet(Arrays.asList(Integer.valueOf(0), Integer.valueOf(1)))).when(column0)
 			.getAllSimilarRightRecords(0, 0.6);
 		doReturn(IntSets.singleton(2)).when(column0)
 			.getAllSimilarRightRecords(1, 0.6);
-		doReturn(0).when(column2).getLeftValue(new int[]{0, 0, 0, 0});
-		doReturn(1).when(column2).getLeftValue(new int[]{1, 0, 1, 0});
-		doReturn(0).when(column2).getRightValue(new int[]{0, 0, 0, 0});
-		doReturn(1).when(column2).getRightValue(new int[]{0, 0, 1, 0});
-		doReturn(2).when(column2).getRightValue(new int[]{0, 0, 2, 0});
-		doReturn(1.0).when(column2).getSimilarity(0, 0);
-		doReturn(0.1).when(column2).getSimilarity(0, 1);
-		doReturn(0.5).when(column2).getSimilarity(1, 2);
+		doReturn(Integer.valueOf(0)).when(column2).getLeftValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(1)).when(column2).getLeftValue(new int[]{1, 0, 1, 0});
+		doReturn(Integer.valueOf(0)).when(column2).getRightValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(1)).when(column2).getRightValue(new int[]{0, 0, 1, 0});
+		doReturn(Integer.valueOf(2)).when(column2).getRightValue(new int[]{0, 0, 2, 0});
+		doReturn(Double.valueOf(1.0)).when(column2).getSimilarity(0, 0);
+		doReturn(Double.valueOf(0.1)).when(column2).getSimilarity(0, 1);
+		doReturn(Double.valueOf(0.5)).when(column2).getSimilarity(1, 2);
 		doReturn(new int[]{0, 0, 0, 0}).when(right).get(0);
 		doReturn(new int[]{0, 0, 1, 0}).when(right).get(1);
 		doReturn(new int[]{0, 0, 2, 0}).when(right).get(2);
@@ -84,15 +84,15 @@ public abstract class ValidatorTest {
 	public void testBelowLowerBound() {
 		MDSite lhs = new MDSiteImpl(4)
 			.set(0, 0.6);
-		doReturn(new IntOpenHashSet(Arrays.asList(0, 1))).when(column0)
+		doReturn(new IntOpenHashSet(Arrays.asList(Integer.valueOf(0), Integer.valueOf(1)))).when(column0)
 			.getAllSimilarRightRecords(0, 0.6);
 		doReturn(IntSets.singleton(2)).when(column0)
 			.getAllSimilarRightRecords(1, 0.6);
-		doReturn(0).when(column2).getLeftValue(new int[]{0, 0, 0, 0});
-		doReturn(0).when(column2).getRightValue(new int[]{0, 0, 0, 0});
-		doReturn(1).when(column2).getRightValue(new int[]{0, 0, 1, 0});
-		doReturn(1.0).when(column2).getSimilarity(0, 0);
-		doReturn(0.7).when(column2).getSimilarity(0, 1);
+		doReturn(Integer.valueOf(0)).when(column2).getLeftValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(0)).when(column2).getRightValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(1)).when(column2).getRightValue(new int[]{0, 0, 1, 0});
+		doReturn(Double.valueOf(1.0)).when(column2).getSimilarity(0, 0);
+		doReturn(Double.valueOf(0.7)).when(column2).getSimilarity(0, 1);
 		doReturn(new int[]{0, 0, 0, 0}).when(right).get(0);
 		doReturn(new int[]{0, 0, 1, 0}).when(right).get(1);
 		doReturn(new int[]{0, 0, 2, 0}).when(right).get(2);
@@ -111,7 +111,7 @@ public abstract class ValidatorTest {
 		assertThat(v2.getActual().getThreshold()).isLessThanOrEqualTo(0.7);
 		assertThat(v2.getOriginal()).isEqualTo(new MDElementImpl(2, 1.0));
 		assertThat(v2.isValidAndMinimal()).isFalse();
-		Assert.assertThat(v2.getViolations(), hasSize(greaterThanOrEqualTo(1)));
+		Assert.assertThat(v2.getViolations(), hasSize(greaterThanOrEqualTo(Integer.valueOf(1))));
 		assertThat(v2.getViolations())
 			.contains(new IntArrayPair(new int[]{0, 0, 0, 0}, new int[]{0, 0, 1, 0}));
 		assertThat(results.getLhsResult().getSupport()).isEqualTo(3L);
@@ -121,18 +121,18 @@ public abstract class ValidatorTest {
 	public void testBelowMinThreshold() {
 		MDSite lhs = new MDSiteImpl(4)
 			.set(0, 0.6);
-		doReturn(new IntOpenHashSet(Arrays.asList(0, 1))).when(column0)
+		doReturn(new IntOpenHashSet(Arrays.asList(Integer.valueOf(0), Integer.valueOf(1)))).when(column0)
 			.getAllSimilarRightRecords(0, 0.6);
-		doReturn(new IntOpenHashSet(Collections.singletonList(2))).when(column0)
+		doReturn(new IntOpenHashSet(Collections.singletonList(Integer.valueOf(2)))).when(column0)
 			.getAllSimilarRightRecords(1, 0.6);
-		doReturn(0).when(column2).getLeftValue(new int[]{0, 0, 0, 0});
-		doReturn(1).when(column2).getLeftValue(new int[]{1, 0, 1, 0});
-		doReturn(0).when(column2).getRightValue(new int[]{0, 0, 0, 0});
-		doReturn(1).when(column2).getRightValue(new int[]{0, 0, 1, 0});
-		doReturn(2).when(column2).getRightValue(new int[]{0, 0, 2, 0});
-		doReturn(1.0).when(column2).getSimilarity(0, 0);
-		doReturn(0.7).when(column2).getSimilarity(0, 1);
-		doReturn(0.7).when(column2).getSimilarity(1, 2);
+		doReturn(Integer.valueOf(0)).when(column2).getLeftValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(1)).when(column2).getLeftValue(new int[]{1, 0, 1, 0});
+		doReturn(Integer.valueOf(0)).when(column2).getRightValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(1)).when(column2).getRightValue(new int[]{0, 0, 1, 0});
+		doReturn(Integer.valueOf(2)).when(column2).getRightValue(new int[]{0, 0, 2, 0});
+		doReturn(Double.valueOf(1.0)).when(column2).getSimilarity(0, 0);
+		doReturn(Double.valueOf(0.7)).when(column2).getSimilarity(0, 1);
+		doReturn(Double.valueOf(0.7)).when(column2).getSimilarity(1, 2);
 		doReturn(new int[]{0, 0, 0, 0}).when(right).get(0);
 		doReturn(new int[]{0, 0, 1, 0}).when(right).get(1);
 		doReturn(new int[]{0, 0, 2, 0}).when(right).get(2);
@@ -149,7 +149,7 @@ public abstract class ValidatorTest {
 		assertThat(results.getLhsResult().getLhs()).isEqualTo(lhs);
 		assertThat(v2.getActual()).isEqualTo(new MDElementImpl(2, 0.7));
 		assertThat(v2.getOriginal()).isEqualTo(new MDElementImpl(2, 1.0));
-		Assert.assertThat(v2.getViolations(), hasSize(greaterThanOrEqualTo(1)));
+		Assert.assertThat(v2.getViolations(), hasSize(greaterThanOrEqualTo(Integer.valueOf(1))));
 		Assert.assertThat(v2.getViolations(),
 			either(hasItem(new IntArrayPair(new int[]{0, 0, 0, 0}, new int[]{0, 0, 1, 0})))
 				.or(hasItem(new IntArrayPair(new int[]{1, 0, 1, 0}, new int[]{0, 0, 2, 0}))));
@@ -159,8 +159,8 @@ public abstract class ValidatorTest {
 	@Test
 	public void testEmptyLhs() {
 		MDSite lhs = new MDSiteImpl(4);
-		when(right.getAll()).thenReturn(new IntOpenHashSet(Arrays.asList(0, 1, 2)));
-		when(column2.getMinSimilarity()).thenReturn(0.1);
+		when(right.getAll()).thenReturn(new IntOpenHashSet(Arrays.asList(Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2))));
+		when(Double.valueOf(column2.getMinSimilarity())).thenReturn(Double.valueOf(0.1));
 		Validator validator = createValidator();
 		Collection<Rhs> rhs = Collections
 			.singletonList(Rhs.builder().rhsAttr(2).threshold(1.0).lowerBound(0.0).build());
@@ -177,18 +177,18 @@ public abstract class ValidatorTest {
 		MDSite lhs = new MDSiteImpl(4)
 			.set(0, 0.6)
 			.set(1, 0.6);
-		doReturn(0).when(column1).getLeftValue(new int[]{0, 0, 0, 0});
-		doReturn(0).when(column1).getLeftValue(new int[]{1, 0, 1, 0});
-		doReturn(new IntOpenHashSet(Arrays.asList(0, 1))).when(column0)
+		doReturn(Integer.valueOf(0)).when(column1).getLeftValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(0)).when(column1).getLeftValue(new int[]{1, 0, 1, 0});
+		doReturn(new IntOpenHashSet(Arrays.asList(Integer.valueOf(0), Integer.valueOf(1)))).when(column0)
 			.getAllSimilarRightRecords(0, 0.6);
 		doReturn(IntSets.singleton(2)).when(column0)
 			.getAllSimilarRightRecords(1, 0.6);
 		doReturn(IntSets.singleton(0)).when(column1)
 			.getAllSimilarRightRecords(0, 0.6);
-		doReturn(1).when(column2).getLeftValue(new int[]{1, 0, 1, 0});
-		doReturn(0).when(column2).getLeftValue(new int[]{0, 0, 0, 0});
-		doReturn(0).when(column2).getRightValue(new int[]{0, 0, 0, 0});
-		doReturn(1.0).when(column2).getSimilarity(0, 0);
+		doReturn(Integer.valueOf(1)).when(column2).getLeftValue(new int[]{1, 0, 1, 0});
+		doReturn(Integer.valueOf(0)).when(column2).getLeftValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(0)).when(column2).getRightValue(new int[]{0, 0, 0, 0});
+		doReturn(Double.valueOf(1.0)).when(column2).getSimilarity(0, 0);
 		doReturn(new int[]{0, 0, 0, 0}).when(right).get(0);
 		when(column0.getLeftPli()).thenReturn(pli0);
 		Collection<Cluster> clusters = Arrays.asList(
@@ -211,8 +211,8 @@ public abstract class ValidatorTest {
 		MDSite lhs = new MDSiteImpl(4)
 			.set(0, 0.7)
 			.set(1, 0.6);
-		doReturn(0).when(column1).getLeftValue(new int[]{0, 0, 0, 0});
-		doReturn(0).when(column1).getLeftValue(new int[]{1, 0, 1, 0});
+		doReturn(Integer.valueOf(0)).when(column1).getLeftValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(0)).when(column1).getLeftValue(new int[]{1, 0, 1, 0});
 		doReturn(IntSets.EMPTY_SET).when(column0).getAllSimilarRightRecords(0, 0.7);
 		doReturn(IntSets.EMPTY_SET).when(column0).getAllSimilarRightRecords(1, 0.7);
 		when(column0.getLeftPli()).thenReturn(pli0);
@@ -235,18 +235,18 @@ public abstract class ValidatorTest {
 	public void testNumberOfValidations() {
 		MDSite lhs = new MDSiteImpl(4)
 			.set(0, 0.6);
-		doReturn(new IntOpenHashSet(Arrays.asList(0, 1))).when(column0)
+		doReturn(new IntOpenHashSet(Arrays.asList(Integer.valueOf(0), Integer.valueOf(1)))).when(column0)
 			.getAllSimilarRightRecords(0, 0.6);
 		doReturn(IntSets.singleton(2)).when(column0)
 			.getAllSimilarRightRecords(1, 0.6);
-		doReturn(0).when(column2).getLeftValue(new int[]{0, 0, 0, 0});
-		doReturn(1).when(column2).getLeftValue(new int[]{1, 0, 1, 0});
-		doReturn(0).when(column2).getRightValue(new int[]{0, 0, 0, 0});
-		doReturn(1).when(column2).getRightValue(new int[]{0, 0, 1, 0});
-		doReturn(2).when(column2).getRightValue(new int[]{0, 0, 2, 0});
-		doReturn(1.0).when(column2).getSimilarity(0, 0);
-		doReturn(1.0).when(column2).getSimilarity(0, 1);
-		doReturn(1.0).when(column2).getSimilarity(1, 2);
+		doReturn(Integer.valueOf(0)).when(column2).getLeftValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(1)).when(column2).getLeftValue(new int[]{1, 0, 1, 0});
+		doReturn(Integer.valueOf(0)).when(column2).getRightValue(new int[]{0, 0, 0, 0});
+		doReturn(Integer.valueOf(1)).when(column2).getRightValue(new int[]{0, 0, 1, 0});
+		doReturn(Integer.valueOf(2)).when(column2).getRightValue(new int[]{0, 0, 2, 0});
+		doReturn(Double.valueOf(1.0)).when(column2).getSimilarity(0, 0);
+		doReturn(Double.valueOf(1.0)).when(column2).getSimilarity(0, 1);
+		doReturn(Double.valueOf(1.0)).when(column2).getSimilarity(1, 2);
 		doReturn(new int[]{0, 0, 0, 0}).when(right).get(0);
 		doReturn(new int[]{0, 0, 1, 0}).when(right).get(1);
 		doReturn(new int[]{0, 0, 2, 0}).when(right).get(2);

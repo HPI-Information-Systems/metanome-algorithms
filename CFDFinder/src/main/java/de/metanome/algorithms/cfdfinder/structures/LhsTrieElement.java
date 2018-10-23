@@ -1,8 +1,7 @@
 package de.metanome.algorithms.cfdfinder.structures;
 
+import java.util.BitSet;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 public class LhsTrieElement {
 
@@ -37,9 +36,9 @@ public class LhsTrieElement {
 		this.childrenCount = childrenCount;
 	}
 
-	protected void getLhsAndGeneralizations(OpenBitSet lhs, int currentLhsAttr, OpenBitSet currentLhs, List<OpenBitSet> foundLhs) {
+	protected void getLhsAndGeneralizations(BitSet lhs, int currentLhsAttr, BitSet currentLhs, List<BitSet> foundLhs) {
 		if (this.children == null) {
-			foundLhs.add(currentLhs.clone());
+			foundLhs.add((BitSet) currentLhs.clone());
 			return;
 		}
 		
@@ -56,7 +55,7 @@ public class LhsTrieElement {
 		}
 	}
 
-	protected boolean containsLhsOrGeneralization(OpenBitSet lhs, int currentLhsAttr) {
+	protected boolean containsLhsOrGeneralization(BitSet lhs, int currentLhsAttr) {
 		if (this.children == null)
 			return true;
 		
@@ -73,9 +72,9 @@ public class LhsTrieElement {
 		return this.containsLhsOrGeneralization(lhs, nextLhsAttr);
 	}
 
-	protected void asBitSetList(OpenBitSet currentLhs, int currentLhsAttr, List<OpenBitSet> foundLhs) {
+	protected void asBitSetList(BitSet currentLhs, int currentLhsAttr, List<BitSet> foundLhs) {
 		if (this.children == null) {
-			foundLhs.add(currentLhs.clone());
+			foundLhs.add((BitSet) currentLhs.clone());
 			return;
 		}
 		

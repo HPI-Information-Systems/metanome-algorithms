@@ -30,15 +30,13 @@ public class NTreeSearch implements ISubsetBackend, ITreeSearch {
 		if (nextBit < 0) {
 			bitset = bs;
 			return;
-		} else {
-			NTreeSearch nextTree = subtrees.get(nextBit);
-			if (nextTree == null) {
-				nextTree = new NTreeSearch();
-				subtrees.put(nextBit, nextTree);
-			}
-			nextTree.add(bs, nextBit + 1);
 		}
-
+		NTreeSearch nextTree = subtrees.get(Integer.valueOf(nextBit));
+		if (nextTree == null) {
+			nextTree = new NTreeSearch();
+			subtrees.put(Integer.valueOf(nextBit), nextTree);
+		}
+		nextTree.add(bs, nextBit + 1);
 	}
 
 	@Override
@@ -56,10 +54,10 @@ public class NTreeSearch implements ISubsetBackend, ITreeSearch {
 
 		int nextBit = invalidFD.nextSetBit(next);
 		while (nextBit >= 0) {
-			NTreeSearch subTree = subtrees.get(nextBit);
+			NTreeSearch subTree = subtrees.get(Integer.valueOf(nextBit));
 			if (subTree != null)
 				if (subTree.getAndRemoveGeneralizations(invalidFD, nextBit + 1, removed))
-					subtrees.remove(nextBit);
+					subtrees.remove(Integer.valueOf(nextBit));
 			nextBit = invalidFD.nextSetBit(nextBit + 1);
 		}
 		return subtrees.isEmpty();
@@ -80,7 +78,7 @@ public class NTreeSearch implements ISubsetBackend, ITreeSearch {
 
 		int nextBit = add.nextSetBit(next);
 		while (nextBit >= 0) {
-			NTreeSearch subTree = subtrees.get(nextBit);
+			NTreeSearch subTree = subtrees.get(Integer.valueOf(nextBit));
 			if (subTree != null) {
 				IBitSet res = subTree.getSubset(add, nextBit + 1);
 				if (res != null)
@@ -111,11 +109,11 @@ public class NTreeSearch implements ISubsetBackend, ITreeSearch {
 
 		// for(int i = next; i <= nextBit; ++i) {
 		for (Entry<Integer, NTreeSearch> entry : subtrees.entrySet()) {
-			if (entry.getKey() > nextBit)
+			if (entry.getKey().intValue() > nextBit)
 				continue;
 			NTreeSearch subTree = entry.getValue();
 			if (subTree != null)
-				subTree.forEachSuperSet(bitset, consumer, entry.getKey() + 1);
+				subTree.forEachSuperSet(bitset, consumer, entry.getKey().intValue() + 1);
 		}
 	}
 
@@ -151,10 +149,10 @@ public class NTreeSearch implements ISubsetBackend, ITreeSearch {
 			if (bitset.equals(remove))
 				bitset = null;
 		} else {
-			NTreeSearch subTree = subtrees.get(nextBit);
+			NTreeSearch subTree = subtrees.get(Integer.valueOf(nextBit));
 			if (subTree != null) {
 				if (subTree.remove(remove, nextBit + 1))
-					subtrees.remove(nextBit);
+					subtrees.remove(Integer.valueOf(nextBit));
 			}
 		}
 		return bitset == null && subtrees.size() == 0;

@@ -41,7 +41,7 @@ public class PreprocessedColumnPairImplTest {
 	@SuppressWarnings("unchecked")
 	private static CompressedRelation createLeft() {
 		CompressedRelation left = Mockito.mock(CompressedRelation.class);
-		when(left.indexOf(A)).thenReturn(0);
+		when(Integer.valueOf(left.indexOf(A))).thenReturn(Integer.valueOf(0));
 		CompressedColumn<Integer> aCompressed = Mockito.mock(CompressedColumn.class);
 		when(aCompressed.getPli()).thenReturn(Mockito.mock(PositionListIndex.class));
 		when(left.<Integer>getColumn(0)).thenReturn(aCompressed);
@@ -56,8 +56,8 @@ public class PreprocessedColumnPairImplTest {
 		CompressedRelation right = Mockito.mock(CompressedRelation.class);
 		doReturn(bCompressed).when(right).<Integer>getColumn(0);
 		doReturn(Mockito.mock(CompressedColumn.class)).when(right).<Integer>getColumn(1);
-		doReturn(0).when(right).indexOf(B);
-		doReturn(1).when(right).indexOf(C);
+		doReturn(Integer.valueOf(0)).when(right).indexOf(B);
+		doReturn(Integer.valueOf(1)).when(right).indexOf(C);
 		return right;
 	}
 
@@ -66,11 +66,11 @@ public class PreprocessedColumnPairImplTest {
 		ColumnMapping<T> columnMapping) {
 		SimilarityIndexBuilder indexBuilder = Mockito.mock(SimilarityIndexBuilder.class);
 		SimilarityIndex index = Mockito.mock(SimilarityIndex.class);
-		doReturn(0.8).when(index).getSimilarity(4, 5);
-		doReturn(0.5).when(index).getSimilarity(4, 8);
-		doReturn(new IntArrayList(Arrays.asList(51, 52, 81, 82))).when(index)
+		doReturn(Double.valueOf(0.8)).when(index).getSimilarity(4, 5);
+		doReturn(Double.valueOf(0.5)).when(index).getSimilarity(4, 8);
+		doReturn(new IntArrayList(Arrays.asList(Integer.valueOf(51), Integer.valueOf(52), Integer.valueOf(81), Integer.valueOf(82)))).when(index)
 			.getSimilarRecords(4, 0.5);
-		doReturn(new IntArrayList(Arrays.asList(51, 52))).when(index).getSimilarRecords(4, 0.6);
+		doReturn(new IntArrayList(Arrays.asList(Integer.valueOf(51), Integer.valueOf(52)))).when(index).getSimilarRecords(4, 0.6);
 		when(indexBuilder.create(any(), any(), any(), any(), anyDouble(), any())).thenReturn(index);
 		SimilarityComputer<T> similarityComputer = Mockito.mock(SimilarityComputer.class);
 		return PreprocessingColumnConfiguration.<T>builder()
@@ -85,13 +85,13 @@ public class PreprocessedColumnPairImplTest {
 		List<PreprocessedColumnPair> columnPairs = create();
 		PreprocessedColumnPair ab = columnPairs.get(0);
 		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.5)).hasSize(4);
-		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.5)).contains(51);
-		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.5)).contains(52);
-		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.5)).contains(81);
-		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.5)).contains(82);
+		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.5)).contains(Integer.valueOf(51));
+		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.5)).contains(Integer.valueOf(52));
+		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.5)).contains(Integer.valueOf(81));
+		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.5)).contains(Integer.valueOf(82));
 		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.6)).hasSize(2);
-		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.6)).contains(51);
-		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.6)).contains(52);
+		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.6)).contains(Integer.valueOf(51));
+		assertThat(ab.getAllSimilarRightRecords(new int[]{4}, 0.6)).contains(Integer.valueOf(52));
 	}
 
 	@Test
@@ -108,7 +108,6 @@ public class PreprocessedColumnPairImplTest {
 		assertThat(columnPairs).hasSize(2);
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<PreprocessedColumnPair> create() {
 		ColumnPair<Integer> pair1 = new ColumnPair<>(A, B);
 		ColumnPair<Integer> pair2 = new ColumnPair<>(A, C);

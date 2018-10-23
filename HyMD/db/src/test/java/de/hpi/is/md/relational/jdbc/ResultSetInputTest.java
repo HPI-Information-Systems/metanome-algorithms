@@ -54,7 +54,7 @@ public class ResultSetInputTest extends JdbcTest {
 				Row bob = rows.next();
 				assertThat(bob.get(NAME)).hasValue("Bob");
 				assertThat(bob.get(LAST_NAME)).isEmpty();
-				assertThat(bob.get(AGE)).hasValue((short) 18);
+				assertThat(bob.get(AGE)).hasValue(Short.valueOf((short) 18));
 			}
 		}
 	}
@@ -73,7 +73,6 @@ public class ResultSetInputTest extends JdbcTest {
 		}
 	}
 
-	@SuppressWarnings("EmptyTryBlock")
 	@Test(expected = InputCloseException.class)
 	public void testClosedResultSetBeforeClose() throws SQLException, InputCloseException {
 		try (Statement statement = connection.createStatement()) {
@@ -102,7 +101,7 @@ public class ResultSetInputTest extends JdbcTest {
 			ResultSet resultSet = statement.executeQuery("SELECT * FROM Person");
 			try (RelationalInput input = ResultSetInput.create(resultSet)) {
 				resultSet.close();
-				for (Row ignored : input) {
+				for (@SuppressWarnings("unused") Row ignored : input) {
 					fail();
 				}
 			}

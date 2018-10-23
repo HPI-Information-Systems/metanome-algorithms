@@ -88,7 +88,7 @@ class SimilaritySetProcessor {
 
 		private void processNotSeen() {
 			Collection<LatticeMD> violated = findViolated();
-			log.trace("Found {} violated LatticeMDs", violated.size());
+			log.trace("Found {} violated LatticeMDs", Integer.valueOf(violated.size()));
 			process(violated);
 			statistics.processed();
 			assert findViolated().isEmpty() : "Violated MDs remain in lattice";

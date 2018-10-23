@@ -33,7 +33,7 @@ class NotSupportedStrategy implements AnalyzeStrategy {
 		// if a candidate does not have minimal support, no specialization can be supported
 		statistics.notSupported();
 		fullLattice.markNotSupported(lhs);
-		log.debug("{} not supported (support={})", lhs, support);
+		log.debug("{} not supported (support={})", lhs, Long.valueOf(support));
 	}
 
 	@RequiredArgsConstructor

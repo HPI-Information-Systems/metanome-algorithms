@@ -56,8 +56,9 @@ final class AddContext extends MDContext {
 
 	private double getUpdatedThreshold(int rhsAttr, double threshold) {
 		return rhs.get(rhsAttr)
-			.map(t -> Math.min(t, threshold))
-			.orElse(threshold);
+			.map(t -> Double.valueOf(Math.min(t, threshold)))
+			.orElse(Double.valueOf(threshold))
+			.doubleValue();
 	}
 
 	private LhsRhsPair toPair(MDSite lhs) {

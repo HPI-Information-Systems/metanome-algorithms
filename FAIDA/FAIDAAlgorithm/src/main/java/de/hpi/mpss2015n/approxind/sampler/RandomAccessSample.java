@@ -40,21 +40,25 @@ public class RandomAccessSample implements RelationalInput {
     Random rnd = new Random();
 
     while (set.size() < numSamples) {
+      
+      RandomAccessFile rndFile = null;
+      CSVReader csvReader = null;
+    	
       try {
-        RandomAccessFile rndFile = new RandomAccessFile(file, "r");
+        rndFile = new RandomAccessFile(file, "r");
         long randomPosition = (long)(rnd.nextDouble()*(length));
         rndFile.seek(randomPosition);
         rndFile.readLine();
         String line = rndFile.readLine();
         if(line == null) continue;
         Reader in = new StringReader(line);
-        CSVReader csvReader = new CSVReader(in,
-                                            input.getSeparatorAsChar(),
-                                            input.getQuoteCharAsChar(),
-                                            input.getEscapeCharAsChar(),
-                                            input.getSkipLines(),
-                                            input.isStrictQuotes(),
-                                            input.isIgnoreLeadingWhiteSpace());
+        csvReader = new CSVReader(in,
+            input.getSeparatorAsChar(),
+            input.getQuoteCharAsChar(),
+            input.getEscapeCharAsChar(),
+            input.getSkipLines().intValue(),
+            input.isStrictQuotes(),
+            input.isIgnoreLeadingWhiteSpace());
         String[] values = csvReader.readNext();
         List<String> valueList = new ArrayList<>();
         for (String val : values) {
@@ -68,6 +72,15 @@ public class RandomAccessSample implements RelationalInput {
         }
       } catch (IOException e) {
         e.printStackTrace();
+      } finally {
+    	try {
+    	  if (rnd != null)
+		    rndFile.close();
+    	  if (rnd != null)
+            csvReader.close();
+    	} catch (IOException e) {
+		  e.printStackTrace();
+		}
       }
     }
     //Todo: return value - + wrapper for interface compatibility

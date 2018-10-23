@@ -64,10 +64,10 @@ public class SimilarityTableBuilderTest {
 		tableBuilder.add(2, row2);
 		Int2Int2DoubleTable table = tableBuilder.build();
 		assertThat(table.row(1).asMap()).hasSize(2);
-		assertThat(table.row(1).asMap()).containsEntry(1, 0.5);
-		assertThat(table.row(1).asMap()).containsEntry(2, 0.6);
+		assertThat(table.row(1).asMap()).containsEntry(Integer.valueOf(1), Double.valueOf(0.5));
+		assertThat(table.row(1).asMap()).containsEntry(Integer.valueOf(2), Double.valueOf(0.6));
 		assertThat(table.row(2).asMap()).hasSize(1);
-		assertThat(table.row(2).asMap()).containsEntry(1, 0.4);
+		assertThat(table.row(2).asMap()).containsEntry(Integer.valueOf(1), Double.valueOf(0.4));
 	}
 
 	@Test
@@ -82,7 +82,7 @@ public class SimilarityTableBuilderTest {
 		tableBuilder.add(2, row2);
 		Int2Int2DoubleTable table = tableBuilder.build();
 		assertThat(table.values()).hasSize(3);
-		assertThat(table.values()).contains(0.4, 0.5, 0.6);
+		assertThat(table.values()).contains(Double.valueOf(0.4), Double.valueOf(0.5), Double.valueOf(0.6));
 	}
 
 	private SimilarityTableBuilder createTableBuilder(int height, int width) {

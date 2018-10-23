@@ -21,11 +21,11 @@ public class StepThresholdProviderTest {
 	@Test
 	public void testGetNext() {
 		ThresholdFilter thresholdFilter = new StepThresholdFilter(
-			Arrays.asList(0.9, 0.8, 0.4, 0.7));
+			Arrays.asList(Double.valueOf(0.9), Double.valueOf(0.8), Double.valueOf(0.4), Double.valueOf(0.7)));
 		Iterable<Double> thresholds = thresholdFilter
-			.filter(new DoubleOpenHashSet(Sets.newHashSet(0.7, 0.6)));
+			.filter(new DoubleOpenHashSet(Sets.newHashSet(Double.valueOf(0.7), Double.valueOf(0.6))));
 		assertThat(thresholds).hasSize(4);
-		assertThat(thresholds).contains(0.9, 0.8, 0.4, 0.7);
+		assertThat(thresholds).contains(Double.valueOf(0.9), Double.valueOf(0.8), Double.valueOf(0.4), Double.valueOf(0.7));
 	}
 
 }

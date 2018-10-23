@@ -1,13 +1,16 @@
 package de.metanome.algorithms.cfdfinder.pruning;
 
+import static de.metanome.algorithms.cfdfinder.utils.LhsUtils.generateLhsSupersets;
+
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import de.metanome.algorithms.cfdfinder.pattern.Pattern;
 import de.metanome.algorithms.cfdfinder.pattern.PatternTableau;
 import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
-import org.apache.lucene.util.OpenBitSet;
-
-import java.util.*;
-
-import static de.metanome.algorithms.cfdfinder.utils.LhsUtils.generateLhsSupersets;
 
 public class SupportIndependentPruning implements PruningStrategy {
 
@@ -92,12 +95,12 @@ public class SupportIndependentPruning implements PruningStrategy {
         if (currentTableau.getPatterns().size() == 0 || currentTableau.getSupport() == 0) {
             return false;
         }
-        supportMap.put(currentCandidate, currentTableau.getSupport());
+        supportMap.put(currentCandidate, Double.valueOf(currentTableau.getSupport()));
         double maxSupport = 0;
-        for (OpenBitSet b : generateLhsSupersets(currentCandidate.lhs)) {
-            FDTreeElement.InternalFunctionalDependency parent = new FDTreeElement.InternalFunctionalDependency(b, currentCandidate.rhs);
+        for (BitSet b : generateLhsSupersets(currentCandidate.lhs, currentCandidate.numAttributes)) {
+            FDTreeElement.InternalFunctionalDependency parent = new FDTreeElement.InternalFunctionalDependency(b, currentCandidate.rhs, currentCandidate.numAttributes);
             if (supportMap.containsKey(parent)) {
-                double support = supportMap.get(parent);
+                double support = supportMap.get(parent).doubleValue();
                 if (support >= maxSupport) {
                     maxSupport = support;
                 }

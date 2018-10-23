@@ -10,8 +10,7 @@ public class BitVectorFactory {
     public BitVector<?> createBitVector(int size) {
         if (isFastVector)
             return new LongArrayHierarchicalBitVector(size);
-        else
-            return new LongArrayBitVector(size);
+		return new LongArrayBitVector(size);
     }
 
 }

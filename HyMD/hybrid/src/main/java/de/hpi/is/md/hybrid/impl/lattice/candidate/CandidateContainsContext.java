@@ -12,11 +12,11 @@ final class CandidateContainsContext extends LhsContext {
 	private final MDSite rhs;
 	@NonNull
 	private final LazyArray<CandidateThresholdNode> children;
-	@NonNull
+	
 	private final int rhsAttr;
 
 	@Builder
-	private CandidateContainsContext(@NonNull MDSite lhs, @NonNull int rhsAttr,
+	private CandidateContainsContext(@NonNull MDSite lhs, int rhsAttr,
 		@NonNull MDSite rhs,
 		@NonNull LazyArray<CandidateThresholdNode> children) {
 		super(lhs);
@@ -34,15 +34,17 @@ final class CandidateContainsContext extends LhsContext {
 		int nextLhsAttrId = id + 1;
 		double threshold = next.getThreshold();
 		boolean childContains = children.get(id)
-			.map(child -> child.containsMdOrGeneralization(lhs, rhsAttr, nextLhsAttrId, threshold))
-			.orElse(false);
+			.map(child -> Boolean.valueOf(child.containsMdOrGeneralization(lhs, rhsAttr, nextLhsAttrId, threshold)))
+			.orElse(Boolean.FALSE)
+			.booleanValue();
 		return childContains || containsNoCheck(nextLhsAttrId);
 	}
 
 	private boolean containsNoCheck(int currentLhsAttr) {
 		return getNext(currentLhsAttr)
 			.map(this::containsMdOrGeneralization)
-			.orElse(false);
+			.orElse(Boolean.FALSE)
+			.booleanValue();
 	}
 
 	private boolean isContainedHere() {

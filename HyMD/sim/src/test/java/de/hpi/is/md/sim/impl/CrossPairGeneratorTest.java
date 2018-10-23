@@ -11,19 +11,18 @@ import org.junit.Test;
 
 public class CrossPairGeneratorTest {
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void test() {
 		PairGenerator<Object> generator = CrossPairGenerator.getInstance();
-		Collection<Object> right = Arrays.asList(3, 4, 5);
-		Collection<Object> left = Arrays.asList(1, 2);
+		Collection<Object> right = Arrays.asList(Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5));
+		Collection<Object> left = Arrays.asList(Integer.valueOf(1), Integer.valueOf(2));
 		Collection<Tuple2<Object, Collection<Object>>> similarities = generator
 			.generate(left, right)
 			.getPairs()
 			.collect(Collectors.toList());
 		assertThat(similarities).hasSize(2);
-		assertThat(similarities).contains(new Tuple2<>(1, Arrays.asList(3, 4, 5)));
-		assertThat(similarities).contains(new Tuple2<>(2, Arrays.asList(3, 4, 5)));
+		assertThat(similarities).contains(new Tuple2<>(Integer.valueOf(1), Arrays.asList(Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5))));
+		assertThat(similarities).contains(new Tuple2<>(Integer.valueOf(2), Arrays.asList(Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5))));
 	}
 
 }

@@ -59,10 +59,10 @@ public class CompressorTest {
 		CompressedColumn<Integer> column = compressed.getColumn(1);
 		Dictionary<Integer> dictionary = column.getDictionary();
 		assertThat(dictionary.values()).hasSize(2);
-		assertThat(dictionary.values()).contains(2);
-		assertThat(dictionary.values()).contains(1);
-		assertThat(dictionary.getOrAdd(2)).isEqualTo(0);
-		assertThat(dictionary.getOrAdd(1)).isEqualTo(1);
+		assertThat(dictionary.values()).contains(Integer.valueOf(2));
+		assertThat(dictionary.values()).contains(Integer.valueOf(1));
+		assertThat(dictionary.getOrAdd(Integer.valueOf(2))).isEqualTo(0);
+		assertThat(dictionary.getOrAdd(Integer.valueOf(1))).isEqualTo(1);
 	}
 
 	@Test
@@ -108,9 +108,9 @@ public class CompressorTest {
 		assertThat(pli.get(0)).hasSize(1);
 		assertThat(pli.get(1)).hasSize(1);
 		assertThat(pli.get(2)).hasSize(1);
-		assertThat(pli.get(0)).contains(0);
-		assertThat(pli.get(1)).contains(1);
-		assertThat(pli.get(2)).contains(2);
+		assertThat(pli.get(0)).contains(Integer.valueOf(0));
+		assertThat(pli.get(1)).contains(Integer.valueOf(1));
+		assertThat(pli.get(2)).contains(Integer.valueOf(2));
 	}
 
 	@Test
@@ -121,9 +121,9 @@ public class CompressorTest {
 		PositionListIndex pli = column.getPli();
 		assertThat(pli.get(0)).hasSize(1);
 		assertThat(pli.get(1)).hasSize(2);
-		assertThat(pli.get(0)).contains(0);
-		assertThat(pli.get(1)).contains(1);
-		assertThat(pli.get(1)).contains(2);
+		assertThat(pli.get(0)).contains(Integer.valueOf(0));
+		assertThat(pli.get(1)).contains(Integer.valueOf(1));
+		assertThat(pli.get(1)).contains(Integer.valueOf(2));
 	}
 
 	private CompressedRelation compress() {
@@ -135,9 +135,9 @@ public class CompressorTest {
 	private void mock() {
 		Schema schema = Schema.of(Arrays.asList(A, B));
 		Collection<Row> rows = ImmutableList.<Row>builder()
-			.add(Row.create(schema, ImmutableMap.of(A, "foo", B, 2)))
-			.add(Row.create(schema, ImmutableMap.of(A, "bar", B, 1)))
-			.add(Row.create(schema, ImmutableMap.of(A, "baz", B, 1)))
+			.add(Row.create(schema, ImmutableMap.of(A, "foo", B, Integer.valueOf(2))))
+			.add(Row.create(schema, ImmutableMap.of(A, "bar", B, Integer.valueOf(1))))
+			.add(Row.create(schema, ImmutableMap.of(A, "baz", B, Integer.valueOf(1))))
 			.build();
 		mockRelation(schema, rows);
 	}

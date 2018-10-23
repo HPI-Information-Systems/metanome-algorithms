@@ -66,7 +66,6 @@ final class ThresholdMapHashFlattener implements ThresholdMapFlattener {
 	@CPSType(id = "map", base = Factory.class)
 	private static class FactoryImpl implements Factory {
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public ThresholdMapFlattener create(int size) {
 			return new ThresholdMapHashFlattener();

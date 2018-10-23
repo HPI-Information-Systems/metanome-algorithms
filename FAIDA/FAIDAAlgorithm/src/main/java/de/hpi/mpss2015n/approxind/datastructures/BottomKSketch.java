@@ -59,38 +59,37 @@ public class BottomKSketch {
 
             return thatIndex >= thatSorted.length;
 
-        } else {
-            // Otherwise, we must only compare the "overlaps" of the sketches, where the dominating sketch should
-            // contain exclusively smaller or equal hashes.
-            long thisMax = thisSorted[thisSorted.length - 1];
-            int thatLimit = Arrays.binarySearch(thatSorted, thisMax);
-            if (thatLimit == -1 || thatLimit == 0) {
-                // The sketches do not overlap but the dominating sketch only contains smaller hashes.
-                // Or the overlap is exactly one.
-                return true;
-            } else if (thatLimit < -1) {
-                thatLimit = -thatLimit - 1;
-            }
-
-            int thisStart = Arrays.binarySearch(thisSorted, thatSorted[0]);
-            if (thisStart < 0) {
-                // If the elements overlap, than every element of that sketch must be included in this sketch
-                // within the overlap interval.
-                return false;
-            }
-
-            int thisIndex = thisStart + 1, thatIndex = 1;
-            while (thisIndex < thisSorted.length && thatIndex < thatLimit) {
-                int diff = Long.compare(thisSorted[thisIndex], thatSorted[thatIndex]);
-                if (diff < 0) thisIndex++;
-                else if (diff == 0) {
-                    thisIndex++;
-                    thatIndex++;
-                } else return false;
-            }
-
-            return thatIndex >= thatLimit;
         }
+		// Otherwise, we must only compare the "overlaps" of the sketches, where the dominating sketch should
+		// contain exclusively smaller or equal hashes.
+		long thisMax = thisSorted[thisSorted.length - 1];
+		int thatLimit = Arrays.binarySearch(thatSorted, thisMax);
+		if (thatLimit == -1 || thatLimit == 0) {
+		    // The sketches do not overlap but the dominating sketch only contains smaller hashes.
+		    // Or the overlap is exactly one.
+		    return true;
+		} else if (thatLimit < -1) {
+		    thatLimit = -thatLimit - 1;
+		}
+
+		int thisStart = Arrays.binarySearch(thisSorted, thatSorted[0]);
+		if (thisStart < 0) {
+		    // If the elements overlap, than every element of that sketch must be included in this sketch
+		    // within the overlap interval.
+		    return false;
+		}
+
+		int thisIndex = thisStart + 1, thatIndex = 1;
+		while (thisIndex < thisSorted.length && thatIndex < thatLimit) {
+		    int diff = Long.compare(thisSorted[thisIndex], thatSorted[thatIndex]);
+		    if (diff < 0) thisIndex++;
+		    else if (diff == 0) {
+		        thisIndex++;
+		        thatIndex++;
+		    } else return false;
+		}
+
+		return thatIndex >= thatLimit;
 
 
     }

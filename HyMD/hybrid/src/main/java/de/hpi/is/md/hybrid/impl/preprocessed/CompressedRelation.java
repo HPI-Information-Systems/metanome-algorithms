@@ -26,7 +26,7 @@ class CompressedRelation {
 	}
 
 	<T> int indexOf(Column<T> column) {
-		return columnIndexes.get(column);
+		return columnIndexes.get(column).intValue();
 	}
 
 	int size() {

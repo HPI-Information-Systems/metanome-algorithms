@@ -36,7 +36,7 @@ public class FullLatticeTest {
 		FullLattice fullLattice = new FullLattice(lattice, notSupported);
 		int columnPairs = 4;
 		MDSite lhs = new MDSiteImpl(columnPairs).set(0, 0.5);
-		when(notSupported.containsMdOrGeneralization(lhs)).thenReturn(true);
+		when(Boolean.valueOf(notSupported.containsMdOrGeneralization(lhs))).thenReturn(Boolean.TRUE);
 		MD md = new MDImpl(lhs, new MDElementImpl(1, 0.7));
 		Optional<LatticeMD> latticeMD = fullLattice.addIfMinimalAndSupported(md);
 		assertThat(latticeMD).isEmpty();
@@ -48,7 +48,7 @@ public class FullLatticeTest {
 		FullLattice fullLattice = new FullLattice(lattice, notSupported);
 		int columnPairs = 4;
 		MDSite lhs = new MDSiteImpl(columnPairs).set(0, 0.5);
-		when(notSupported.containsMdOrGeneralization(lhs)).thenReturn(false);
+		when(Boolean.valueOf(notSupported.containsMdOrGeneralization(lhs))).thenReturn(Boolean.FALSE);
 		MD md = new MDImpl(lhs, new MDElementImpl(1, 0.7));
 		LatticeMD latticeMD = Mockito.mock(LatticeMD.class);
 		when(lattice.addIfMinimal(md)).thenReturn(Optional.of(latticeMD));
@@ -71,7 +71,7 @@ public class FullLatticeTest {
 	@Test
 	public void testGetDepth() {
 		FullLattice fullLattice = new FullLattice(lattice, notSupported);
-		when(lattice.getDepth()).thenReturn(2);
+		when(Integer.valueOf(lattice.getDepth())).thenReturn(Integer.valueOf(2));
 		assertThat(fullLattice.getDepth()).isEqualTo(2);
 		verify(lattice).getDepth();
 	}

@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jooq.lambda.Seq;
 
 
-@SuppressWarnings({"FieldMayBeFinal", "CanBeFinal", "FieldCanBeLocal", "UseOfSystemOutOrSystemErr"})
 @Slf4j
 public class EnforceDemo implements Application {
 
@@ -117,6 +116,7 @@ public class EnforceDemo implements Application {
 			return getQuality(matches);
 		}
 
+		@SuppressWarnings("boxing")
 		private Collection<String> toString(EnforceMatch enforceMatch) {
 			Seq<Integer> left = StreamUtils.seq(enforceMatch.getLeft())
 				.map(o -> o[leftId])
@@ -127,7 +127,7 @@ public class EnforceDemo implements Application {
 				.map(Objects::toString)
 				.map(Integer::parseInt);
 			return left.crossJoin(right)
-				.filter(t -> t.map((v1, v2) -> v1.compareTo(v2) < 0))
+				.filter(t -> t.map((v1, v2) -> v1 < v2))
 				.map(t -> t.map(EnforceDemo::toMatchEntry))
 				.toList();
 		}

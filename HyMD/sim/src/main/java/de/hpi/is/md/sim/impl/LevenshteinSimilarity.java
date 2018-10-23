@@ -32,7 +32,7 @@ public enum LevenshteinSimilarity implements SimilarityMeasure<String> {
 		if (ObjectUtils.eitherNull(obj1, obj2)) {
 			return MIN_SIMILARITY;
 		}
-		int distance = LEVENSHTEIN.apply(obj1, obj2);
+		int distance = LEVENSHTEIN.apply(obj1, obj2).intValue();
 		int length1 = obj1.length();
 		int length2 = obj2.length();
 		int maxLength = Math.max(length1, length2);

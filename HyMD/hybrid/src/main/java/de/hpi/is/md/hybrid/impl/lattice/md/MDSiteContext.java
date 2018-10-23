@@ -27,12 +27,12 @@ class MDSiteContext {
 		<T> T disableAndDo(Supplier<T> action) {
 			Collection<Tuple2<Integer, Double>> old = remove();
 			T result = action.get();
-			old.forEach(t -> set(t.v1(), t.v2()));
+			old.forEach(t -> set(t.v1().intValue(), t.v2().doubleValue()));
 			return result;
 		}
 
 		private Tuple2<Integer, Double> getOld(int attr) {
-			return new Tuple2<>(attr, site.getOrDefault(attr));
+			return new Tuple2<>(Integer.valueOf(attr), Double.valueOf(site.getOrDefault(attr)));
 		}
 
 		private Collection<Tuple2<Integer, Double>> remove() {

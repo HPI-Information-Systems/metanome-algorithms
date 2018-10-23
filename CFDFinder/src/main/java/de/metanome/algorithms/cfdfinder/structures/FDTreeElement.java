@@ -1,5 +1,14 @@
 package de.metanome.algorithms.cfdfinder.structures;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import de.metanome.algorithm_integration.ColumnCombination;
 import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
@@ -9,25 +18,17 @@ import de.metanome.algorithm_integration.results.FunctionalDependency;
 import de.uni_potsdam.hpi.utils.CollectionUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.util.OpenBitSet;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class FDTreeElement {
 
 	protected FDTreeElement[] children;
-	protected OpenBitSet rhsAttributes;
-	protected OpenBitSet rhsFds;
+	protected BitSet rhsAttributes;
+	protected BitSet rhsFds;
 	protected int numAttributes;
 	
 	public FDTreeElement(int numAttributes) {
-		this.rhsAttributes = new OpenBitSet(numAttributes);
-		this.rhsFds = new OpenBitSet(numAttributes);
+		this.rhsAttributes = new BitSet(numAttributes);
+		this.rhsFds = new BitSet(numAttributes);
 		this.numAttributes = numAttributes;
 	}
 
@@ -47,7 +48,7 @@ public class FDTreeElement {
 
 	// rhsAttributes
 
-	public OpenBitSet getRhsAttributes() {
+	public BitSet getRhsAttributes() {
 		return this.rhsAttributes;
 	}
 
@@ -55,7 +56,7 @@ public class FDTreeElement {
 		this.rhsAttributes.set(i);
 	}
 
-	public void addRhsAttributes(OpenBitSet other) {
+	public void addRhsAttributes(BitSet other) {
 		this.rhsAttributes.or(other);
 	}
 	
@@ -69,7 +70,7 @@ public class FDTreeElement {
 	
 	// rhsFds
 
-	public OpenBitSet getFds() {
+	public BitSet getFds() {
 		return this.rhsFds;
 	}
 
@@ -77,7 +78,7 @@ public class FDTreeElement {
 		this.rhsFds.set(i);
 	}
 
-	public void markFds(OpenBitSet other) {
+	public void markFds(BitSet other) {
 		this.rhsFds.or(other);
 	}
 
@@ -85,11 +86,11 @@ public class FDTreeElement {
 		this.rhsFds.clear(i);
 	}
 
-	public void retainFds(OpenBitSet other) {
+	public void retainFds(BitSet other) {
 		this.rhsFds.and(other);
 	}
 
-	public void setFds(OpenBitSet other) {
+	public void setFds(BitSet other) {
 		this.rhsFds = other;
 	}
 
@@ -114,7 +115,7 @@ public class FDTreeElement {
 					child.trimRecursive(currentDepth + 1, newDepth);
 	}
 
-	protected void filterGeneralizations(OpenBitSet currentLhs, FDTree tree) {
+	protected void filterGeneralizations(BitSet currentLhs, FDTree tree) {
 		if (this.children != null) {		
 			for (int attr = 0; attr < this.numAttributes; attr++) {
 				if (this.children[attr] != null) {
@@ -128,7 +129,7 @@ public class FDTreeElement {
 			tree.filterGeneralizations(currentLhs, rhs);
 	}
 	
-	protected void filterGeneralizations(OpenBitSet lhs, int rhs, int currentLhsAttr, OpenBitSet currentLhs) {
+	protected void filterGeneralizations(BitSet lhs, int rhs, int currentLhsAttr, BitSet currentLhs) {
 		if (currentLhs.equals(lhs))
 			return;
 		
@@ -149,7 +150,7 @@ public class FDTreeElement {
 		}
 	}
 	
-	protected boolean containsFdOrGeneralization(OpenBitSet lhs, int rhs, int currentLhsAttr) {
+	protected boolean containsFdOrGeneralization(BitSet lhs, int rhs, int currentLhsAttr) {
 		if (this.isFd(rhs))
 			return true;
 
@@ -166,7 +167,7 @@ public class FDTreeElement {
 		return this.containsFdOrGeneralization(lhs, rhs, nextLhsAttr);
 	}
 
-	protected boolean getFdOrGeneralization(OpenBitSet lhs, int rhs, int currentLhsAttr, OpenBitSet foundLhs) {
+	protected boolean getFdOrGeneralization(BitSet lhs, int rhs, int currentLhsAttr, BitSet foundLhs) {
 		if (this.isFd(rhs))
 			return true;
 
@@ -186,9 +187,9 @@ public class FDTreeElement {
 		return this.getFdOrGeneralization(lhs, rhs, nextLhsAttr, foundLhs);
 	}
 
-	protected void getFdAndGeneralizations(OpenBitSet lhs, int rhs, int currentLhsAttr, OpenBitSet currentLhs, List<OpenBitSet> foundLhs) {
+	protected void getFdAndGeneralizations(BitSet lhs, int rhs, int currentLhsAttr, BitSet currentLhs, List<BitSet> foundLhs) {
 		if (this.isFd(rhs))
-			foundLhs.add(currentLhs.clone());
+			foundLhs.add((BitSet) currentLhs.clone());
 
 		if (this.children == null)
 			return;
@@ -206,9 +207,9 @@ public class FDTreeElement {
 		}
 	}
 
-	public void getLevel(int level, int currentLevel, OpenBitSet currentLhs, List<FDTreeElementLhsPair> result) {
+	public void getLevel(int level, int currentLevel, BitSet currentLhs, List<FDTreeElementLhsPair> result) {
 		if (level == currentLevel) {
-			result.add(new FDTreeElementLhsPair(this, currentLhs.clone()));
+			result.add(new FDTreeElementLhsPair(this, (BitSet) currentLhs.clone()));
 		}
 		else {
 			currentLevel++;
@@ -243,12 +244,12 @@ public class FDTreeElement {
 	 * @return true, if the element contains a specialization of the functional
 	 *         dependency lhs -> a. false otherwise.
 	 */
-	public boolean containsFdOrSpecialization(OpenBitSet lhs, int rhs) {
+	public boolean containsFdOrSpecialization(BitSet lhs, int rhs) {
 		int currentLhsAttr = lhs.nextSetBit(0);
 		return this.containsFdOrSpecialization(lhs, rhs, currentLhsAttr);
 	}
 	
-	protected boolean containsFdOrSpecialization(OpenBitSet lhs, int rhs, int currentLhsAttr) {
+	protected boolean containsFdOrSpecialization(BitSet lhs, int rhs, int currentLhsAttr) {
 		if (!this.hasRhsAttribute(rhs))
 			return false;
 		
@@ -275,7 +276,7 @@ public class FDTreeElement {
 		return false;
 	}
 
-/*	public boolean getSpecialization(OpenBitSet lhs, int rhs, int currentAttr, OpenBitSet specLhsOut) { // TODO: difference to containsSpecialization() ?
+/*	public boolean getSpecialization(BitSet lhs, int rhs, int currentAttr, BitSet specLhsOut) { // TODO: difference to containsSpecialization() ?
 		boolean found = false;
 		// if (!specLhsOut.isEmpty()) {
 		// specLhsOut.clear(0, this.maxAttributeNumber);
@@ -323,7 +324,7 @@ public class FDTreeElement {
 		return found;
 	}
 */
-	protected boolean removeRecursive(OpenBitSet lhs, int rhs, int currentLhsAttr) {
+	protected boolean removeRecursive(BitSet lhs, int rhs, int currentLhsAttr) {
 		// If this is the last attribute of lhs, remove the fd-mark from the rhs
 		if (currentLhsAttr < 0) {
 			this.removeFd(rhs);
@@ -358,7 +359,7 @@ public class FDTreeElement {
 		return true;
 	}
 
-/*	public void filterSpecializations(FDTree filteredTree, OpenBitSet activePath) {
+/*	public void filterSpecializations(FDTree filteredTree, BitSet activePath) {
 		for (int attr = 0; attr < this.numAttributes; attr++) {
 			if (this.children[attr] != null) {
 				activePath.set(attr);
@@ -373,7 +374,7 @@ public class FDTreeElement {
 	}
 */
 /*	// Only keep the most general dependencies in the tree
-	public void filterGeneralizations(FDTree filteredTree, OpenBitSet activePath) {
+	public void filterGeneralizations(FDTree filteredTree, BitSet activePath) {
 		for (int attr = 0; attr < this.maxAttributeNumber; attr++) {
 			if (this.isFd(attr)) {
 				if (!filteredTree.containsFdOrGeneralization(activePath, attr, 0)) {
@@ -390,7 +391,7 @@ public class FDTreeElement {
 		}
 	}
 */
-/*	public void printDependencies(OpenBitSet activePath) {
+/*	public void printDependencies(BitSet activePath) {
 		for (int attr = 0; attr < this.maxAttributeNumber; attr++) {
 			if (this.isFd(attr)) {
 				String out = "{";
@@ -436,7 +437,7 @@ public class FDTreeElement {
 	}
 */
 	// FUDEBS
-	protected void addOneSmallerGeneralizations(OpenBitSet currentLhs, int maxCurrentLhsAttribute, int rhs, FDTree tree) {
+	protected void addOneSmallerGeneralizations(BitSet currentLhs, int maxCurrentLhsAttribute, int rhs, FDTree tree) {
 		for (int lhsAttribute = currentLhs.nextSetBit(0); lhsAttribute != maxCurrentLhsAttribute; lhsAttribute = currentLhs.nextSetBit(lhsAttribute + 1)) {
 			currentLhs.clear(lhsAttribute);
 			tree.addGeneralization(currentLhs, rhs);
@@ -444,7 +445,7 @@ public class FDTreeElement {
 		}
 	}
 	
-	protected void addOneSmallerGeneralizations(OpenBitSet currentLhs, int maxCurrentLhsAttribute, OpenBitSet rhs, FDTree tree) {
+	protected void addOneSmallerGeneralizations(BitSet currentLhs, int maxCurrentLhsAttribute, BitSet rhs, FDTree tree) {
 		for (int lhsAttribute = currentLhs.nextSetBit(0); lhsAttribute != maxCurrentLhsAttribute; lhsAttribute = currentLhs.nextSetBit(lhsAttribute + 1)) {
 			currentLhs.clear(lhsAttribute);
 			tree.addGeneralization(currentLhs, rhs);
@@ -452,7 +453,7 @@ public class FDTreeElement {
 		}
 	}
 	
-	public void addPrunedElements(OpenBitSet currentLhs, int maxCurrentLhsAttribute, FDTree tree) {
+	public void addPrunedElements(BitSet currentLhs, int maxCurrentLhsAttribute, FDTree tree) {
 		this.addOneSmallerGeneralizations(currentLhs, maxCurrentLhsAttribute, this.rhsAttributes, tree);
 		
 		if (this.children == null)
@@ -467,7 +468,7 @@ public class FDTreeElement {
 		}
 	}
 	
-	public void growNegative(PositionListIndex currentPli, OpenBitSet currentLhs, int maxCurrentLhsAttribute, List<PositionListIndex> plis, int[][] rhsPlis, FDTree invalidFds) {
+	public void growNegative(PositionListIndex currentPli, BitSet currentLhs, int maxCurrentLhsAttribute, List<PositionListIndex> plis, int[][] rhsPlis, FDTree invalidFds) {
 		int numAttributes = plis.size();
 
 		PositionListIndex[] childPlis = new PositionListIndex[numAttributes];
@@ -523,7 +524,7 @@ public class FDTreeElement {
 		}
 	}
 
-	protected void maximizeNegativeRecursive(PositionListIndex currentPli, OpenBitSet currentLhs, int numAttributes, int[][] rhsPlis, FDTree invalidFds) {
+	protected void maximizeNegativeRecursive(PositionListIndex currentPli, BitSet currentLhs, int numAttributes, int[][] rhsPlis, FDTree invalidFds) {
 		PositionListIndex[] childPlis = new PositionListIndex[numAttributes];
 		
 		// Traverse the tree depth-first, left-first; generate plis for children and pass them over; store the child plis locally to reuse them for the checking afterwards
@@ -543,7 +544,7 @@ public class FDTreeElement {
 		//     which supersets to consider: add all attributes A with A notIn lhs and A notequal rhs; 
 		//         for newLhs->rhs check that no FdOrSpecialization exists, because it is invalid then; this check might be slower than the FD check on high levels but faster on low levels in particular in the root! this check is faster on the negative cover, because we look for a non-FD
 		for (int rhs = this.rhsFds.nextSetBit(0); rhs >= 0; rhs = this.rhsFds.nextSetBit(rhs + 1)) {
-			OpenBitSet extensions = currentLhs.clone();
+			BitSet extensions = (BitSet) currentLhs.clone();
 			extensions.flip(0, numAttributes);
 			extensions.clear(rhs);
 			
@@ -566,9 +567,9 @@ public class FDTreeElement {
 		}
 	}
 	
-	public void addFunctionalDependenciesInto(List<FunctionalDependency> functionalDependencies, OpenBitSet lhs, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<PositionListIndex> plis) {
+	public void addFunctionalDependenciesInto(List<FunctionalDependency> functionalDependencies, BitSet lhs, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<PositionListIndex> plis) {
 		for (int rhs = this.rhsFds.nextSetBit(0); rhs >= 0; rhs = this.rhsFds.nextSetBit(rhs + 1)) {
-			ColumnIdentifier[] columns = new ColumnIdentifier[(int) lhs.cardinality()];
+			ColumnIdentifier[] columns = new ColumnIdentifier[lhs.cardinality()];
 			int j = 0;
 			for (int i = lhs.nextSetBit(0); i >= 0; i = lhs.nextSetBit(i + 1)) {
 				int columnId = plis.get(i).getAttribute(); // Here we translate the column i back to the real column i before the sorting
@@ -594,10 +595,10 @@ public class FDTreeElement {
 		}
 	}
 
-	public int addFunctionalDependenciesInto(FunctionalDependencyResultReceiver resultReceiver, OpenBitSet lhs, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<PositionListIndex> plis) throws CouldNotReceiveResultException, ColumnNameMismatchException {
+	public int addFunctionalDependenciesInto(FunctionalDependencyResultReceiver resultReceiver, BitSet lhs, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<PositionListIndex> plis) throws CouldNotReceiveResultException, ColumnNameMismatchException {
 		int numFDs = 0;
 		for (int rhs = this.rhsFds.nextSetBit(0); rhs >= 0; rhs = this.rhsFds.nextSetBit(rhs + 1)) {
-			ColumnIdentifier[] columns = new ColumnIdentifier[(int) lhs.cardinality()];
+			ColumnIdentifier[] columns = new ColumnIdentifier[lhs.cardinality()];
 			int j = 0;
 			for (int i = lhs.nextSetBit(0); i >= 0; i = lhs.nextSetBit(i + 1)) {
 				int columnId = plis.get(i).getAttribute(); // Here we translate the column i back to the real column i before the sorting
@@ -626,18 +627,20 @@ public class FDTreeElement {
 	}
 
 	public static class InternalFunctionalDependency {
-		public OpenBitSet lhs;
+		public BitSet lhs;
 		public int rhs;
+		public int numAttributes;
 
-		public InternalFunctionalDependency(OpenBitSet lhs, int rhs) {
-			this.lhs = lhs.clone();
+		public InternalFunctionalDependency(BitSet lhs, int rhs, int numAttributes) {
+			this.lhs = (BitSet) lhs.clone();
 			this.rhs = rhs;
+			this.numAttributes = numAttributes;
 		}
 
 		public String toString() {
 			ArrayList<Integer> bits = new ArrayList<>();
 			for (int i = lhs.nextSetBit(0); i >= 0; i = lhs.nextSetBit(i + 1)) {
-				bits.add(i);
+				bits.add(Integer.valueOf(i));
 			}
 			return "[" + StringUtils.join(bits, ',') + "] -> " + Integer.toString(rhs);
 		}
@@ -661,9 +664,9 @@ public class FDTreeElement {
 		}
 	}
 
-	public void getInternalFunctionalDependencies(List<InternalFunctionalDependency> result, OpenBitSet lhs, List<PositionListIndex> plis) {
+	public void getInternalFunctionalDependencies(List<InternalFunctionalDependency> result, BitSet lhs, List<PositionListIndex> plis) {
 		for (int rhs = this.rhsFds.nextSetBit(0); rhs >= 0; rhs = this.rhsFds.nextSetBit(rhs + 1)) {
-			result.add(new InternalFunctionalDependency(lhs, rhs));
+			result.add(new InternalFunctionalDependency(lhs, rhs, this.numAttributes));
 		}
 
 		if (this.getChildren() == null)
@@ -679,8 +682,8 @@ public class FDTreeElement {
 		}
 	}
 	
-	public int writeFunctionalDependencies(Writer writer, OpenBitSet lhs, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<PositionListIndex> plis, boolean writeTableNamePrefix) throws IOException {
-		int numFDs = (int)this.rhsFds.cardinality();
+	public int writeFunctionalDependencies(Writer writer, BitSet lhs, ObjectArrayList<ColumnIdentifier> columnIdentifiers, List<PositionListIndex> plis, boolean writeTableNamePrefix) throws IOException {
+		int numFDs = this.rhsFds.cardinality();
 		
 		if (numFDs != 0) {
 			List<String> lhsIdentifier = new ArrayList<>();
@@ -740,15 +743,15 @@ public class FDTreeElement {
 
 	protected class ElementLhsPair {
 		public FDTreeElement element = null;
-		public OpenBitSet lhs = null;
-		public ElementLhsPair(FDTreeElement element, OpenBitSet lhs) {
+		public BitSet lhs = null;
+		public ElementLhsPair(FDTreeElement element, BitSet lhs) {
 			this.element = element;
 			this.lhs = lhs;
 		}
 	}
 	
-	protected void addToIndex(Int2ObjectOpenHashMap<ArrayList<ElementLhsPair>> level2elements, int level, OpenBitSet lhs) {
-		level2elements.get(level).add(new ElementLhsPair(this, lhs.clone()));
+	protected void addToIndex(Int2ObjectOpenHashMap<ArrayList<ElementLhsPair>> level2elements, int level, BitSet lhs) {
+		level2elements.get(level).add(new ElementLhsPair(this, (BitSet) lhs.clone()));
 		if (this.children != null) {
 			for (int childAttr = 0; childAttr < this.numAttributes; childAttr++) {
 				FDTreeElement element = this.children[childAttr];
@@ -761,12 +764,12 @@ public class FDTreeElement {
 		}
 	}
 
-	public void grow(OpenBitSet lhs, FDTree fdTree) {
+	public void grow(BitSet lhs, FDTree fdTree) {
 		// Add specializations of all nodes an mark them as isFD, but if specialization exists, then it is invalid and should not be marked; only add specializations of nodes not marked as isFD!
-		OpenBitSet rhs = this.rhsAttributes;
+		BitSet rhs = this.rhsAttributes;
 		
-		OpenBitSet invalidRhs = rhs.clone();
-		invalidRhs.remove(this.rhsFds);
+		BitSet invalidRhs = (BitSet) rhs.clone();
+		invalidRhs.andNot(this.rhsFds);
 		
 		// Add specializations that are not invalid
 		if (invalidRhs.cardinality() > 0) {
@@ -793,7 +796,7 @@ public class FDTreeElement {
 		}
 	}
 
-	protected void minimize(OpenBitSet lhs, FDTree fdTree) {
+	protected void minimize(BitSet lhs, FDTree fdTree) {
 		// Traverse children and minimize their FDs
 		if (this.children != null) {
 			for (int childAttr = 0; childAttr < this.numAttributes; childAttr++) {
@@ -816,7 +819,7 @@ public class FDTreeElement {
 		}
 	}
 	
-/*	public void validateRecursive(OpenBitSet lhs, PositionListIndex currentPli, List<PositionListIndex> initialPlis, FDTree invalidFds) {
+/*	public void validateRecursive(BitSet lhs, PositionListIndex currentPli, List<PositionListIndex> initialPlis, FDTree invalidFds) {
 		// Validate the current FDs
 		for (int rhs = this.rhsFds.nextSetBit(0); rhs >= 0; rhs = this.rhsFds.nextSetBit(rhs + 1)) {
 			if (!currentPli.refines(initialPlis.get(rhs))) {
@@ -837,7 +840,7 @@ public class FDTreeElement {
 		}
 	}
 */
-/*	public void discover(OpenBitSet lhs, List<PositionListIndex> initialPlis, FDTree invalidFds, FDTree validFds, List<FDTreeElementLhsPair> nextLevel) {
+/*	public void discover(BitSet lhs, List<PositionListIndex> initialPlis, FDTree invalidFds, FDTree validFds, List<FDTreeElementLhsPair> nextLevel) {
 		for (int rhs = this.rhsFds.nextSetBit(0); rhs >= 0; rhs = this.rhsFds.nextSetBit(rhs + 1)) {
 			for (int attr = 0; attr < this.numAttributes; attr++) {
 				if ((rhs == attr) || lhs.get(attr))

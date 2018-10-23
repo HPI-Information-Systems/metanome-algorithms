@@ -13,7 +13,6 @@ import org.junit.Test;
 
 public class SortedNeighborhoodPairGeneratorTest {
 
-	@SuppressWarnings("unchecked")
 	private static PairGenerator<Integer> createComputer() {
 		return new SortedNeighborhoodPairGenerator<>(new NullComparator<>(Integer::compareTo), 3);
 	}
@@ -22,28 +21,28 @@ public class SortedNeighborhoodPairGeneratorTest {
 	public void test() {
 		PairGenerator<Integer> generator = createComputer();
 		Collection<Tuple2<Integer, Collection<Integer>>> similarities = generator
-			.generate(Arrays.asList(1, 2, 3, 6), Arrays.asList(1, 3, 4, 5))
+			.generate(Arrays.asList(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(6)), Arrays.asList(Integer.valueOf(1), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5)))
 			.getPairs()
 			.collect(Collectors.toList());
 		assertThat(similarities).hasSize(4);
-		assertThat(similarities).contains(new Tuple2<>(1, Arrays.asList(1, 3)));
-		assertThat(similarities).contains(new Tuple2<>(2, Arrays.asList(1, 3, 4)));
-		assertThat(similarities).contains(new Tuple2<>(3, Arrays.asList(1, 3, 4)));
-		assertThat(similarities).contains(new Tuple2<>(6, Collections.singletonList(5)));
+		assertThat(similarities).contains(new Tuple2<>(Integer.valueOf(1), Arrays.asList(Integer.valueOf(1), Integer.valueOf(3))));
+		assertThat(similarities).contains(new Tuple2<>(Integer.valueOf(2), Arrays.asList(Integer.valueOf(1), Integer.valueOf(3), Integer.valueOf(4))));
+		assertThat(similarities).contains(new Tuple2<>(Integer.valueOf(3), Arrays.asList(Integer.valueOf(1), Integer.valueOf(3), Integer.valueOf(4))));
+		assertThat(similarities).contains(new Tuple2<>(Integer.valueOf(6), Collections.singletonList(Integer.valueOf(5))));
 	}
 
 	@Test
 	public void testNull() {
 		PairGenerator<Integer> generator = createComputer();
 		Collection<Tuple2<Integer, Collection<Integer>>> similarities = generator
-			.generate(Arrays.asList(null, 1, 2, 3), Arrays.asList(null, 1, 2, 3))
+			.generate(Arrays.asList(null, Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3)), Arrays.asList(null, Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3)))
 			.getPairs()
 			.collect(Collectors.toList());
 		assertThat(similarities).hasSize(4);
-		assertThat(similarities).contains(new Tuple2<>(null, Arrays.asList(null, 1)));
-		assertThat(similarities).contains(new Tuple2<>(1, Arrays.asList(null, 1, 2)));
-		assertThat(similarities).contains(new Tuple2<>(2, Arrays.asList(1, 2, 3)));
-		assertThat(similarities).contains(new Tuple2<>(3, Arrays.asList(2, 3)));
+		assertThat(similarities).contains(new Tuple2<>(null, Arrays.asList(null, Integer.valueOf(1))));
+		assertThat(similarities).contains(new Tuple2<>(Integer.valueOf(1), Arrays.asList(null, Integer.valueOf(1), Integer.valueOf(2))));
+		assertThat(similarities).contains(new Tuple2<>(Integer.valueOf(2), Arrays.asList(Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3))));
+		assertThat(similarities).contains(new Tuple2<>(Integer.valueOf(3), Arrays.asList(Integer.valueOf(2), Integer.valueOf(3))));
 	}
 
 }

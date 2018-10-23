@@ -1,7 +1,5 @@
 package de.metanome.algorithms.cfdfinder.pattern;
 
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-
 import java.util.List;
 
 public class RangePatternEntry extends PatternEntry {
@@ -34,11 +32,11 @@ public class RangePatternEntry extends PatternEntry {
     }
 
     public int getLowerBound() {
-        return sortedClusters.get(minCluster);
+        return sortedClusters.get(minCluster).intValue();
     }
 
     public int getUpperBound() {
-        return sortedClusters.get(maxCluster);
+        return sortedClusters.get(maxCluster).intValue();
     }
 
     @Override

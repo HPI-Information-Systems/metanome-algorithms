@@ -26,7 +26,7 @@ public abstract class ResultStrategy {
     protected void sendToMetanome(Result result) {
         this.numResults += 1;
 
-        ColumnIdentifier[] lhsColumns = new ColumnIdentifier[(int) result.getEmbeddedFD().lhs.cardinality()];
+        ColumnIdentifier[] lhsColumns = new ColumnIdentifier[result.getEmbeddedFD().lhs.cardinality()];
         int j = 0;
         for (int i = result.getEmbeddedFD().lhs.nextSetBit(0); i >= 0; i = result.getEmbeddedFD().lhs.nextSetBit(i + 1)) {
             int columnId = i; // todo: Here we translate the column i back to the real column i before the sorting

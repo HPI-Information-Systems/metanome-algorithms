@@ -150,8 +150,8 @@ public class TestFileIterator implements RelationalInput {
 
   protected List<String> generateHeaderLine() {
     List<String> headerList = new ArrayList<String>();
-    for (Integer i = 1; i <= this.numberOfColumns; i++) {
-      headerList.add(DEFAULT_HEADER_STRING + i.toString());
+    for (int i = 1; i <= this.numberOfColumns; i++) {
+      headerList.add(DEFAULT_HEADER_STRING + String.valueOf(i));
     }
     return Collections.unmodifiableList(headerList);
   }
@@ -166,19 +166,18 @@ public class TestFileIterator implements RelationalInput {
     }
     if (lineArray == null) {
       return null;
-    } else {
-      // Convert empty Strings to null
-      List<String> list = new ArrayList<String>();
-      for (String val : lineArray) {
-        if (val.equals("")) {
-          list.add(null);
-        } else {
-          list.add(val);
-        }
-      }
-      // Return an immutable list
-      return Collections.unmodifiableList(list);
     }
+	// Convert empty Strings to null
+    List<String> list = new ArrayList<String>();
+    for (String val : lineArray) {
+      if (val.equals("")) {
+        list.add(null);
+      } else {
+        list.add(val);
+      }
+    }
+    // Return an immutable list
+    return Collections.unmodifiableList(list);
   }
 
   @Override

@@ -29,7 +29,8 @@ final class ContainsContext extends MDContext {
 		}
 		return getNext(currentLhsAttr)
 			.map(this::containsMdOrGeneralization)
-			.orElse(false);
+			.orElse(Boolean.FALSE)
+			.booleanValue();
 	}
 
 	private boolean containsMdOrGeneralization(MDElement next) {
@@ -37,8 +38,9 @@ final class ContainsContext extends MDContext {
 		int nextLhsAttrId = id + 1;
 		double threshold = next.getThreshold();
 		boolean childContains = children.get(id)
-			.map(child -> child.containsMdOrGeneralization(md, nextLhsAttrId, threshold))
-			.orElse(false);
+			.map(child -> Boolean.valueOf(child.containsMdOrGeneralization(md, nextLhsAttrId, threshold)))
+			.orElse(Boolean.FALSE)
+			.booleanValue();
 		return childContains || containsMdOrGeneralization(nextLhsAttrId);
 	}
 
@@ -54,7 +56,8 @@ final class ContainsContext extends MDContext {
 	private boolean isMd() {
 		return getThreshold()
 			.map(this::isAbove)
-			.orElse(false);
+			.orElse(Boolean.FALSE)
+			.booleanValue();
 	}
 
 }

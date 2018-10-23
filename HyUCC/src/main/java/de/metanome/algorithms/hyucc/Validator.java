@@ -1,6 +1,7 @@
 package de.metanome.algorithms.hyucc;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -8,8 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithms.hyucc.structures.IntegerPair;
@@ -51,7 +50,7 @@ public class Validator {
 	private class ValidationResult {
 		public int validations = 0;
 		public int intersections = 0;
-		public List<OpenBitSet> invalidUCCs = new ArrayList<>();
+		public List<BitSet> invalidUCCs = new ArrayList<>();
 		public List<IntegerPair> comparisonSuggestions = new ArrayList<>();
 		public void add(ValidationResult other) {
 			this.validations += other.validations;
@@ -73,7 +72,7 @@ public class Validator {
 			ValidationResult result = new ValidationResult();
 			
 			UCCTreeElement element = this.elementUCCPair.getElement();
-			OpenBitSet ucc = this.elementUCCPair.getUCC();
+			BitSet ucc = this.elementUCCPair.getUCC();
 			
 			result.validations = result.validations + 1;
 			
@@ -158,7 +157,7 @@ public class Validator {
 		int numAttributes = this.plis.size();
 		
 //		Logger.getInstance().writeln("Adding new non UCCs to negative cover tree ...");
-//		for (OpenBitSet nonUCC : newNonUCCs)
+//		for (BitSet nonUCC : newNonUCCs)
 //			this.negCover.addUniqueColumnCombination(nonUCC);
 		
 		Logger.getInstance().writeln("Validating UCCs using plis ...");
@@ -192,7 +191,7 @@ public class Validator {
 			List<UCCTreeElementUCCPair> nextLevel = new ArrayList<>();
 			for (UCCTreeElementUCCPair elementUCCPair : currentLevel) {
 				UCCTreeElement element = elementUCCPair.getElement();
-				OpenBitSet ucc = elementUCCPair.getUCC();
+				BitSet ucc = elementUCCPair.getUCC();
 
 				if (element.getChildren() == null)
 					continue;
@@ -201,7 +200,7 @@ public class Validator {
 					UCCTreeElement child = element.getChildren()[childAttr];
 					
 					if (child != null) {
-						OpenBitSet childUCC = ucc.clone();
+						BitSet childUCC = (BitSet) ucc.clone();
 						childUCC.set(childAttr);
 						nextLevel.add(new UCCTreeElementUCCPair(child, childUCC));
 					}
@@ -212,9 +211,9 @@ public class Validator {
 			Logger.getInstance().write("(G); ");
 			
 			int candidates = 0;
-			for (OpenBitSet invalidUCC : validationResult.invalidUCCs) {
+			for (BitSet invalidUCC : validationResult.invalidUCCs) {
 				for (int extensionAttr = 0; extensionAttr < numAttributes; extensionAttr++) {
-					OpenBitSet childUCC = this.extendWith(invalidUCC, extensionAttr);
+					BitSet childUCC = this.extendWith(invalidUCC, extensionAttr);
 					if (childUCC != null) {
 						UCCTreeElement child = this.posCover.addUniqueColumnCombinationGetIfNew(childUCC);
 						if (child != null) {
@@ -256,11 +255,11 @@ public class Validator {
 		return null;
 	}
 	
-	private OpenBitSet extendWith(OpenBitSet ucc, int extensionAttr) {
+	private BitSet extendWith(BitSet ucc, int extensionAttr) {
 		if (ucc.get(extensionAttr))
 			return null;
 		
-		OpenBitSet childUCC = ucc.clone();
+		BitSet childUCC = (BitSet) ucc.clone();
 		childUCC.set(extensionAttr);
 		
 		if (this.posCover.containsUCCOrGeneralization(childUCC))

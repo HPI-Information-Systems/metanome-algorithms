@@ -1,14 +1,14 @@
 package de.metanome.algorithms.cfdfinder.structures;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.BitSet;
 
-import org.apache.lucene.util.OpenBitSet;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class ClusterTree {
 
 	protected Int2ObjectOpenHashMap<ClusterTreeElement> children = new Int2ObjectOpenHashMap<ClusterTreeElement>();
 	
-	public boolean add(int[][] compressedRecords, OpenBitSet lhs, int recordId, int content) {
+	public boolean add(int[][] compressedRecords, BitSet lhs, int recordId, int content) {
 		int firstLhsAttr = lhs.nextSetBit(0);
 		int firstCluster = compressedRecords[recordId][firstLhsAttr];
 		if (firstCluster < 0)

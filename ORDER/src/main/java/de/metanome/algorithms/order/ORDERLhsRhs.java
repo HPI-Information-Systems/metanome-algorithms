@@ -165,7 +165,7 @@ public class ORDERLhsRhs extends ORDER {
     for (final byte[] candidate : this.levelCandidates) {
       final byte[][] candidatePrefixes = ByteArrayPermutations.prefixes(candidate);
       if (this.allCandidateSetsEmpty(candidatePrefixes)) {
-        this.logger.debug("Level {}: Pruned {}.", this.level,
+        this.logger.debug("Level {}: Pruned {}.", Integer.valueOf(this.level),
             ByteArrayPermutations.permutationToIntegerString(candidate));
         prunedLevelCandidates.add(candidate);
       }
@@ -356,7 +356,7 @@ public class ORDERLhsRhs extends ORDER {
           }
 
         }
-        this.logger.debug("Level {}: Extending rhs candidates for lhs {} to {}", this.level, lhs,
+        this.logger.debug("Level {}: Extending rhs candidates for lhs {} to {}", Integer.valueOf(this.level), lhs,
             ByteArrayPermutations.permutationListToIntegerString(extendedRhsCandidates));
         this.currentRhsCandidateSet.put(lhs, extendedRhsCandidates);
 
@@ -398,7 +398,7 @@ public class ORDERLhsRhs extends ORDER {
           }
         }
 
-        this.logger.debug("Level {}: Created the new rhs candidate set C({}) = {}", this.level,
+        this.logger.debug("Level {}: Created the new rhs candidate set C({}) = {}", Integer.valueOf(this.level),
             ByteArrayPermutations.permutationToIntegerString(lhs), ByteArrayPermutations
                 .permutationListToIntegerString(this.currentRhsCandidateSet.get(lhs)));
       }
@@ -689,7 +689,7 @@ public class ORDERLhsRhs extends ORDER {
 
     System.gc();
 
-    this.logger.debug("PREFIX_BLOCKS in level {}: {} ", this.level, this.prettyPrintPrefixBlocks());
+    this.logger.debug("PREFIX_BLOCKS in level {}: {} ", Integer.valueOf(this.level), this.prettyPrintPrefixBlocks());
 
     for (final List<byte[]> candidatesWithSamePrefix : this.prefixBlocks.values()) {
       if (candidatesWithSamePrefix.size() < 2) {
@@ -706,15 +706,15 @@ public class ORDERLhsRhs extends ORDER {
         }
       }
     }
-    this.logger.debug("Generated level {}", this.level + 1);
-    this.logger.debug("Level {} candidates: {}", (this.level + 1),
+    this.logger.debug("Generated level {}", Integer.valueOf(this.level + 1));
+    this.logger.debug("Level {} candidates: {}", Integer.valueOf(this.level + 1),
         ByteArrayPermutations.permutationListToIntegerString(this.levelCandidates));
     if (this.level > 1 && !this.levelCandidates.isEmpty()) {
       for (final byte[] newLhs : this.previousLevelCandidates) {
         this.logger
             .debug(
                 "After generating level {}. Adding {} as an lhs to the candidate set for the next level.",
-                this.level + 1, ByteArrayPermutations.permutationToIntegerString(newLhs));
+                Integer.valueOf(this.level + 1), ByteArrayPermutations.permutationToIntegerString(newLhs));
         this.currentRhsCandidateSet.put(newLhs, new ObjectOpenCustomHashSet<byte[]>(
             ByteArrays.HASH_STRATEGY));
       }

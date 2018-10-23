@@ -9,7 +9,7 @@ public interface DoubleObjectBiConsumer<T> extends BiConsumer<Double, T> {
 	@Deprecated
 	@Override
 	default void accept(Double d, T t) {
-		accept((double) d, t);
+		accept(d.doubleValue(), t);
 	}
 
 }

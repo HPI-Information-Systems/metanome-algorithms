@@ -1,6 +1,6 @@
 package de.metanome.algorithms.tane.algorithm_helper;
 
-import org.apache.lucene.util.OpenBitSet;
+import java.util.BitSet;
 
 public class FDTree extends FDTreeElement {
 
@@ -15,7 +15,7 @@ public class FDTree extends FDTreeElement {
         }
     }
 
-    public void addFunctionalDependency(OpenBitSet lhs, int a) {
+    public void addFunctionalDependency(BitSet lhs, int a) {
         FDTreeElement fdTreeEl;
         //update root vertex
         FDTreeElement currentNode = this;
@@ -43,7 +43,7 @@ public class FDTree extends FDTreeElement {
      * @return
      */
     public void filterSpecializations() {
-        OpenBitSet activePath = new OpenBitSet();
+        BitSet activePath = new BitSet();
         FDTree filteredTree = new FDTree(maxAttributeNumber);
         this.filterSpecializations(filteredTree, activePath);
 
@@ -53,7 +53,7 @@ public class FDTree extends FDTreeElement {
     }
 
     public void filterGeneralizations() {
-        OpenBitSet activePath = new OpenBitSet();
+        BitSet activePath = new BitSet();
         FDTree filteredTree = new FDTree(maxAttributeNumber);
         this.filterGeneralizations(filteredTree, activePath);
 
@@ -61,7 +61,7 @@ public class FDTree extends FDTreeElement {
     }
 
     public void printDependencies() {
-        OpenBitSet activePath = new OpenBitSet();
+        BitSet activePath = new BitSet();
         this.printDependencies(activePath);
 
     }

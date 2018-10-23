@@ -6,7 +6,7 @@ import de.hpi.is.md.util.LazyArray;
 class LhsNode {
 
 	private final LazyArray<LhsThresholdNode> children;
-	private final ValueHolder<Boolean> notSupported = new ValueHolder<>(false);
+	private final ValueHolder<Boolean> notSupported = new ValueHolder<>(Boolean.FALSE);
 
 	LhsNode(int columnPairs) {
 		children = new LazyArray<>(new LhsThresholdNode[columnPairs], LhsThresholdNode::new);

@@ -124,7 +124,6 @@ public class AnalyzerTest {
 		Analyzer analyzer = createAnalyzer(found);
 		int columnPairs = 4;
 		MDSite lhs = new MDSiteImpl(columnPairs);
-		MDElement rhs = new MDElementImpl(1, 0.8);
 		RhsResult rhsResult = RhsResult.builder()
 			.rhsAttr(1)
 			.threshold(0.8)

@@ -101,7 +101,7 @@ public final class SimpleColumnCombination implements Comparable<SimpleColumnCom
 
     @Override
     public int hashCode() {
-        return Objects.hash(table) ^ Arrays.hashCode(columns);
+        return Objects.hash(Integer.valueOf(table)) ^ Arrays.hashCode(columns);
     }
 
     @Override

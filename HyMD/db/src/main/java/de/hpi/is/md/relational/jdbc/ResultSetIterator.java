@@ -56,7 +56,7 @@ final class ResultSetIterator implements Iterator<Row>, AutoCloseable, HasSchema
 
 	@Override
 	public boolean hasNext() {
-		return getNext().orElseGet(this::moveCursor);
+		return getNext().orElseGet(this::moveCursor).booleanValue();
 	}
 
 	@Override
@@ -108,8 +108,8 @@ final class ResultSetIterator implements Iterator<Row>, AutoCloseable, HasSchema
 
 	private boolean moveCursor() {
 		try {
-			currentNext = resultSet.next();
-			return currentNext;
+			currentNext = Boolean.valueOf(resultSet.next());
+			return currentNext.booleanValue();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}

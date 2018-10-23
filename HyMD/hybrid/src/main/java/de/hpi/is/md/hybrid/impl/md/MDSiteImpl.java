@@ -80,7 +80,6 @@ public class MDSiteImpl implements MDSite {
 		return thresholds.length;
 	}
 
-	@SuppressWarnings("MethodDoesntCallSuperMethod")
 	@Override
 	public MDSite clone() {
 		return new MDSiteImpl(thresholds.clone(), cardinality);

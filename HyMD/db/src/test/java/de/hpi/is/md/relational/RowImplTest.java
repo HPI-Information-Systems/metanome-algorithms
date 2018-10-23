@@ -21,7 +21,7 @@ public class RowImplTest {
 
 	private static Row createRow() {
 		Schema schema = createSchema();
-		Map<Column<?>, Object> values = ImmutableMap.of(A, "foo", B, 0);
+		Map<Column<?>, Object> values = ImmutableMap.of(A, "foo", B, Integer.valueOf(0));
 		return RowImpl.create(schema, values);
 	}
 
@@ -36,7 +36,7 @@ public class RowImplTest {
 		Optional<String> a = row.get(A);
 		assertThat(a).hasValue("foo");
 		Optional<Integer> b = row.get(B);
-		assertThat(b).hasValue(0);
+		assertThat(b).hasValue(Integer.valueOf(0));
 		assertThat(row.get(C)).isEmpty();
 	}
 

@@ -25,13 +25,12 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.uni_potsdam.hpi.utils.CollectionUtils;
 
@@ -298,13 +297,13 @@ public class PositionListIndex {
 		return true;
 	}
 	
-/*	public OpenBitSet refines(int[][] invertedPlis, OpenBitSet lhs, OpenBitSet rhs) {
+/*	public BitSet refines(int[][] invertedPlis, BitSet lhs, BitSet rhs) {
 		// Returns the rhs attributes that are refined by the lhs
-		OpenBitSet refinedRhs = rhs.clone();
+		BitSet refinedRhs = rhs.clone();
 		
 		// TODO: Check if it is technically possible that this fd holds, i.e., if A1 has 2 clusters of size 10 and A2 has 2 clusters of size 10, then the intersection can have at most 4 clusters of size 5 (see join cardinality estimation)
 		
-		OpenBitSet invalidRhs = new OpenBitSet(rhs.cardinality());
+		BitSet invalidRhs = new BitSet(rhs.cardinality());
 		for (IntArrayList cluster : this.clusters) {
 			// Build the intersection of lhs attribute clusters
 			Object2ObjectOpenHashMap<IntArrayList, IntArrayList> subClusters = new Object2ObjectOpenHashMap<>(cluster.size());
@@ -337,12 +336,12 @@ public class PositionListIndex {
 		return refinedRhs;
 	}
 */
-	public OpenBitSet refines(int[][] compressedRecords, OpenBitSet lhs, OpenBitSet rhs, List<IntegerPair> comparisonSuggestions) {
-		int rhsSize = (int) rhs.cardinality();
-		int lhsSize = (int) lhs.cardinality();
+	public BitSet refines(int[][] compressedRecords, BitSet lhs, BitSet rhs, List<IntegerPair> comparisonSuggestions) {
+		int rhsSize = rhs.cardinality();
+		int lhsSize = lhs.cardinality();
 		
 		// Returns the rhs attributes that are refined by the lhs
-		OpenBitSet refinedRhs = rhs.clone();
+		BitSet refinedRhs = (BitSet) rhs.clone();
 		
 		// TODO: Check if it is technically possible that this fd holds, i.e., if A1 has 2 clusters of size 10 and A2 has 2 clusters of size 10, then the intersection can have at most 4 clusters of size 5 (see join cardinality estimation)
 		
@@ -387,12 +386,12 @@ public class PositionListIndex {
 		return refinedRhs;
 	}
 	
-	public OpenBitSet refines(int[][] invertedPlis, OpenBitSet lhs, OpenBitSet rhs, int numAttributes, ArrayList<IntegerPair> comparisonSuggestions) {
-		int rhsSize = (int) rhs.cardinality();
-		int lhsSize = (int) lhs.cardinality();
+	public BitSet refines(int[][] invertedPlis, BitSet lhs, BitSet rhs, int numAttributes, ArrayList<IntegerPair> comparisonSuggestions) {
+		int rhsSize = rhs.cardinality();
+		int lhsSize = lhs.cardinality();
 		
 		// Returns the rhs attributes that are refined by the lhs
-		OpenBitSet refinedRhs = rhs.clone();
+		BitSet refinedRhs = (BitSet) rhs.clone();
 		
 		// TODO: Check if it is technically possible that this fd holds, i.e., if A1 has 2 clusters of size 10 and A2 has 2 clusters of size 10, then the intersection can have at most 4 clusters of size 5 (see join cardinality estimation)
 		
@@ -437,7 +436,7 @@ public class PositionListIndex {
 		return refinedRhs;
 	}
 
-	public boolean refines(int[][] compressedRecords, OpenBitSet lhs, int[] rhs) {
+	public boolean refines(int[][] compressedRecords, BitSet lhs, int[] rhs) {
 		for (IntArrayList cluster : this.clusters) {
 			ClusterTree clusterTree = new ClusterTree();
 			
@@ -471,7 +470,7 @@ public class PositionListIndex {
 		return true;
 	}
 
-	protected ClusterIdentifier buildClusterIdentifier(OpenBitSet lhs, int lhsSize, int[] record) { 
+	protected ClusterIdentifier buildClusterIdentifier(BitSet lhs, int lhsSize, int[] record) { 
 		int[] cluster = new int[lhsSize];
 		
 		int index = 0;
@@ -488,7 +487,7 @@ public class PositionListIndex {
 		return new ClusterIdentifier(cluster);
 	}
 
-	protected ClusterIdentifier buildClusterIdentifier(int recordId, int[][] invertedPlis, OpenBitSet lhs, int lhsSize) { 
+	protected ClusterIdentifier buildClusterIdentifier(int recordId, int[][] invertedPlis, BitSet lhs, int lhsSize) { 
 		int[] cluster = new int[lhsSize];
 		
 		int index = 0;

@@ -30,24 +30,24 @@ public abstract class SimilarityComputerTest {
 
 	@Test
 	public void test() {
-		doReturn(0.13).when(similarityMeasure).calculateSimilarity(1, 3);
-		doReturn(0.14).when(similarityMeasure).calculateSimilarity(1, 4);
-		doReturn(0.23).when(similarityMeasure).calculateSimilarity(2, 3);
-		doReturn(0.24).when(similarityMeasure).calculateSimilarity(2, 4);
-		when(generator.generate(Arrays.asList(1, 2), Arrays.asList(3, 4)))
+		doReturn(Double.valueOf(0.13)).when(similarityMeasure).calculateSimilarity(Integer.valueOf(1), Integer.valueOf(3));
+		doReturn(Double.valueOf(0.14)).when(similarityMeasure).calculateSimilarity(Integer.valueOf(1), Integer.valueOf(4));
+		doReturn(Double.valueOf(0.23)).when(similarityMeasure).calculateSimilarity(Integer.valueOf(2), Integer.valueOf(3));
+		doReturn(Double.valueOf(0.24)).when(similarityMeasure).calculateSimilarity(Integer.valueOf(2), Integer.valueOf(4));
+		when(generator.generate(Arrays.asList(Integer.valueOf(1), Integer.valueOf(2)), Arrays.asList(Integer.valueOf(3), Integer.valueOf(4))))
 			.thenReturn(new Result<>(Stream.of(
-				Tuple.tuple(1, Arrays.asList(3, 4)),
-				Tuple.tuple(2, Arrays.asList(3, 4))), true));
+				Tuple.tuple(Integer.valueOf(1), Arrays.asList(Integer.valueOf(3), Integer.valueOf(4))),
+				Tuple.tuple(Integer.valueOf(2), Arrays.asList(Integer.valueOf(3), Integer.valueOf(4)))), true));
 		SimilarityComputer<Integer> computer = createComputer();
 		Collection<Similarity<Integer>> similarities = computer
-			.compute(similarityMeasure, Arrays.asList(1, 2), Arrays.asList(3, 4))
+			.compute(similarityMeasure, Arrays.asList(Integer.valueOf(1), Integer.valueOf(2)), Arrays.asList(Integer.valueOf(3), Integer.valueOf(4)))
 			.getSimilarities()
 			.collect(Collectors.toList());
 		assertThat(similarities).hasSize(2);
 		assertThat(similarities)
-			.contains(new Similarity<>(1, Arrays.asList(new To<>(3, 0.13), new To<>(4, 0.14))));
+			.contains(new Similarity<>(Integer.valueOf(1), Arrays.asList(new To<>(Integer.valueOf(3), 0.13), new To<>(Integer.valueOf(4), 0.14))));
 		assertThat(similarities)
-			.contains(new Similarity<>(2, Arrays.asList(new To<>(3, 0.23), new To<>(4, 0.24))));
+			.contains(new Similarity<>(Integer.valueOf(2), Arrays.asList(new To<>(Integer.valueOf(3), 0.23), new To<>(Integer.valueOf(4), 0.24))));
 	}
 
 	protected abstract <T> SimilarityComputerImpl<T> createComputer(PairGenerator<T> generator);

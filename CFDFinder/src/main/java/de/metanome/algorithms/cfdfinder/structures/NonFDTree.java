@@ -1,8 +1,7 @@
 package de.metanome.algorithms.cfdfinder.structures;
 
 import java.util.ArrayList;
-
-import org.apache.lucene.util.OpenBitSet;
+import java.util.BitSet;
 
 import de.metanome.algorithms.cfdfinder.utils.ValueComparator;
 
@@ -40,9 +39,9 @@ public class NonFDTree extends NonFDTreeElement {
 		return newNonFD;
 	}
 
-	public ArrayList<OpenBitSet> asBitSets() {
-		ArrayList<OpenBitSet> bitsets = new ArrayList<>(this.size);
-		OpenBitSet bitset = new OpenBitSet(this.children.length);
+	public ArrayList<BitSet> asBitSets() {
+		ArrayList<BitSet> bitsets = new ArrayList<>(this.size);
+		BitSet bitset = new BitSet(this.children.length);
 		
 		for (int i = 0; i < this.children.length; i++)
 			if (this.children[i] != null)

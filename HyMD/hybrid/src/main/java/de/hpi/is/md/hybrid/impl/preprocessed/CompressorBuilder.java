@@ -46,7 +46,7 @@ class CompressorBuilder {
 		for (Column<?> column : columns) {
 			ColumnCompressor<?> compressor = new ColumnCompressor<>(column);
 			columnCompressors.add(compressor);
-			columnIndexes.put(column, columnIndex++);
+			columnIndexes.put(column, Integer.valueOf(columnIndex++));
 		}
 		return new Compressor(columnCompressors.build(), columnIndexes.build(), records);
 	}

@@ -1,11 +1,34 @@
 package de.metanome.algorithms.cfdfinder;
 
+import static de.metanome.algorithms.cfdfinder.utils.LhsUtils.addSubsetsTo;
+import static de.metanome.algorithms.cfdfinder.utils.LhsUtils.generateLhsSubsets;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.ColumnCombination;
 import de.metanome.algorithm_integration.ColumnIdentifier;
-import de.metanome.algorithm_integration.algorithm_types.*;
-import de.metanome.algorithm_integration.configuration.*;
+import de.metanome.algorithm_integration.algorithm_types.BooleanParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.ConditionalFunctionalDependencyAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.IntegerParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.RelationalInputParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.StringParameterAlgorithm;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirementInteger;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirementRelationalInput;
+import de.metanome.algorithm_integration.configuration.ConfigurationRequirementString;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
@@ -18,8 +41,17 @@ import de.metanome.algorithms.cfdfinder.expansion.PositiveAndNegativeConstantPat
 import de.metanome.algorithms.cfdfinder.expansion.RangePatternExpansionStrategy;
 import de.metanome.algorithms.cfdfinder.pattern.Pattern;
 import de.metanome.algorithms.cfdfinder.pattern.PatternTableau;
-import de.metanome.algorithms.cfdfinder.pruning.*;
-import de.metanome.algorithms.cfdfinder.result.*;
+import de.metanome.algorithms.cfdfinder.pruning.LegacyPruning;
+import de.metanome.algorithms.cfdfinder.pruning.PartialFdPruning;
+import de.metanome.algorithms.cfdfinder.pruning.PruningStrategy;
+import de.metanome.algorithms.cfdfinder.pruning.RhsFilterPruning;
+import de.metanome.algorithms.cfdfinder.pruning.SupportIndependentPruning;
+import de.metanome.algorithms.cfdfinder.result.DirectOutputResultStrategy;
+import de.metanome.algorithms.cfdfinder.result.FileResultStrategy;
+import de.metanome.algorithms.cfdfinder.result.PruningLatticeResultStrategy;
+import de.metanome.algorithms.cfdfinder.result.PruningLatticeToFileResultStrategy;
+import de.metanome.algorithms.cfdfinder.result.Result;
+import de.metanome.algorithms.cfdfinder.result.ResultStrategy;
 import de.metanome.algorithms.cfdfinder.structures.FDTreeElement;
 import de.metanome.algorithms.cfdfinder.structures.PositionListIndex;
 import de.metanome.algorithms.cfdfinder.utils.ValueComparator;
@@ -28,13 +60,6 @@ import de.uni_potsdam.hpi.utils.FileUtils;
 import it.unimi.dsi.fastutil.ints.Int2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import org.apache.lucene.util.OpenBitSet;
-
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import static de.metanome.algorithms.cfdfinder.utils.LhsUtils.addSubsetsTo;
-import static de.metanome.algorithms.cfdfinder.utils.LhsUtils.generateLhsSubsets;
 
 public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, StringParameterAlgorithm, BooleanParameterAlgorithm, IntegerParameterAlgorithm, RelationalInputParameterAlgorithm {
 
@@ -103,7 +128,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 		configs.add(new ConfigurationRequirementRelationalInput(CFDFinder.Identifier.INPUT_GENERATOR.name()));
 		
 		ConfigurationRequirementInteger inputRowLimit = new ConfigurationRequirementInteger(CFDFinder.Identifier.INPUT_ROW_LIMIT.name());
-		Integer[] defaultInputRowLimit = {this.inputRowLimit};
+		Integer[] defaultInputRowLimit = {Integer.valueOf(this.inputRowLimit)};
 		inputRowLimit.setDefaultValues(defaultInputRowLimit);
 		inputRowLimit.setRequired(false);
 		configs.add(inputRowLimit);
@@ -136,7 +161,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 		configs.add(minConfidence);
 
 		ConfigurationRequirementInteger maxPatterns = new ConfigurationRequirementInteger(Identifier.MAX_PATTERNS.name());
-		Integer[] defaultMaxPatterns = {this.patternThreshold};
+		Integer[] defaultMaxPatterns = {Integer.valueOf(this.patternThreshold)};
 		maxPatterns.setDefaultValues(defaultMaxPatterns);
 		maxPatterns.setRequired(false);
 		configs.add(maxPatterns);
@@ -163,12 +188,13 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 
 	@Override
 	public void setBooleanConfigurationValue(String identifier, Boolean... values) throws AlgorithmConfigurationException {
+		boolean value = values[0].booleanValue();
 		if (CFDFinder.Identifier.NULL_EQUALS_NULL.name().equals(identifier))
-			this.valueComparator = new ValueComparator(values[0]);
+			this.valueComparator = new ValueComparator(value);
 		else if (CFDFinder.Identifier.VALIDATE_PARALLEL.name().equals(identifier))
-			this.validateParallel = values[0];
+			this.validateParallel = value;
 		else if (CFDFinder.Identifier.ENABLE_MEMORY_GUARDIAN.name().equals(identifier))
-			this.memoryGuardian.setActive(values[0]);
+			this.memoryGuardian.setActive(value);
 		else
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 	}
@@ -200,16 +226,17 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 	
 	@Override
 	public void setIntegerConfigurationValue(String identifier, Integer... values) throws AlgorithmConfigurationException {
+		int value = values[0].intValue();
 		if (CFDFinder.Identifier.MAX_DETERMINANT_SIZE.name().equals(identifier)) {
-			this.maxLhsSize = values[0];
+			this.maxLhsSize = value;
 		} else if (CFDFinder.Identifier.INPUT_ROW_LIMIT.name().equals(identifier)) {
 			if (values.length > 0) {
-				this.inputRowLimit = values[0];
+				this.inputRowLimit = value;
 			}
 		} else if (Identifier.MAX_PATTERNS.name().equals(identifier)) {
-			this.patternThreshold = values[0];
+			this.patternThreshold = value;
 		} else if (Identifier.RHS_FILTER.name().equals(identifier)) {
-			this.rhsFilter = values[0];
+			this.rhsFilter = value;
 		} else {
 			this.handleUnknownConfiguration(identifier, CollectionUtils.concat(values, ","));
 		}
@@ -347,7 +374,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 		fds.sort(new Comparator<FDTreeElement.InternalFunctionalDependency>() {
 			@Override
 			public int compare(FDTreeElement.InternalFunctionalDependency o1, FDTreeElement.InternalFunctionalDependency o2) {
-				return (int) o1.lhs.cardinality() - (int) o2.lhs.cardinality();
+				return o1.lhs.cardinality() - o2.lhs.cardinality();
 			}
 		});
 
@@ -356,16 +383,18 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 		candidates.addAll(validator.maxNonFDs);
 
 		for (FDTreeElement.InternalFunctionalDependency fd : fds) {
-			for (OpenBitSet subset : generateLhsSubsets(fd.lhs)) {
+			for (BitSet subset : generateLhsSubsets(fd.lhs)) {
 				boolean skip = false;
 				for (FDTreeElement.InternalFunctionalDependency candidate : candidates) {
-					if (OpenBitSet.intersectionCount(subset, candidate.lhs) >= subset.cardinality() && fd.rhs == candidate.rhs) {
+					BitSet intersection = (BitSet) subset.clone();
+					intersection.and(candidate.lhs);
+					if (intersection.cardinality() >= subset.cardinality() && fd.rhs == candidate.rhs) {
 						skip = true;
 						break;
 					}
 				}
 				if (!skip) {
-					candidates.add(new FDTreeElement.InternalFunctionalDependency(subset, fd.rhs));
+					candidates.add(new FDTreeElement.InternalFunctionalDependency(subset, fd.rhs, numAttributes));
 				}
 			}
 		}
@@ -375,7 +404,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 			levels.add(new HashSet<FDTreeElement.InternalFunctionalDependency>());
 		}
 		for (FDTreeElement.InternalFunctionalDependency candidate : candidates) {
-			levels.get((int) candidate.lhs.cardinality() - 1).add(candidate);
+			levels.get(candidate.lhs.cardinality() - 1).add(candidate);
 		}
 		log("Done. " + String.valueOf(candidates.size()) + " maximal non-FDs (initial candidates).");
 
@@ -389,7 +418,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 				for (String key : clusterMaps.get(i).keySet()) {
 					IntArrayList ial = clusterMaps.get(i).get(key);
 					if (ial.contains(enrichedPLIs.get(i).get(j).get(0))) {
-						clusterMapping.put(j, key);
+						clusterMapping.put(Integer.valueOf(j), key);
 						break;
 					}
 				}
@@ -497,15 +526,15 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 		log("... done!");
 	}
 
-	private PositionListIndex getLhsPli(final OpenBitSet lhs, final List<PositionListIndex> plis) {
+	private PositionListIndex getLhsPli(final BitSet lhs, final List<PositionListIndex> plis) {
         PositionListIndex result = pliCache.get(lhs);
         if (result != null) {
         	fullHits += 1;
         	return result;
 		}
-		OpenBitSet currentlhs = new OpenBitSet(lhs.capacity());
+		BitSet currentlhs = new BitSet(lhs.length());
         for (int i = lhs.nextSetBit(0); i >= 0; i = lhs.nextSetBit(i + 1)) {
-        	currentlhs.fastFlip(i);
+        	currentlhs.flip(i);
 			PositionListIndex currentPLI = pliCache.get(currentlhs);
 			if (currentPLI != null) {
 				partialHits += 1;
@@ -517,7 +546,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 				} else {
 					totalMisses += 1;
 					result = result.intersect(pli);
-					pliCache.put(currentlhs.clone(), result);
+					pliCache.put((BitSet) currentlhs.clone(), result);
 				}
 			}
         }
@@ -525,7 +554,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
     }
 
 	public static int findViolationsFor(final IntArrayList cluster, final int[] invertedRhsPLI) {
-		Integer maxSize = 0;
+		int maxSize = 0;
 		Int2IntAVLTreeMap clusterMap = new Int2IntAVLTreeMap();
 		clusterMap.defaultReturnValue(0);
 		for (int tuple : cluster) {
@@ -543,13 +572,12 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 		}
 		if (maxSize > 0) {
 			return cluster.size() - maxSize;
-		} else {
-			// if there is no cluster in the list, there are only single-tuple clusters on the rhs and thus, only one keeper
-			return cluster.size() - 1;
 		}
+		// if there is no cluster in the list, there are only single-tuple clusters on the rhs and thus, only one keeper
+		return cluster.size() - 1;
 	}
 
-	private PatternTableau generateTableau(final OpenBitSet attributes, final int[][] values, final PositionListIndex lhs, final int[] rhs, final int numberOfTuples, final PruningStrategy pruningStrategy, final ExpansionStrategy expansionStrategy) {
+	private PatternTableau generateTableau(final BitSet attributes, final int[][] values, final PositionListIndex lhs, final int[] rhs, final int numberOfTuples, final PruningStrategy pruningStrategy, final ExpansionStrategy expansionStrategy) {
 		Pattern nullPattern = expansionStrategy.generateNullPattern(attributes);
 		int violations = 0;
 		List<IntArrayList> enrichedClusters = enrichPLI(lhs, numberOfTuples);
@@ -625,7 +653,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 					List<IntArrayList> clusters = enrichedPLIs.get(attr);
 					for (int clusterId = clusters.size() - 1; clusterId >= 0; clusterId -= 1) {
 						IntArrayList cluster = clusters.get(clusterId);
-						if (cluster.get(0) == tupleId) {
+						if (cluster.get(0).intValue() == tupleId) {
 							tuple[attr] = clusterId;
 							break;
 						}
@@ -638,7 +666,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 	private List<IntArrayList> determineCover(final Pattern c, final Pattern currentPattern, final int[][] values) {
 	    List<IntArrayList> result = new LinkedList<>();
 	    for (IntArrayList cluster : currentPattern.getCover()) {
-	        int[] tuple = values[cluster.get(0)];
+	        int[] tuple = values[cluster.get(0).intValue()];
 	        if (c.matches(tuple)) {
 	            result.add(cluster.clone());
             }
@@ -664,6 +692,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 		return columnIdentifiers;
 	}
 
+	@SuppressWarnings("unused")
 	private ObjectArrayList<List<String>> loadData(RelationalInput relationalInput) throws InputIterationException {
 		ObjectArrayList<List<String>> records = new ObjectArrayList<List<String>>();
 		while (relationalInput.hasNext())

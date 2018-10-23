@@ -17,7 +17,6 @@ import java.util.function.Predicate;
 import org.junit.Test;
 import org.mockito.Mock;
 
-@SuppressWarnings("ProtectedField")
 public abstract class RhsValidationTaskTest {
 
 	protected double minThreshold = 0.7;
@@ -32,9 +31,9 @@ public abstract class RhsValidationTaskTest {
 		int[] rec = {0, 0, 0, 0};
 		int[] rec0 = {1, 1, 1, 1};
 		when(rightRecords.get(0)).thenReturn(rec0);
-		when(columnPair.getRightValue(rec0)).thenReturn(1);
-		when(columnPair.getLeftValue(rec)).thenReturn(0);
-		doReturn(0.7).when(columnPair).getSimilarity(0, 1);
+		when(Integer.valueOf(columnPair.getRightValue(rec0))).thenReturn(Integer.valueOf(1));
+		when(Integer.valueOf(columnPair.getLeftValue(rec))).thenReturn(Integer.valueOf(0));
+		doReturn(Double.valueOf(0.7)).when(columnPair).getSimilarity(0, 1);
 		Rhs rhs = Rhs.builder()
 			.lowerBound(0.8)
 			.rhsAttr(2)
@@ -55,9 +54,9 @@ public abstract class RhsValidationTaskTest {
 		int[] rec = {0, 0, 0, 0};
 		int[] rec0 = {1, 1, 1, 1};
 		when(rightRecords.get(0)).thenReturn(rec0);
-		when(columnPair.getRightValue(rec0)).thenReturn(1);
-		when(columnPair.getLeftValue(rec)).thenReturn(0);
-		doReturn(0.6).when(columnPair).getSimilarity(0, 1);
+		when(Integer.valueOf(columnPair.getRightValue(rec0))).thenReturn(Integer.valueOf(1));
+		when(Integer.valueOf(columnPair.getLeftValue(rec))).thenReturn(Integer.valueOf(0));
+		doReturn(Double.valueOf(0.6)).when(columnPair).getSimilarity(0, 1);
 		Rhs rhs = Rhs.builder()
 			.lowerBound(0.0)
 			.rhsAttr(2)
@@ -80,11 +79,11 @@ public abstract class RhsValidationTaskTest {
 		int[] rec1 = {1, 1, 2, 1};
 		doReturn(rec0).when(rightRecords).get(0);
 		doReturn(rec1).when(rightRecords).get(1);
-		doReturn(1).when(columnPair).getRightValue(rec0);
-		doReturn(2).when(columnPair).getRightValue(rec1);
-		when(columnPair.getLeftValue(rec)).thenReturn(0);
-		doReturn(0.6).when(columnPair).getSimilarity(0, 1);
-		doReturn(0.5).when(columnPair).getSimilarity(0, 2);
+		doReturn(Integer.valueOf(1)).when(columnPair).getRightValue(rec0);
+		doReturn(Integer.valueOf(2)).when(columnPair).getRightValue(rec1);
+		when(Integer.valueOf(columnPair.getLeftValue(rec))).thenReturn(Integer.valueOf(0));
+		doReturn(Double.valueOf(0.6)).when(columnPair).getSimilarity(0, 1);
+		doReturn(Double.valueOf(0.5)).when(columnPair).getSimilarity(0, 2);
 		Rhs rhs = Rhs.builder()
 			.lowerBound(0.0)
 			.rhsAttr(2)
@@ -124,9 +123,9 @@ public abstract class RhsValidationTaskTest {
 		int[] rec = {0, 0, 0, 0};
 		int[] rec0 = {1, 1, 1, 1};
 		when(rightRecords.get(0)).thenReturn(rec0);
-		when(columnPair.getRightValue(rec0)).thenReturn(1);
-		when(columnPair.getLeftValue(rec)).thenReturn(0);
-		doReturn(0.7).when(columnPair).getSimilarity(0, 1);
+		when(Integer.valueOf(columnPair.getRightValue(rec0))).thenReturn(Integer.valueOf(1));
+		when(Integer.valueOf(columnPair.getLeftValue(rec))).thenReturn(Integer.valueOf(0));
+		doReturn(Double.valueOf(0.7)).when(columnPair).getSimilarity(0, 1);
 		Rhs rhs = Rhs.builder()
 			.lowerBound(0.0)
 			.rhsAttr(2)

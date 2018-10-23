@@ -40,7 +40,7 @@ public class InferrerTest {
 		MDElement rhs = new MDElementImpl(rhsAttr, 0.5);
 		MD specialized = Mockito.mock(MD.class);
 		double similarity = 0.4;
-		when(similaritySet.get(rhsAttr)).thenReturn(similarity);
+		when(Double.valueOf(similaritySet.get(rhsAttr))).thenReturn(Double.valueOf(similarity));
 		when(specializer.specialize(lhs, rhs, similaritySet))
 			.thenReturn(Collections.singletonList(specialized));
 		when(lattice.addIfMinimalAndSupported(specialized))
@@ -58,7 +58,7 @@ public class InferrerTest {
 		MDElement rhs = new MDElementImpl(rhsAttr, 0.5);
 		MD specialized = Mockito.mock(MD.class);
 		double similarity = 0.4;
-		when(similaritySet.get(rhsAttr)).thenReturn(similarity);
+		when(Double.valueOf(similaritySet.get(rhsAttr))).thenReturn(Double.valueOf(similarity));
 		when(specializer.specialize(lhs, rhs, similaritySet))
 			.thenReturn(Collections.singletonList(specialized));
 		when(lattice.addIfMinimalAndSupported(specialized)).thenReturn(Optional.empty());

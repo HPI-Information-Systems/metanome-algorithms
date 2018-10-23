@@ -67,7 +67,6 @@ class SingleValidationTask implements ValidationTask {
 		return new ValidationResult(lhsResult, rhsResults);
 	}
 
-	@SuppressWarnings("TypeMayBeWeakened")
 	private Iterable<int[]> getRecords(IntCollection leftMatches) {
 		int size = leftMatches.size();
 		Collection<int[]> left = new ArrayList<>(size);
@@ -85,8 +84,8 @@ class SingleValidationTask implements ValidationTask {
 	}
 
 	private long validate(IntCollection leftMatches, IntCollection rightMatches) {
-		log.trace("Validating {} left matches with {} right matches", leftMatches.size(),
-			rightMatches.size());
+		log.trace("Validating {} left matches with {} right matches", Integer.valueOf(leftMatches.size()),
+			Integer.valueOf(rightMatches.size()));
 		Iterable<int[]> left = getRecords(leftMatches);
 		rhs.forEach(rhsTask -> rhsTask.validate(left, rightMatches));
 		return (long) leftMatches.size() * rightMatches.size();

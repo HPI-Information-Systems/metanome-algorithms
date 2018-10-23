@@ -22,7 +22,6 @@ public class PruneHashSet extends HashMap<ColumnCollection, HashSet<ColumnCollec
 		for (ColumnCollection candidate : candidates) {
 			if (!dependencies.isRepresented(candidate) && !nonDependencies.isRepresented(candidate)) {
 				return candidate;
-			} else {
 			}
 		}
 		return null;
@@ -47,7 +46,7 @@ public class PruneHashSet extends HashMap<ColumnCollection, HashSet<ColumnCollec
 	@Override
 	public void rebalanceGroup(ColumnCollection groupKey) {
 		HashSet<ColumnCollection> depsOfGroup = this.get(groupKey);
-		for (Integer columnIndex : groupKey.complementCopy().getSetBits()) {
+		for (int columnIndex : groupKey.complementCopy().getSetBits()) {
 			ColumnCollection newKey = groupKey.setCopy(columnIndex);
 			HashSet<ColumnCollection> newGroup = new HashSet<ColumnCollection>();
 			this.put(newKey, newGroup);
