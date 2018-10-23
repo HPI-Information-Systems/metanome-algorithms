@@ -14,7 +14,7 @@
     <parent>
         <groupId>de.metanome.algorithms.fun</groupId>
         <artifactId>FUNModules</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>de.metanome.algorithms.fun</groupId>
             <artifactId>fun_test_helper</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -38,7 +38,7 @@
         <dependency>
             <groupId>de.metanome.algorithms.fun</groupId>
             <artifactId>fun_algorithm</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

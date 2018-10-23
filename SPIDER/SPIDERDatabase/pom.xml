@@ -13,7 +13,7 @@
   <parent>
     <groupId>de.metanome.algorithms.spider</groupId>
     <artifactId>SPIDERModules</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>de.metanome.algorithms.spider</groupId>
       <artifactId>SPIDERAlgorithm</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.2-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
