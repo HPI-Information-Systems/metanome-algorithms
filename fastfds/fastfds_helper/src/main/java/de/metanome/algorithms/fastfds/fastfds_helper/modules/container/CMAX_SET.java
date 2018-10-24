@@ -1,31 +1,30 @@
 package de.metanome.algorithms.fastfds.fastfds_helper.modules.container;
 
-import de.metanome.algorithms.fastfds.fastfds_helper.util.BitSetUtil;
-
-import org.apache.lucene.util.OpenBitSet;
-
+import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.metanome.algorithms.fastfds.fastfds_helper.util.BitSetUtil;
 
 public class CMAX_SET extends StorageSet {
 
     protected int attribute;
-    protected List<OpenBitSet> columnCombinations;
+    protected List<BitSet> columnCombinations;
     private boolean finalized;
 
     public CMAX_SET(int attribute) {
 
         this.attribute = attribute;
-        this.columnCombinations = new LinkedList<OpenBitSet>();
+        this.columnCombinations = new LinkedList<BitSet>();
         this.finalized = false;
     }
 
-    public void addCombination(OpenBitSet combination) {
+    public void addCombination(BitSet combination) {
 
         this.columnCombinations.add(combination);
     }
 
-    public List<OpenBitSet> getCombinations() {
+    public List<BitSet> getCombinations() {
 
         return this.columnCombinations;
     }
@@ -39,8 +38,8 @@ public class CMAX_SET extends StorageSet {
     public String toString_() {
 
         String s = "cmax(" + this.attribute + ": ";
-        for (OpenBitSet set : this.columnCombinations) {
-            s += BitSetUtil.convertToLongList(set);
+        for (BitSet set : this.columnCombinations) {
+            s += BitSetUtil.convertToIntList(set);
         }
         return s + ")";
     }

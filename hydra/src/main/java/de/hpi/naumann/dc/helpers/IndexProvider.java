@@ -17,9 +17,9 @@ public class IndexProvider<T> {
 	private int nextIndex = 0;
 
 	public Integer getIndex(T object) {
-		Integer index = indexes.putIfAbsent(object, nextIndex);
+		Integer index = indexes.putIfAbsent(object, Integer.valueOf(nextIndex));
 		if (index == null) {
-			index = nextIndex;
+			index = Integer.valueOf(nextIndex);
 			++nextIndex;
 			objects.add(object);
 		}
@@ -33,7 +33,7 @@ public class IndexProvider<T> {
 	public IBitSet getBitSet(Iterable<T> objects) {
 		IBitSet result = LongBitSet.FACTORY.create();
 		for (T i : objects) {
-			result.set(getIndex(i));
+			result.set(getIndex(i).intValue());
 		}
 		return result;
 	}

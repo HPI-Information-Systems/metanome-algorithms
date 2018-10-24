@@ -1,21 +1,21 @@
 package de.metanome.algorithms.fastfds.fastfds_helper.modules.container;
 
-import de.metanome.algorithms.fastfds.fastfds_helper.util.BitSetUtil;
+import java.util.BitSet;
 
-import org.apache.lucene.util.OpenBitSet;
+import de.metanome.algorithms.fastfds.fastfds_helper.util.BitSetUtil;
 
 public class AgreeSet extends StorageSet {
 
-    protected OpenBitSet attributes = new OpenBitSet();
+    protected BitSet attributes = new BitSet();
 
     public void add(int attribute) {
 
         this.attributes.set(attribute);
     }
 
-    public OpenBitSet getAttributes() {
+    public BitSet getAttributes() {
 
-        return this.attributes.clone();
+        return (BitSet) this.attributes.clone();
 
     }
 

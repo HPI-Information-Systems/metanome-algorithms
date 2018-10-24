@@ -1,15 +1,10 @@
 package de.metanome.algorithms.depminer.depminer_algorithm.modules;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
-
+import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
@@ -17,20 +12,23 @@ import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultEx
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithms.depminer.depminer_helper.modules.Algorithm_Group2_Modul;
 import de.metanome.algorithms.depminer.depminer_helper.modules.container.FunctionalDependencyGroup2;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 public class FunctionalDependencyGenerator extends Algorithm_Group2_Modul {
 
     private FunctionalDependencyResultReceiver fdrr;
     private String relationName;
     private List<String> columns;
-    private Int2ObjectMap<List<OpenBitSet>> lhss;
+    private Int2ObjectMap<List<BitSet>> lhss;
 
     private AlgorithmExecutionException exception = null;
 
     private List<FunctionalDependencyGroup2> result;
 
     public FunctionalDependencyGenerator(FunctionalDependencyResultReceiver fdrr, String relationName,
-                                         List<String> columnIdentifer, int numberOfThreads, Int2ObjectMap<List<OpenBitSet>> lhss) {
+                                         List<String> columnIdentifer, int numberOfThreads, Int2ObjectMap<List<BitSet>> lhss) {
 
         super(numberOfThreads, "FunctionalDependencyGen");
 
@@ -78,7 +76,7 @@ public class FunctionalDependencyGenerator extends Algorithm_Group2_Modul {
     // TODO: find better name for method
     private void executePara(int attribute) throws CouldNotReceiveResultException, ColumnNameMismatchException {
 
-        for (OpenBitSet lhs : this.lhss.get(attribute)) {
+        for (BitSet lhs : this.lhss.get(attribute)) {
             if (lhs.get(attribute)) {
                 continue;
             }

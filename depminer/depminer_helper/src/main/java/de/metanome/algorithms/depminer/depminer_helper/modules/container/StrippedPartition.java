@@ -1,15 +1,15 @@
 package de.metanome.algorithms.depminer.depminer_helper.modules.container;
 
-import it.unimi.dsi.fastutil.longs.LongList;
-import org.apache.lucene.util.OpenBitSet;
-
+import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
+
+import it.unimi.dsi.fastutil.ints.IntList;
 
 public class StrippedPartition extends StorageSet {
 
     protected int attribute;
-    protected List<LongList> value = new LinkedList<LongList>();
+    protected List<IntList> value = new LinkedList<IntList>();
     protected boolean finalized = false;
 
     public StrippedPartition(int attribute) {
@@ -17,7 +17,7 @@ public class StrippedPartition extends StorageSet {
         this.attribute = attribute;
     }
 
-    public void addElement(LongList element) {
+    public void addElement(IntList element) {
 
         if (finalized) {
             return;
@@ -35,7 +35,7 @@ public class StrippedPartition extends StorageSet {
         return this.attribute;
     }
 
-    public List<LongList> getValues() {
+    public List<IntList> getValues() {
 
         return this.value;
 
@@ -53,12 +53,12 @@ public class StrippedPartition extends StorageSet {
         // }
     }
 
-    public List<OpenBitSet> getValuesAsBitSet() {
+    public List<BitSet> getValuesAsBitSet() {
 
-        List<OpenBitSet> result = new LinkedList<OpenBitSet>();
-        for (LongList list : this.value) {
-            OpenBitSet set = new OpenBitSet();
-            for (long i : list) {
+        List<BitSet> result = new LinkedList<BitSet>();
+        for (IntList list : this.value) {
+            BitSet set = new BitSet();
+            for (int i : list) {
                 set.set(i);
             }
             result.add(set);
@@ -70,7 +70,7 @@ public class StrippedPartition extends StorageSet {
     protected String toString_() {
 
         String s = "sp(";
-        for (LongList il : this.value) {
+        for (IntList il : this.value) {
             s += il.toString() + "-";
         }
         return s + ")";
@@ -78,7 +78,7 @@ public class StrippedPartition extends StorageSet {
 
     public StrippedPartition copy() {
         StrippedPartition copy = new StrippedPartition(this.attribute);
-        for (LongList l : this.value) {
+        for (IntList l : this.value) {
             copy.value.add(l);
         }
         copy.finalized = this.finalized;

@@ -1,13 +1,24 @@
 package de.metanome.algorithms.fastfds.fastfds_helper.modules;
 
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithms.fastfds.fastfds_helper.modules.container.AgreeSet;
 import de.metanome.algorithms.fastfds.fastfds_helper.modules.container.StrippedPartition;
-import it.unimi.dsi.fastutil.longs.*;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArraySet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 
 public class AgreeSetGenerator extends Algorithm_Group2_Modul {
 
@@ -38,7 +49,7 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
             System.out.println("-----");
         }
 
-        Set<LongList> maxSets;
+        Set<IntList> maxSets;
         if (this.chooseAlternative1) {
             maxSets = this.computeMaximumSetsAlternative(partitions);
         } else if (this.chooseAlternative2) {
@@ -58,14 +69,14 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
         return result;
     }
 
-    public Set<AgreeSet> computeAgreeSets(Long2ObjectMap<TupleEquivalenceClassRelation> relationships, Set<LongList> maxSets,
+    public Set<AgreeSet> computeAgreeSets(Long2ObjectMap<TupleEquivalenceClassRelation> relationships, Set<IntList> maxSets,
                                           List<StrippedPartition> partitions) throws AlgorithmExecutionException {
 
         if (this.debugSysout) {
             System.out.println("\tstartet calculation of agree sets");
-            int bitsPerSet = (((int) (partitions.size() - 1) / 64) + 1) * 64;
+            int bitsPerSet = (((partitions.size() - 1) / 64) + 1) * 64;
             long setsNeeded = 0;
-            for (LongList l : maxSets) {
+            for (IntList l : maxSets) {
                 setsNeeded += l.size() * (l.size() - 1) / 2;
             }
             System.out
@@ -83,7 +94,7 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
             Map<AgreeSet, Object> agreeSets = new ConcurrentHashMap<AgreeSet, Object>();
 
             ExecutorService exec = this.getExecuter();
-            for (LongList maxEquiClass : maxSets) {
+            for (IntList maxEquiClass : maxSets) {
                 if (this.debugSysout) {
                     System.out.println(a++);
                 }
@@ -96,25 +107,22 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
             this.awaitExecuter(exec);
 
             return agreeSets.keySet();
-        } else {
+        }
+        Set<AgreeSet> agreeSets = new HashSet<AgreeSet>();
 
-            Set<AgreeSet> agreeSets = new HashSet<AgreeSet>();
-
-            for (LongList maxEquiClass : maxSets) {
-                if (this.debugSysout) {
-                    System.out.println(a++);
-                }
-                for (int i = 0; i < maxEquiClass.size() - 1; i++) {
-                    for (int j = i + 1; j < maxEquiClass.size(); j++) {
-                        relationships.get(maxEquiClass.getLong(i)).intersectWithAndAddToAgreeSet(
-                                relationships.get(maxEquiClass.getLong(j)), agreeSets);
-                    }
+        for (IntList maxEquiClass : maxSets) {
+            if (this.debugSysout) {
+                System.out.println(a++);
+            }
+            for (int i = 0; i < maxEquiClass.size() - 1; i++) {
+                for (int j = i + 1; j < maxEquiClass.size(); j++) {
+                    relationships.get(maxEquiClass.getInt(i)).intersectWithAndAddToAgreeSet(
+                            relationships.get(maxEquiClass.getInt(j)), agreeSets);
                 }
             }
-
-            return agreeSets;
         }
 
+        return agreeSets;
     }
 
     public Long2ObjectMap<TupleEquivalenceClassRelation> calculateRelationships(List<StrippedPartition> partitions) {
@@ -133,7 +141,7 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
     private void calculateRelationship(StrippedPartition partitions, Long2ObjectMap<TupleEquivalenceClassRelation> relationships) {
 
         int partitionNr = 0;
-        for (LongList partition : partitions.getValues()) {
+        for (IntList partition : partitions.getValues()) {
             if (this.debugSysout)
                 System.out.println(".");
             for (long index : partition) {
@@ -147,7 +155,7 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
 
     }
 
-    public Set<LongList> computeMaximumSets(List<StrippedPartition> partitionsOrig) {
+    public Set<IntList> computeMaximumSets(List<StrippedPartition> partitionsOrig) {
 
         if (this.debugSysout) {
             System.out.println("\tstartet calculation of maximal partitions");
@@ -158,7 +166,7 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
             partitions.add(p.copy());
         }
 
-        Set<LongList> maxSets = new HashSet<LongList>(partitions.get(partitions.size() - 1).getValues());
+        Set<IntList> maxSets = new HashSet<IntList>(partitions.get(partitions.size() - 1).getValues());
 
         for (int i = partitions.size() - 2; i >= 0; i--) {
             if (this.debugSysout)
@@ -169,7 +177,7 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
         if (this.debugSysout) {
             long count = 0;
             System.out.println("-----\nAnzahl maximaler Partitionen: " + maxSets.size() + "\n-----");
-            for (LongList l : maxSets) {
+            for (IntList l : maxSets) {
                 System.out.println("Partitionsgröße: " + l.size());
                 count = count + (l.size() * (l.size() - 1) / 2);
             }
@@ -179,17 +187,17 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
         return maxSets;
     }
 
-    public void calculateSupersets(Set<LongList> maxSets, List<LongList> partitions) {
+    public void calculateSupersets(Set<IntList> maxSets, List<IntList> partitions) {
 
-        List<LongList> toDelete = new LinkedList<LongList>();
-        Set<LongList> toAdd = new HashSet<LongList>();
+        List<IntList> toDelete = new LinkedList<IntList>();
+        Set<IntList> toAdd = new HashSet<IntList>();
         int deleteFromPartition = -1;
 
-        // List<LongList> remainingSets = new LinkedList<LongList>();
+        // List<IntList> remainingSets = new LinkedList<IntList>();
         // remainingSets.addAll(partition);
-        for (LongList maxSet : maxSets) {
-            for (LongList partition : partitions) {
-                // LongList partitionCopy = new LongArrayList(partition);
+        for (IntList maxSet : maxSets) {
+            for (IntList partition : partitions) {
+                // IntList partitionCopy = new IntArrayList(partition);
                 if ((maxSet.size() >= partition.size()) && (maxSet.containsAll(partition))) {
                     toAdd.remove(partition);
                     deleteFromPartition = partitions.indexOf(partition);
@@ -213,27 +221,27 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
         maxSets.addAll(toAdd);
     }
 
-    public Set<LongList> computeMaximumSetsAlternative(List<StrippedPartition> partitions) {
+    public Set<IntList> computeMaximumSetsAlternative(List<StrippedPartition> partitions) {
 
         if (this.debugSysout) {
             System.out.println("\tstartet calculation of maximal partitions");
         }
         long start = System.currentTimeMillis();
 
-        Set<LongList> sortedPartitions = new TreeSet<LongList>(new ListComparator());
+        Set<IntList> sortedPartitions = new TreeSet<IntList>(new ListComparator());
         for (StrippedPartition p : partitions) {
             sortedPartitions.addAll(p.getValues());
         }
-        Iterator<LongList> it = sortedPartitions.iterator();
-        Long2ObjectMap<Set<LongList>> maxSets = new Long2ObjectOpenHashMap<Set<LongList>>();
+        Iterator<IntList> it = sortedPartitions.iterator();
+        Long2ObjectMap<Set<IntList>> maxSets = new Long2ObjectOpenHashMap<Set<IntList>>();
         long remainingPartitions = sortedPartitions.size();
         if (this.debugSysout) {
             System.out.println("\tNumber of Partitions: " + remainingPartitions);
         }
         if (it.hasNext()) {
-            LongList actuelList = it.next();
+            IntList actuelList = it.next();
             long minSize = actuelList.size();
-            Set<LongList> set = new HashSet<LongList>();
+            Set<IntList> set = new HashSet<IntList>();
             set.add(actuelList);
             while ((actuelList = it.next()) != null && (actuelList.size() == minSize)) {
                 if (this.debugSysout) {
@@ -243,7 +251,7 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
             }
             maxSets.put(minSize, set);
             if (actuelList != null) {
-                maxSets.put(actuelList.size(), new HashSet<LongList>());
+                maxSets.put(actuelList.size(), new HashSet<IntList>());
                 if (this.debugSysout) {
                     System.out.println("\tremaining: " + --remainingPartitions);
                 }
@@ -254,7 +262,7 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
                         System.out.println("\tremaining: " + --remainingPartitions);
                     }
                     if (!maxSets.containsKey(actuelList.size()))
-                        maxSets.put(actuelList.size(), new HashSet<LongList>());
+                        maxSets.put(actuelList.size(), new HashSet<IntList>());
                     this.handleList(actuelList, maxSets, true);
                 }
             }
@@ -264,7 +272,7 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
         if (this.debugSysout)
             System.out.println("\tTime needed: " + (end - start));
 
-        Set<LongList> max = this.mergeResult(maxSets);
+        Set<IntList> max = this.mergeResult(maxSets);
         maxSets.clear();
         sortedPartitions.clear();
 
@@ -273,19 +281,19 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
 
     // ############################################
 
-    private Set<LongList> mergeResult(Long2ObjectMap<Set<LongList>> maxSets) {
+    private Set<IntList> mergeResult(Long2ObjectMap<Set<IntList>> maxSets) {
 
-        Set<LongList> max = new HashSet<LongList>();
-        for (Set<LongList> set : maxSets.values()) {
+        Set<IntList> max = new HashSet<IntList>();
+        for (Set<IntList> set : maxSets.values()) {
             max.addAll(set);
         }
         return max;
     }
 
-    private void handleList(LongList list, Long2ObjectMap<Set<LongList>> maxSets, boolean firstStep) {
+    private void handleList(IntList list, Long2ObjectMap<Set<IntList>> maxSets, boolean firstStep) {
 
         for (int i = 0; i < list.size(); i++) {
-            long removedElement = list.removeLong(i);
+            int removedElement = list.removeInt(i);
             if (maxSets.containsKey(list.size()) && maxSets.get(list.size()).contains(list))
                 maxSets.get(list.size()).remove(list);
             else {
@@ -300,20 +308,20 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
             maxSets.get(list.size()).add(list);
     }
 
-    public Set<LongList> computeMaximumSetsAlternative2(List<StrippedPartition> partitions) throws AlgorithmExecutionException {
+    public Set<IntList> computeMaximumSetsAlternative2(List<StrippedPartition> partitions) throws AlgorithmExecutionException {
 
         if (this.debugSysout) {
             System.out.println("\tstartet calculation of maximal partitions");
         }
         long start = System.currentTimeMillis();
 
-        Set<LongList> sortedPartitions = this.sortPartitions(partitions, new ListComparator2());
+        Set<IntList> sortedPartitions = this.sortPartitions(partitions, new ListComparator2());
 
         if (this.debugSysout) {
             System.out.println("\tTime to sort: " + (System.currentTimeMillis() - start));
         }
 
-        Iterator<LongList> it = sortedPartitions.iterator();
+        Iterator<IntList> it = sortedPartitions.iterator();
         long remainingPartitions = sortedPartitions.size();
         if (this.debugSysout) {
             System.out.println("\tNumber of Partitions: " + remainingPartitions);
@@ -321,10 +329,10 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
 
         if (this.optimize()) {
             Map<Long, LongSet> index = new ConcurrentHashMap<Long, LongSet>();
-            Map<LongList, Object> max = new ConcurrentHashMap<LongList, Object>();
+            Map<IntList, Object> max = new ConcurrentHashMap<IntList, Object>();
 
             long actuelIndex = 0;
-            LongList actuelList;
+            IntList actuelList;
 
             int currentSize = Integer.MAX_VALUE;
             ExecutorService exec = this.getExecuter();
@@ -349,48 +357,46 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
             sortedPartitions.clear();
 
             return max.keySet();
-        } else {
-            Long2ObjectMap<LongSet> index = new Long2ObjectOpenHashMap<LongSet>();
-            Set<LongList> max = new HashSet<LongList>();
+        }
+        Long2ObjectMap<LongSet> index = new Long2ObjectOpenHashMap<LongSet>();
+        Set<IntList> max = new HashSet<IntList>();
 
-            long actuelIndex = 0;
-            LongList actuelList;
+        long actuelIndex = 0;
+        IntList actuelList;
 
-            while (it.hasNext()) {
-                actuelList = it.next();
-                this.handlePartition(actuelList, actuelIndex, index, max);
-                actuelIndex++;
-            }
-
-            long end = System.currentTimeMillis();
-            if (this.debugSysout) {
-                System.out.println("\tTime needed: " + (end - start));
-            }
-
-            index.clear();
-            sortedPartitions.clear();
-
-            return max;
+        while (it.hasNext()) {
+            actuelList = it.next();
+            this.handlePartition(actuelList, actuelIndex, index, max);
+            actuelIndex++;
         }
 
+        long end = System.currentTimeMillis();
+        if (this.debugSysout) {
+            System.out.println("\tTime needed: " + (end - start));
+        }
+
+        index.clear();
+        sortedPartitions.clear();
+
+        return max;
     }
 
-    private void handlePartitionConcurrent(LongList actuelList, long position, Map<Long, LongSet> index, Map<LongList, Object> max) {
+    private void handlePartitionConcurrent(IntList actuelList, long position, Map<Long, LongSet> index, Map<IntList, Object> max) {
 
         if (!this.isSubset(actuelList, index)) {
             max.put(actuelList, new Object());
             for (long e : actuelList) {
-                if (!index.containsKey(e)) {
-                    index.put(e, new LongArraySet());
+                if (!index.containsKey(Long.valueOf(e))) {
+                    index.put(Long.valueOf(e), new LongArraySet());
                 }
-                index.get(e).add(position);
+                index.get(Long.valueOf(e)).add(position);
             }
         }
     }
 
     // ############## next alternative #################
 
-    private void handlePartition(LongList actuelList, long position, Long2ObjectMap<LongSet> index, Set<LongList> max) {
+    private void handlePartition(IntList actuelList, long position, Long2ObjectMap<LongSet> index, Set<IntList> max) {
 
         if (!this.isSubset(actuelList, index)) {
             max.add(actuelList);
@@ -403,20 +409,20 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
         }
     }
 
-    private boolean isSubset(LongList actuelList, Map<Long, LongSet> index) {
+    private boolean isSubset(IntList actuelList, Map<Long, LongSet> index) {
 
         boolean first = true;
         LongSet positions = new LongArraySet();
         for (long e : actuelList) {
-            if (!index.containsKey(e)) {
+            if (!index.containsKey(Long.valueOf(e))) {
                 return false;
             }
             if (first) {
-                positions.addAll(index.get(e));
+                positions.addAll(index.get(Long.valueOf(e)));
                 first = false;
             } else {
 
-                this.intersect(positions, index.get(e));
+                this.intersect(positions, index.get(Long.valueOf(e)));
                 // FIXME: Throws UnsupportedOperationExeption within fastUtil
                 // positions.retainAll(index.get(e));
             }
@@ -438,9 +444,9 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
         positions.removeAll(toRemove);
     }
 
-    private Set<LongList> sortPartitions(List<StrippedPartition> partitions, Comparator<LongList> comparator) {
+    private Set<IntList> sortPartitions(List<StrippedPartition> partitions, Comparator<IntList> comparator) {
 
-        Set<LongList> sortedPartitions = new TreeSet<LongList>(comparator);
+        Set<IntList> sortedPartitions = new TreeSet<IntList>(comparator);
         for (StrippedPartition p : partitions) {
             sortedPartitions.addAll(p.getValues());
         }
@@ -451,11 +457,11 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
 
         private int i;
         private int j;
-        private LongList maxEquiClass;
+        private IntList maxEquiClass;
         private Long2ObjectMap<TupleEquivalenceClassRelation> relationships;
         private Map<AgreeSet, Object> agreeSets;
 
-        private IntersectWithAndAddToAgreeSetTask(int i, int j, LongList maxEquiClass,
+        private IntersectWithAndAddToAgreeSetTask(int i, int j, IntList maxEquiClass,
                                                   Long2ObjectMap<TupleEquivalenceClassRelation> relationships, Map<AgreeSet, Object> agreeSets) {
 
             this.i = i;
@@ -468,24 +474,24 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
         @Override
         public void run() {
 
-            relationships.get(maxEquiClass.getLong(i)).intersectWithAndAddToAgreeSetConcurrent(
-                    relationships.get(maxEquiClass.getLong(j)), agreeSets);
+            relationships.get(maxEquiClass.getInt(i)).intersectWithAndAddToAgreeSetConcurrent(
+                    relationships.get(maxEquiClass.getInt(j)), agreeSets);
 
         }
 
     }
 
-    private class ListComparator implements Comparator<LongList> {
+    private class ListComparator implements Comparator<IntList> {
 
         @Override
-        public int compare(LongList l1, LongList l2) {
+        public int compare(IntList l1, IntList l2) {
 
             if (l1.size() - l2.size() != 0)
                 return l1.size() - l2.size();
             for (int i = 0; i < l1.size(); i++) {
-                if (l1.getLong(i) == l2.getLong(i))
+                if (l1.getInt(i) == l2.getInt(i))
                     continue;
-                return (int) (l1.getLong(i) - l2.getLong(i));
+                return l1.getInt(i) - l2.getInt(i);
             }
             return 0;
         }
@@ -495,11 +501,11 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
     private class HandlePartitionTask implements Runnable {
 
         private Map<Long, LongSet> index;
-        private Map<LongList, Object> max;
-        private LongList actuelList;
+        private Map<IntList, Object> max;
+        private IntList actuelList;
         private long actuelIndex;
 
-        private HandlePartitionTask(LongList actuelList, long actuelIndex, Map<Long, LongSet> index, Map<LongList, Object> max) {
+        private HandlePartitionTask(IntList actuelList, long actuelIndex, Map<Long, LongSet> index, Map<IntList, Object> max) {
 
             this.index = index;
             this.max = max;
@@ -521,17 +527,17 @@ public class AgreeSetGenerator extends Algorithm_Group2_Modul {
 
     }
 
-    private class ListComparator2 implements Comparator<LongList> {
+    private class ListComparator2 implements Comparator<IntList> {
 
         @Override
-        public int compare(LongList l1, LongList l2) {
+        public int compare(IntList l1, IntList l2) {
 
             if (l1.size() - l2.size() != 0)
                 return l2.size() - l1.size();
             for (int i = 0; i < l1.size(); i++) {
-                if (l1.getLong(i) == l2.getLong(i))
+                if (l1.getInt(i) == l2.getInt(i))
                     continue;
-                return (int) (l2.getLong(i) - l1.getLong(i));
+                return l2.getInt(i) - l1.getInt(i);
             }
             return 0;
         }

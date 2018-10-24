@@ -1,5 +1,8 @@
 package de.metanome.algorithms.depminer.depminer_algorithm;
 
+import java.util.BitSet;
+import java.util.List;
+
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
@@ -12,9 +15,6 @@ import de.metanome.algorithms.depminer.depminer_helper.modules.container.AgreeSe
 import de.metanome.algorithms.depminer.depminer_helper.modules.container.CMAX_SET;
 import de.metanome.algorithms.depminer.depminer_helper.modules.container.StrippedPartition;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import org.apache.lucene.util.OpenBitSet;
-
-import java.util.List;
 
 public class DepMiner {
 
@@ -37,7 +37,7 @@ public class DepMiner {
         List<AgreeSet> agreeSets = new AgreeSetGenerator(this.numberOfThreads).execute(strippedPartitions);
 
         List<CMAX_SET> cmaxSets = new CMAX_SET_Generator(this.numberOfThreads, agreeSets, length).execute();
-        Int2ObjectMap<List<OpenBitSet>> lhss = new LeftHandSideGenerator(this.numberOfThreads).execute(cmaxSets, length);
+        Int2ObjectMap<List<BitSet>> lhss = new LeftHandSideGenerator(this.numberOfThreads).execute(cmaxSets, length);
 
         new FunctionalDependencyGenerator(fdrr, input.relationName(), input.columnNames(), this.numberOfThreads, lhss).execute();
 

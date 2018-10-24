@@ -13,11 +13,7 @@ import de.metanome.algorithm_integration.input.RelationalInput;
 public class Input {
 	private final int lineCount;
 	private final List<ParsedColumn<?>> parsedColumns;
-	private String name;
-
-	public Input(RelationalInput relationalInput) throws InputIterationException {
-		this(relationalInput, -1);
-	}
+	private final String name;
 
 	public Input(RelationalInput relationalInput, int rowLimit) throws InputIterationException {
 		final int columnCount = relationalInput.numberOfColumns();
@@ -94,6 +90,14 @@ public class Input {
 		return parsedColumns.toArray(new ParsedColumn[0]);
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public Input(RelationalInput relationalInput) throws InputIterationException {
+		this(relationalInput, -1);
+	}
+
 	public int[][] getInts() {
 		final int COLUMN_COUNT = parsedColumns.size();
 		final int ROW_COUNT = getLineCount();
@@ -107,16 +111,16 @@ public class Input {
 
 			if (parsedColumns.get(col).getType() == String.class) {
 				for (int line = 0; line < ROW_COUNT; ++line) {
-					input2s[line][col] = (int) providerS.getIndex((String) parsedColumns.get(col).getValue(line));
+					input2s[line][col] = providerS.getIndex((String) parsedColumns.get(col).getValue(line)).intValue();
 				}
 			} else if (parsedColumns.get(col).getType() == Double.class) {
 				for (int line = 0; line < ROW_COUNT; ++line) {
-					input2s[line][col] = (int) providerD.getIndex((Double) parsedColumns.get(col).getValue(line));
+					input2s[line][col] = providerD.getIndex((Double) parsedColumns.get(col).getValue(line)).intValue();
 
 				}
 			} else if (parsedColumns.get(col).getType() == Long.class) {
 				for (int line = 0; line < ROW_COUNT; ++line) {
-					input2s[line][col] = (int) providerL.getIndex((Long) parsedColumns.get(col).getValue(line));
+					input2s[line][col] = providerL.getIndex((Long) parsedColumns.get(col).getValue(line)).intValue();
 				}
 			} else {
 				log.error("Wrong type! " + parsedColumns.get(col).getValue(0).getClass().getName());
@@ -128,16 +132,16 @@ public class Input {
 		for (int col = 0; col < COLUMN_COUNT; ++col) {
 			if (parsedColumns.get(col).getType() == String.class) {
 				for (int line = 0; line < ROW_COUNT; ++line) {
-					input2s[line][col] = (int) providerS.getIndex((String) parsedColumns.get(col).getValue(line));
+					input2s[line][col] = providerS.getIndex((String) parsedColumns.get(col).getValue(line)).intValue();
 				}
 			} else if (parsedColumns.get(col).getType() == Double.class) {
 				for (int line = 0; line < ROW_COUNT; ++line) {
-					input2s[line][col] = (int) providerD.getIndex((Double) parsedColumns.get(col).getValue(line));
+					input2s[line][col] = providerD.getIndex((Double) parsedColumns.get(col).getValue(line)).intValue();
 
 				}
 			} else if (parsedColumns.get(col).getType() == Long.class) {
 				for (int line = 0; line < ROW_COUNT; ++line) {
-					input2s[line][col] = (int) providerL.getIndex((Long) parsedColumns.get(col).getValue(line));
+					input2s[line][col] = providerL.getIndex((Long) parsedColumns.get(col).getValue(line)).intValue();
 				}
 			} else {
 				log.error("Wrong type!");

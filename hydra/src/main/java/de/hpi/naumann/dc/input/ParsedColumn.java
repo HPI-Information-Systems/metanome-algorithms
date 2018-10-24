@@ -66,13 +66,13 @@ public class ParsedColumn<T extends Comparable<T>> {
 		if (type.equals(Double.class)) {
 			for (int i = 0; i < size; i++) {
 				Double l = (Double) values.get(i);
-				double tmp = l / (double) size;
+				double tmp = l.doubleValue() / size;
 				avg += tmp;
 			}
 		} else if (type.equals(Long.class)) {
 			for (int i = 0; i < size; i++) {
 				Long l = (Long) values.get(i);
-				double tmp = l / (double) size;
+				double tmp = l.doubleValue() / size;
 				avg += tmp;
 			}
 		}

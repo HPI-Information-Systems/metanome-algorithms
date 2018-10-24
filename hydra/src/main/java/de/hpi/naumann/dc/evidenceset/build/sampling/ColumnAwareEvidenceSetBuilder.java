@@ -38,7 +38,9 @@ public class ColumnAwareEvidenceSetBuilder extends EvidenceSetBuilder {
 
 		public void execute(Input input, IEvidenceSet evidenceSet) {
 			int sizePrior = evidenceSet.size();
-			forEachLine(data.clusters, (clusterIndex, line1) -> {
+			forEachLine(data.clusters, (index, line) -> {
+				int clusterIndex = index.intValue();
+				int line1 = line.intValue();
 				PredicateBitSet staticSet = getStatic(pairs, line1);
 				switch (type) {
 				case BEFORE:
@@ -154,7 +156,7 @@ public class ColumnAwareEvidenceSetBuilder extends EvidenceSetBuilder {
 			TIntIterator iter = cluster.iterator();
 			while (iter.hasNext()) {
 				int line1 = iter.next();
-				consumer.accept(clusterIndex, line1);
+				consumer.accept(Integer.valueOf(clusterIndex), Integer.valueOf(line1));
 			}
 			++clusterIndex;
 		}

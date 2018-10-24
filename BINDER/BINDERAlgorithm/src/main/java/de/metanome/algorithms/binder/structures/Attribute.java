@@ -91,7 +91,7 @@ public class Attribute implements Comparable<Attribute> {
 	}
 	
 	public void removeDependent(int dependent) {
-		this.dependents.rem(dependent);
+		this.dependents.remove(dependent);
 	}
 	
 	public boolean hasFinished() {

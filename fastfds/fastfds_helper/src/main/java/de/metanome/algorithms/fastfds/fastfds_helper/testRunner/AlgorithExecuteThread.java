@@ -23,7 +23,7 @@ public class AlgorithExecuteThread extends Thread {
 
         try {
             algo.setRelationalInputConfigurationValue(AlgorithmMetaGroup2.INPUT_TAG, csvt);
-            algo.setBooleanConfigurationValue(AlgorithmMetaGroup2.USE_OPTIMIZATIONS_TAG, false);
+            algo.setBooleanConfigurationValue(AlgorithmMetaGroup2.USE_OPTIMIZATIONS_TAG, Boolean.FALSE);
             algo.setResultReceiver(csvt);
 
             time = System.currentTimeMillis();

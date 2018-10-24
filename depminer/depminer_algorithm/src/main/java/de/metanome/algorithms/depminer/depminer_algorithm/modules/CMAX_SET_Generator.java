@@ -1,16 +1,16 @@
 package de.metanome.algorithms.depminer.depminer_algorithm.modules;
 
+import java.util.BitSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithms.depminer.depminer_helper.modules.Algorithm_Group2_Modul;
 import de.metanome.algorithms.depminer.depminer_helper.modules.container.AgreeSet;
 import de.metanome.algorithms.depminer.depminer_helper.modules.container.CMAX_SET;
 import de.metanome.algorithms.depminer.depminer_helper.modules.container.MAX_SET;
-import org.apache.lucene.util.OpenBitSet;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
 
 public class CMAX_SET_Generator extends Algorithm_Group2_Modul {
 
@@ -88,7 +88,7 @@ public class CMAX_SET_Generator extends Algorithm_Group2_Modul {
 
         MAX_SET result = new MAX_SET(currentJob);
         for (AgreeSet a : this.agreeSets) {
-            OpenBitSet content = a.getAttributes();
+            BitSet content = a.getAttributes();
             if (content.get(currentJob)) {
                 continue;
             }
@@ -110,8 +110,8 @@ public class CMAX_SET_Generator extends Algorithm_Group2_Modul {
 
         CMAX_SET result = new CMAX_SET(currentJob);
 
-        for (OpenBitSet il : maxSet.getCombinations()) {
-            OpenBitSet inverse = new OpenBitSet();
+        for (BitSet il : maxSet.getCombinations()) {
+            BitSet inverse = new BitSet();
             inverse.set(0, this.numberOfAttributes);
             inverse.xor(il);
             result.addCombination(inverse);

@@ -1,15 +1,15 @@
 package de.metanome.algorithms.depminer.depminer_algorithm.modules;
 
-import de.metanome.algorithms.depminer.depminer_helper.modules.Algorithm_Group2_Modul;
-import de.metanome.algorithms.depminer.depminer_helper.modules.container.CMAX_SET;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.apache.lucene.util.OpenBitSet;
-
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import de.metanome.algorithms.depminer.depminer_helper.modules.Algorithm_Group2_Modul;
+import de.metanome.algorithms.depminer.depminer_helper.modules.container.CMAX_SET;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * Third phase of the Dep-Miner algorithm proposed in:
@@ -32,15 +32,15 @@ public class LeftHandSideGenerator extends Algorithm_Group2_Modul {
      *
      * @param maximalSets    The set of the complements of maximal sets (see Phase 2 for further information)
      * @param nrOfAttributes The number attributes in the whole relation
-     * @return {@code Int2ObjectMap<List<OpenBitSet>>} (key: dependent attribute, value: set of all lefthand sides)
+     * @return {@code Int2ObjectMap<List<BitSet>>} (key: dependent attribute, value: set of all lefthand sides)
      */
-    public Int2ObjectMap<List<OpenBitSet>> execute(List<CMAX_SET> maximalSets, int nrOfAttributes) {
+    public Int2ObjectMap<List<BitSet>> execute(List<CMAX_SET> maximalSets, int nrOfAttributes) {
 
         if (this.timeMesurement) {
             this.startTime();
         }
 
-        Int2ObjectMap<List<OpenBitSet>> lhs = new Int2ObjectOpenHashMap<List<OpenBitSet>>();
+        Int2ObjectMap<List<BitSet>> lhs = new Int2ObjectOpenHashMap<List<BitSet>>();
 
 		/* 1: for all attributes A in R do */
         for (int attribute = 0; attribute < nrOfAttributes; attribute++) {
@@ -49,10 +49,10 @@ public class LeftHandSideGenerator extends Algorithm_Group2_Modul {
             // int i = 1;
 
 			/* 3: Li:={B | B in X, X in cmax(dep(r),A)} */
-            Set<OpenBitSet> Li = new HashSet<OpenBitSet>();
+            Set<BitSet> Li = new HashSet<BitSet>();
             CMAX_SET correctSet = this.generateFirstLevelAndFindCorrectSet(maximalSets, attribute, Li);
 
-            List<List<OpenBitSet>> lhs_a = new LinkedList<List<OpenBitSet>>();
+            List<List<BitSet>> lhs_a = new LinkedList<List<BitSet>>();
 
 			/* 4: while Li != ø do */
             while (!Li.isEmpty()) {
@@ -60,7 +60,7 @@ public class LeftHandSideGenerator extends Algorithm_Group2_Modul {
 				/*
                  * 5: LHSi[A]:={l in Li | l intersect X != ø, for all X in cmax(dep(r),A)}
 				 */
-                List<OpenBitSet> lhs_i = findLHS(Li, correctSet);
+                List<BitSet> lhs_i = findLHS(Li, correctSet);
 
 				/* 6: Li:=Li/LHSi[A] */
                 Li.removeAll(lhs_i);
@@ -82,9 +82,9 @@ public class LeftHandSideGenerator extends Algorithm_Group2_Modul {
 
 			/* 9: lhs(dep(r),A):= union LHSi[A] */
             if (!lhs.containsKey(attribute)) {
-                lhs.put(attribute, new LinkedList<OpenBitSet>());
+                lhs.put(attribute, new LinkedList<BitSet>());
             }
-            for (List<OpenBitSet> lhs_ia : lhs_a) {
+            for (List<BitSet> lhs_ia : lhs_a) {
                 lhs.get(attribute).addAll(lhs_ia);
             }
         }
@@ -96,12 +96,12 @@ public class LeftHandSideGenerator extends Algorithm_Group2_Modul {
         return lhs;
     }
 
-    private List<OpenBitSet> findLHS(Set<OpenBitSet> Li, CMAX_SET correctSet) {
+    private List<BitSet> findLHS(Set<BitSet> Li, CMAX_SET correctSet) {
 
-        List<OpenBitSet> lhs_i = new LinkedList<OpenBitSet>();
-        for (OpenBitSet l : Li) {
+        List<BitSet> lhs_i = new LinkedList<BitSet>();
+        for (BitSet l : Li) {
             boolean isLHS = true;
-            for (OpenBitSet x : correctSet.getCombinations()) {
+            for (BitSet x : correctSet.getCombinations()) {
                 if (!l.intersects(x)) {
                     isLHS = false;
                     break;
@@ -114,7 +114,7 @@ public class LeftHandSideGenerator extends Algorithm_Group2_Modul {
         return lhs_i;
     }
 
-    private CMAX_SET generateFirstLevelAndFindCorrectSet(List<CMAX_SET> maximalSets, int attribute, Set<OpenBitSet> Li) {
+    private CMAX_SET generateFirstLevelAndFindCorrectSet(List<CMAX_SET> maximalSets, int attribute, Set<BitSet> Li) {
 
         CMAX_SET correctSet = null;
         for (CMAX_SET set : maximalSets) {
@@ -122,12 +122,12 @@ public class LeftHandSideGenerator extends Algorithm_Group2_Modul {
                 continue;
             }
             correctSet = set;
-            for (OpenBitSet list : correctSet.getCombinations()) {
+            for (BitSet list : correctSet.getCombinations()) {
 
-                OpenBitSet combination;
+                BitSet combination;
                 int lastIndex = list.nextSetBit(0);
                 while (lastIndex != -1) {
-                    combination = new OpenBitSet();
+                    combination = new BitSet();
                     combination.set(lastIndex);
                     Li.add(combination);
                     lastIndex = list.nextSetBit(lastIndex + 1);
@@ -138,16 +138,16 @@ public class LeftHandSideGenerator extends Algorithm_Group2_Modul {
         return correctSet;
     }
 
-    private Set<OpenBitSet> generateNextLevel(Set<OpenBitSet> li) {
+    private Set<BitSet> generateNextLevel(Set<BitSet> li) {
 
         // Join-Step
-        List<OpenBitSet> Ck = new LinkedList<OpenBitSet>();
-        for (OpenBitSet p : li) {
-            for (OpenBitSet q : li) {
+        List<BitSet> Ck = new LinkedList<BitSet>();
+        for (BitSet p : li) {
+            for (BitSet q : li) {
                 if (!this.checkJoinCondition(p, q)) {
                     continue;
                 }
-                OpenBitSet candidate = new OpenBitSet();
+                BitSet candidate = new BitSet();
                 candidate.or(p);
                 candidate.or(q);
                 Ck.add(candidate);
@@ -155,8 +155,8 @@ public class LeftHandSideGenerator extends Algorithm_Group2_Modul {
         }
 
         // Pruning-Step
-        Set<OpenBitSet> result = new HashSet<OpenBitSet>();
-        for (OpenBitSet c : Ck) {
+        Set<BitSet> result = new HashSet<BitSet>();
+        for (BitSet c : Ck) {
             boolean prune = false;
             int lastIndex = c.nextSetBit(0);
             while (lastIndex != -1) {
@@ -178,17 +178,17 @@ public class LeftHandSideGenerator extends Algorithm_Group2_Modul {
 
     }
 
-    private boolean checkJoinCondition(OpenBitSet p, OpenBitSet q) {
+    private boolean checkJoinCondition(BitSet p, BitSet q) {
 
-        if (p.prevSetBit(p.length()) >= q.prevSetBit(p.length())) {
+        if (p.length() >= q.length()) {
             return false;
         }
-        for (int i = 0; i < p.prevSetBit(p.length()); i++) {
-            if (p.getBit(i) != q.getBit(i)) {
-                return false;
-            }
-        }
-        return true;
+        
+        BitSet intersection = (BitSet) p.clone();
+        intersection.and(q);
+        
+        return p.cardinality() == intersection.cardinality() && 
+        		q.cardinality() == intersection.cardinality();
     }
 
 }

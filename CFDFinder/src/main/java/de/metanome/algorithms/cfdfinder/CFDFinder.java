@@ -417,7 +417,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 			for (int j = 0; j < enrichedPLIs.get(i).size(); j += 1) {
 				for (String key : clusterMaps.get(i).keySet()) {
 					IntArrayList ial = clusterMaps.get(i).get(key);
-					if (ial.contains(enrichedPLIs.get(i).get(j).get(0))) {
+					if (ial.contains(enrichedPLIs.get(i).get(j).getInt(0))) {
 						clusterMapping.put(Integer.valueOf(j), key);
 						break;
 					}
@@ -653,7 +653,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 					List<IntArrayList> clusters = enrichedPLIs.get(attr);
 					for (int clusterId = clusters.size() - 1; clusterId >= 0; clusterId -= 1) {
 						IntArrayList cluster = clusters.get(clusterId);
-						if (cluster.get(0).intValue() == tupleId) {
+						if (cluster.getInt(0) == tupleId) {
 							tuple[attr] = clusterId;
 							break;
 						}
@@ -666,7 +666,7 @@ public class CFDFinder implements ConditionalFunctionalDependencyAlgorithm, Stri
 	private List<IntArrayList> determineCover(final Pattern c, final Pattern currentPattern, final int[][] values) {
 	    List<IntArrayList> result = new LinkedList<>();
 	    for (IntArrayList cluster : currentPattern.getCover()) {
-	        int[] tuple = values[cluster.get(0).intValue()];
+	        int[] tuple = values[cluster.getInt(0)];
 	        if (c.matches(tuple)) {
 	            result.add(cluster.clone());
             }

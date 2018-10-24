@@ -49,14 +49,14 @@ public class ResultCompletion {
 				long s1 = selectivityCount.get(r1);
 				long s2 = selectivityCount.get(r2);
 
-				return Double.compare(1.0d * counts.apply(r1) / s1, 1.0d * counts.apply(r2) / s2);
+				return Double.compare(1.0d * counts.apply(r1).intValue() / s1, 1.0d * counts.apply(r2).intValue() / s2);
 
 			};;
 	
 	private static BiFunction< Multiset<PredicatePair> ,
 	AtomicLongMap<PartitionRefiner>, Function<PredicatePair, Double>> pairWeight = (
 			paircountDC, selectivityCount) -> (pair) -> {
-				return 1.0d * selectivityCount.get(pair) / paircountDC.count(pair);
+				return Double.valueOf(1.0d * selectivityCount.get(pair) / paircountDC.count(pair));
 			};
 
 	public ResultCompletion(Input input, PredicateBuilder predicates) {
@@ -150,11 +150,11 @@ public class ResultCompletion {
 			PartitionRefiner refiner = indexProvider.getObject(i);
 			refiners.add(refiner);
 		}
-		refiners.sort(resultSorter.apply(selectivityCount, refiner -> counts2[indexProvider.getIndex(refiner)]));
+		refiners.sort(resultSorter.apply(selectivityCount, refiner -> Integer.valueOf(counts2[indexProvider.getIndex(refiner).intValue()])));
 
 		int i = 0;
 		for (PartitionRefiner refiner : refiners) {
-			counts3[indexProvider.getIndex(refiner)] = i;
+			counts3[indexProvider.getIndex(refiner).intValue()] = i;
 			++i;
 		}
 		return counts3;
@@ -166,7 +166,7 @@ public class ResultCompletion {
 		Map<IBitSet, List<DenialConstraint>> predicateDCMap = new HashMap<>();
 		HashMap<PredicatePair, Integer> prios = new HashMap<>();
 		for (int i = 0; i < sortedPredicatePairs.size(); ++i) {
-			prios.put(sortedPredicatePairs.get(i), i);
+			prios.put(sortedPredicatePairs.get(i), Integer.valueOf(i));
 		}
 		for (DenialConstraint dc : set) {
 			Set<PartitionRefiner> refinerSet = getRefinerSet(prios, dc);
@@ -206,7 +206,7 @@ public class ResultCompletion {
 			for (Predicate p2 : pairSet) {
 				if (p1 != p2) {
 					PredicatePair pair = new PredicatePair(p1, p2);
-					int score = prios.get(pair);
+					int score = prios.get(pair).intValue();
 					if (score > best) {
 						best = score;
 						bestP = pair;
@@ -230,7 +230,7 @@ public class ResultCompletion {
 			}
 
 			private double getPriority(PredicatePair o1) {
-				return weightProv.apply(o1);
+				return weightProv.apply(o1).doubleValue();
 			}
 		});
 		return sortedPredicatePairs;

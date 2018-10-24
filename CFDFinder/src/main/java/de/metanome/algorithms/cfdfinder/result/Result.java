@@ -73,7 +73,7 @@ public class Result {
                 }
             }
             builder.append("(");
-            List<Map.Entry<Integer, PatternEntry>> entries = new ArrayList<>(pattern.getAttributes().entrySet());
+            List<Map.Entry<Integer, PatternEntry>> entries = new ArrayList<>(pattern.getAttributes().int2ReferenceEntrySet());
             Collections.sort(entries, new Comparator<Map.Entry<Integer, PatternEntry>>() {
                 @Override
                 public int compare(Map.Entry<Integer, PatternEntry> o1, Map.Entry<Integer, PatternEntry> o2) {

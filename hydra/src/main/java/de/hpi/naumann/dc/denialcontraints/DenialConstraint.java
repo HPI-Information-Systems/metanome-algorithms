@@ -1,15 +1,11 @@
 package de.hpi.naumann.dc.denialcontraints;
 
-import java.util.List;
-
 import ch.javasoft.bitset.IBitSet;
 import ch.javasoft.bitset.search.NTreeSearch;
-import de.hpi.naumann.dc.input.Column;
 import de.hpi.naumann.dc.predicates.Predicate;
 import de.hpi.naumann.dc.predicates.sets.Closure;
 import de.hpi.naumann.dc.predicates.sets.PredicateBitSet;
 import de.hpi.naumann.dc.predicates.sets.PredicateSetFactory;
-import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.PredicateVariable;
 
 public class DenialConstraint {

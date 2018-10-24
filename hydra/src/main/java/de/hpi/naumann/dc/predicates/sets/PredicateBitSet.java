@@ -28,11 +28,11 @@ public class PredicateBitSet implements Iterable<Predicate> {
 	}
 	
 	public void remove(Predicate predicate) {
-		this.bitset.clear(indexProvider.getIndex(predicate));
+		this.bitset.clear(indexProvider.getIndex(predicate).intValue());
 	}
 
 	public boolean containsPredicate(Predicate predicate) {
-		return this.bitset.get(indexProvider.getIndex(predicate));
+		return this.bitset.get(indexProvider.getIndex(predicate).intValue());
 	}
 
 	public boolean isSubsetOf(PredicateBitSet superset) {
@@ -53,7 +53,7 @@ public class PredicateBitSet implements Iterable<Predicate> {
 	}
 
 	static public IBitSet getBitSet(Predicate p) {
-		int index = indexProvider.getIndex(p);
+		int index = indexProvider.getIndex(p).intValue();
 		IBitSet bitset = bf.create();
 		bitset.set(index);
 		return bitset;
@@ -89,7 +89,7 @@ public class PredicateBitSet implements Iterable<Predicate> {
 	}
 
 	public static int getIndex(Predicate add) {
-		return indexProvider.getIndex(add);
+		return indexProvider.getIndex(add).intValue();
 	}
 
 	public int size() {

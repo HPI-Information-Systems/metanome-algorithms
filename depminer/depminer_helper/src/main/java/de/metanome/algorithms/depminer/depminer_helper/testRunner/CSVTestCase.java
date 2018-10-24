@@ -131,19 +131,18 @@ public class CSVTestCase implements RelationalInput, RelationalInputGenerator, F
     public ImmutableList<String> next() throws InputIterationException {
 
         if (this.hasNext()) {
-            ImmutableList<String> result = this.getList(this.nextLine);
+            ImmutableList<String> result = this.getList();
             try {
                 this.nextLine = this.br.readLine();
             } catch (IOException e) {
                 this.nextLine = null;
             }
             return result;
-        } else {
-            throw new InputIterationException("nix mehr da");
         }
+		throw new InputIterationException("nix mehr da");
     }
 
-    private ImmutableList<String> getList(String nextLine2) {
+    private ImmutableList<String> getList() {
 
         String[] splitted = this.nextLine.split(",");
 

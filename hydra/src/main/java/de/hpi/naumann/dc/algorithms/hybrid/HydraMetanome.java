@@ -1,7 +1,6 @@
 package de.hpi.naumann.dc.algorithms.hybrid;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,7 @@ public class HydraMetanome extends Hydra implements DenialConstraintAlgorithm, I
 	private DenialConstraintResultReceiver resultReceiver;
 	private RelationalInputGenerator inputGen;
 
-	private Boolean noCrossColumn = true;
+	private Boolean noCrossColumn = Boolean.TRUE;
 	private double minimumSharedValue = 0.15d;
 
 	@Override
@@ -44,7 +43,7 @@ public class HydraMetanome extends Hydra implements DenialConstraintAlgorithm, I
 		ArrayList<ConfigurationRequirement<?>> reqs = new ArrayList<>();
 
 		ConfigurationRequirementInteger sampleReq = new ConfigurationRequirementInteger(SAMPLE_ROUNDS);
-		sampleReq.setDefaultValues(new Integer[] { this.sampleRounds });
+		sampleReq.setDefaultValues(new Integer[] { Integer.valueOf(this.sampleRounds) });
 		reqs.add(sampleReq);
 		ConfigurationRequirementString effThresReq = new ConfigurationRequirementString(EFFICIENCY_THRESHOLD);
 		effThresReq.setDefaultValues(new String[] { "" + this.efficiencyThreshold });
@@ -57,9 +56,7 @@ public class HydraMetanome extends Hydra implements DenialConstraintAlgorithm, I
 		minOverlapReq.setDefaultValues(new String[] { "" + this.minimumSharedValue } );
 		reqs.add(minOverlapReq);
 		
-		
-
-		for (ConfigurationRequirement req : reqs) {
+		for (ConfigurationRequirement<?> req : reqs) {
 			req.setRequired(false);
 		}
 		
@@ -101,7 +98,7 @@ public class HydraMetanome extends Hydra implements DenialConstraintAlgorithm, I
 		if (!identifier.equals(SAMPLE_ROUNDS))
 			throw new AlgorithmConfigurationException("Unknown integer parameter.");
 
-		this.sampleRounds = values[0];
+		this.sampleRounds = values[0].intValue();
 	}
 
 	@Override

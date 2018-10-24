@@ -89,7 +89,7 @@ public class Pattern implements Comparable<Pattern> {
 
         int index = 0;
         for (Map.Entry<Integer, PatternEntry> entry : attributes.entrySet()) {
-            this.attributes.put(entry.getKey(), entry.getValue());
+            this.attributes.put(entry.getKey().intValue(), entry.getValue());
             this.ids[index] = entry.getKey().intValue();
             this.patternEntries[index] = entry.getValue();
             index += 1;
@@ -174,9 +174,9 @@ public class Pattern implements Comparable<Pattern> {
         int violations = 0;
         for (IntArrayList cluster : this.getCover()) {
             for (int i = 0; i < cluster.size(); i += 1) {
-                int iValue = rhs[cluster.get(i).intValue()];
+                int iValue = rhs[cluster.getInt(i)];
                 for (int j = 0; j < cluster.size(); j += 1) {
-                    int jValue = rhs[cluster.get(j).intValue()];
+                    int jValue = rhs[cluster.getInt(j)];
                     if (iValue != jValue || iValue == -1) {
                         violations += 1;
                     }

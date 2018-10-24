@@ -1,7 +1,6 @@
 package de.hpi.naumann.dc.predicates.operands;
 
 import de.hpi.naumann.dc.input.ParsedColumn;
-import de.metanome.algorithm_integration.ColumnIdentifier;
 
 public class ColumnOperand<T extends Comparable<T>> {
 	private ParsedColumn<T> column;

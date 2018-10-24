@@ -1,16 +1,15 @@
 package de.metanome.algorithms.fastfds.modules;
 
-import de.metanome.algorithm_integration.AlgorithmExecutionException;
-import de.metanome.algorithms.fastfds.fastfds_helper.modules.Algorithm_Group2_Modul;
-import de.metanome.algorithms.fastfds.fastfds_helper.modules.container.AgreeSet;
-import de.metanome.algorithms.fastfds.modules.container.DifferenceSet;
-
-import org.apache.lucene.util.OpenBitSet;
-
+import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
+
+import de.metanome.algorithm_integration.AlgorithmExecutionException;
+import de.metanome.algorithms.fastfds.fastfds_helper.modules.Algorithm_Group2_Modul;
+import de.metanome.algorithms.fastfds.fastfds_helper.modules.container.AgreeSet;
+import de.metanome.algorithms.fastfds.modules.container.DifferenceSet;
 
 public class DifferenceSetGenerator extends Algorithm_Group2_Modul {
 
@@ -61,7 +60,7 @@ public class DifferenceSetGenerator extends Algorithm_Group2_Modul {
 
     private void doTask(AgreeSet as) {
 
-        OpenBitSet value = as.getAttributes();
+        BitSet value = as.getAttributes();
 
         DifferenceSet ds = new DifferenceSet();
         for (int i = 0; i < numberOfAttributes; i++) {

@@ -147,13 +147,13 @@ public class IEJoin {
 
 	@SuppressWarnings("rawtypes")
 	public void calc(ClusterPair clusters, Predicate p1, Predicate p2, Consumer<ClusterPair> consumer) {
-		ColumnOperand op11 = (ColumnOperand) p1.getOperand1();
+		ColumnOperand op11 = p1.getOperand1();
 		ParsedColumn<?> columnX = op11.getColumn();
-		ColumnOperand op12 = (ColumnOperand) p1.getOperand2();
+		ColumnOperand op12 = p1.getOperand2();
 		ParsedColumn<?> columnX_ = op12.getColumn();
-		ColumnOperand op21 = (ColumnOperand) p2.getOperand1();
+		ColumnOperand op21 = p2.getOperand1();
 		ParsedColumn<?> columnY = op21.getColumn();
-		ColumnOperand op22 = (ColumnOperand) p2.getOperand2();
+		ColumnOperand op22 = p2.getOperand2();
 		ParsedColumn<?> columnY_ = op22.getColumn();
 
 		Order order1 = getSortingOrder(0, p1);
@@ -245,9 +245,9 @@ public class IEJoin {
 
 	public void calc(ClusterPair clusters, Predicate p1, Consumer<ClusterPair> consumer) {
 
-		ColumnOperand op11 = (ColumnOperand) p1.getOperand1();
+		ColumnOperand<?> op11 = p1.getOperand1();
 		ParsedColumn<?> columnX = op11.getColumn();
-		ColumnOperand op12 = (ColumnOperand) p1.getOperand2();
+		ColumnOperand<?> op12 = p1.getOperand2();
 		ParsedColumn<?> columnX_ = op12.getColumn();
 
 		Order order1 = getSortingOrder(0, p1);

@@ -68,7 +68,7 @@ public class HyMD implements MatchingDependencyAlgorithm,
     ConfigurationRequirementInteger config = new ConfigurationRequirementInteger(
         Identifier.SUPPORT.name());
     config.setRequired(false);
-    config.setDefaultValues(new Integer[]{0});
+    config.setDefaultValues(new Integer[]{Integer.valueOf(0)});
     return config;
   }
 
@@ -207,7 +207,7 @@ public class HyMD implements MatchingDependencyAlgorithm,
       throws AlgorithmConfigurationException {
     if (Identifier.SUPPORT.name().equals(identifier)) {
       if (values.length > 0) {
-        int support = values[0];
+        int support = values[0].intValue();
         this.supportCalculator = createSupportCalculator(support);
       } else {
         throw new AlgorithmConfigurationException("Support not provided");

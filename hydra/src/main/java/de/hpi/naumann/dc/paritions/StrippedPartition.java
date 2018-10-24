@@ -31,24 +31,23 @@ public class StrippedPartition {
 	}
 
 	public static boolean isSingleSupported(Predicate p) {
-		if (p.getOperand1() instanceof ColumnOperand && p.getOperand2() instanceof ColumnOperand) {
-			ColumnOperand<?> o1 = (ColumnOperand<?>) p.getOperand1();
-			ColumnOperand<?> o2 = (ColumnOperand<?>) p.getOperand2();
+		if (p.getOperand1() != null && p.getOperand2() != null) {
+			ColumnOperand<?> o1 = p.getOperand1();
+			ColumnOperand<?> o2 = p.getOperand2();
 			if (o1.getIndex() == o2.getIndex())
 				return true;
 
 			if (p.getOperator() == Operator.EQUAL || p.getOperator() == Operator.UNEQUAL)
 				return true;
-
 		}
 
 		return false;
 	}
 
 	public static boolean isPairSupported(Predicate p) {
-		if (p.getOperand1() instanceof ColumnOperand && p.getOperand2() instanceof ColumnOperand) {
-			ColumnOperand<?> o1 = (ColumnOperand<?>) p.getOperand1();
-			ColumnOperand<?> o2 = (ColumnOperand<?>) p.getOperand2();
+		if (p.getOperand1() != null && p.getOperand2() != null) {
+			ColumnOperand<?> o1 = p.getOperand1();
+			ColumnOperand<?> o2 = p.getOperand2();
 			if (o1.getIndex() != o2.getIndex() && p.getOperator() != Operator.EQUAL
 					&& p.getOperator() != Operator.UNEQUAL)
 				return true;
@@ -105,9 +104,9 @@ public class StrippedPartition {
 	private StrippedPartition refinePs(Predicate p, IEJoin join) {
 		Collection<ClusterPair> newClusters = new ArrayList<>();
 		boolean didRefine = false;
-		if (p.getOperand1() instanceof ColumnOperand && p.getOperand2() instanceof ColumnOperand) {
-			ColumnOperand<?> o1 = (ColumnOperand<?>) p.getOperand1();
-			ColumnOperand<?> o2 = (ColumnOperand<?>) p.getOperand2();
+		if (p.getOperand1() != null && p.getOperand2() != null) {
+			ColumnOperand<?> o1 = p.getOperand1();
+			ColumnOperand<?> o2 = p.getOperand2();
 			if (o1.getIndex() == o2.getIndex()) {
 				// SIMPLE FILTER
 				for (ClusterPair clusterPair : clustersPairs) {

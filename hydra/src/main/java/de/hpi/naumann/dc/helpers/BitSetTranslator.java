@@ -24,14 +24,14 @@ public class BitSetTranslator {
 	}
 	
 	public int retransform(int i) {
-		return indexes[i];
+		return indexes[i].intValue();
 	}
 
 	public IBitSet bitsetTransform(IBitSet bitset) {
 		IBitSet bitset2 = LongBitSet.FACTORY.create();
 		for (Integer i : indexes) {
-			if (bitset.get(indexes[i])) {
-				bitset2.set(i);
+			if (bitset.get(indexes[i.intValue()].intValue())) {
+				bitset2.set(i.intValue());
 			}
 		}
 		return bitset2;

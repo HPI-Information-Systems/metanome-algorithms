@@ -14,7 +14,7 @@ public final class Jackson {
 
   public static <T> ObjectReader createReader(Class<T> type) {
     ObjectMapper mapper = createMapper();
-    return mapper.reader(type);
+    return mapper.readerFor(type);
   }
 
   private static ObjectMapper createMapper() {

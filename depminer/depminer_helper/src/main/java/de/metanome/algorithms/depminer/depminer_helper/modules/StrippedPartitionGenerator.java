@@ -1,10 +1,5 @@
 package de.metanome.algorithms.depminer.depminer_helper.modules;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-import it.unimi.dsi.fastutil.longs.LongList;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +10,10 @@ import java.util.concurrent.ExecutorService;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithms.depminer.depminer_helper.modules.container.StrippedPartition;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 public class StrippedPartitionGenerator extends Algorithm_Group2_Modul {
 
@@ -22,7 +21,7 @@ public class StrippedPartitionGenerator extends Algorithm_Group2_Modul {
     public static String nullValue = "null#" + Math.random();
 
     private List<StrippedPartition> returnValue;
-    private Int2ObjectMap<Map<String, LongList>> translationMaps = new Int2ObjectOpenHashMap<Map<String, LongList>>();
+    private Int2ObjectMap<Map<String, IntList>> translationMaps = new Int2ObjectOpenHashMap<Map<String, IntList>>();
 
     public StrippedPartitionGenerator(int numberOfThreads) {
 
@@ -51,14 +50,14 @@ public class StrippedPartitionGenerator extends Algorithm_Group2_Modul {
                     content = StrippedPartitionGenerator.nullValue;
                 }
 
-                Map<String, LongList> translationMap;
+                Map<String, IntList> translationMap;
                 if ((translationMap = this.translationMaps.get(spalte)) == null) {
-                    translationMap = new HashMap<String, LongList>();
+                    translationMap = new HashMap<String, IntList>();
                     this.translationMaps.put(spalte, translationMap);
                 }
-                LongList element;
+                IntList element;
                 if ((element = translationMap.get(content)) == null) {
-                    element = new LongArrayList();
+                    element = new IntArrayList();
                     translationMap.put(content, element);
                 }
                 element.add(lineNumber);
@@ -99,9 +98,9 @@ public class StrippedPartitionGenerator extends Algorithm_Group2_Modul {
         StrippedPartition sp = new StrippedPartition(i);
         this.returnValue.add(sp);
 
-        Map<String, LongList> toItterate = this.translationMaps.get(i);
+        Map<String, IntList> toItterate = this.translationMaps.get(i);
 
-        for (LongList it : toItterate.values()) {
+        for (IntList it : toItterate.values()) {
 
             if (it.size() > 1) {
                 sp.addElement(it);

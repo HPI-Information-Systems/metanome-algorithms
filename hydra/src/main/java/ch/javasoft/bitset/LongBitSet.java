@@ -52,6 +52,8 @@ import java.util.zip.ZipOutputStream;
  */
 public class LongBitSet implements IBitSet, Serializable {
 
+	private static final long serialVersionUID = 3961087336068687071L;
+	
 	/**
 	 * Default static factory for {@link LongBitSet} instances.
 	 */

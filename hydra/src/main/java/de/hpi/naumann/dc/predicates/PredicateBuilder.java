@@ -24,7 +24,7 @@ public class PredicateBuilder {
 
 	private Collection<Collection<Predicate>> predicateGroups;
 
-	public PredicateBuilder(Input input, Boolean noCrossColumn, double minimumSharedValue) {
+	public PredicateBuilder(Input input, boolean noCrossColumn, double minimumSharedValue) {
 		predicates = new HashSet<>();
 		predicateGroups = new ArrayList<>();
 		this.noCrossColumn = noCrossColumn;

@@ -1,14 +1,8 @@
 package de.metanome.algorithms.fastfds.modules;
 
-import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
-
+import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.lucene.util.OpenBitSet;
 
 import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
@@ -17,6 +11,10 @@ import de.metanome.algorithm_integration.results.FunctionalDependency;
 import de.metanome.algorithms.fastfds.fastfds_helper.modules.Algorithm_Group2_Modul;
 import de.metanome.algorithms.fastfds.fastfds_helper.modules.container.FunctionalDependencyGroup2;
 import de.metanome.algorithms.fastfds.modules.container.DifferenceSet;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 public class FindCoversGenerator extends Algorithm_Group2_Modul {
 
@@ -49,13 +47,12 @@ public class FindCoversGenerator extends Algorithm_Group2_Modul {
 
             // Compute DifferenceSet modulo attribute (line 3 - Fig5 - FastFDs)
             for (DifferenceSet ds : differenceSets) {
-                OpenBitSet obs = ds.getAttributes().clone();
+                BitSet obs = (BitSet) ds.getAttributes().clone();
                 if (!obs.get(attribute)) {
                     continue;
-                } else {
-                    obs.flip(attribute);
-                    tempDiffSet.add(new DifferenceSet(obs));
                 }
+                obs.flip(attribute);
+                tempDiffSet.add(new DifferenceSet(obs));
             }
 
             // check new DifferenceSet (line 4 + 5 - Fig5 - FastFDs)
@@ -161,7 +158,7 @@ public class FindCoversGenerator extends Algorithm_Group2_Modul {
 
         if (setsNotCovered.isEmpty()) {
 
-            List<OpenBitSet> subSets = this.generateSubSets(currentPath);
+            List<BitSet> subSets = this.generateSubSets(currentPath);
             if (this.noOneCovers(subSets, originalDiffSet)) {
                 FunctionalDependencyGroup2 fdg = new FunctionalDependencyGroup2(currentAttribute, currentPath);
                 this.addFdToReceivers(fdg);
@@ -197,9 +194,7 @@ public class FindCoversGenerator extends Algorithm_Group2_Modul {
         for (int i = 0; i < currentOrdering.size(); i++) {
 
             if (!seen) {
-                if (currentOrdering.getInt(i) != attribute) {
-                    continue;
-                } else {
+                if (currentOrdering.getInt(i) == attribute) {
                     seen = true;
                 }
             } else {
@@ -274,9 +269,9 @@ public class FindCoversGenerator extends Algorithm_Group2_Modul {
 
     }
 
-    private boolean noOneCovers(List<OpenBitSet> subSets, List<DifferenceSet> originalDiffSet) {
+    private boolean noOneCovers(List<BitSet> subSets, List<DifferenceSet> originalDiffSet) {
 
-        for (OpenBitSet obs : subSets) {
+        for (BitSet obs : subSets) {
 
             if (this.covers(obs, originalDiffSet)) {
                 return false;
@@ -287,30 +282,30 @@ public class FindCoversGenerator extends Algorithm_Group2_Modul {
         return true;
     }
 
-    private boolean covers(OpenBitSet obs, List<DifferenceSet> originalDiffSet) {
+    private boolean covers(BitSet obs, List<DifferenceSet> originalDiffSet) {
 
         for (DifferenceSet diff : originalDiffSet) {
 
-            if (OpenBitSet.intersectionCount(obs, diff.getAttributes()) == 0) {
+        	if (!obs.intersects(diff.getAttributes())) {
                 return false;
             }
         }
 
         return true;
     }
+    
+    private List<BitSet> generateSubSets(IntList currentPath) {
 
-    private List<OpenBitSet> generateSubSets(IntList currentPath) {
+        List<BitSet> result = new LinkedList<BitSet>();
 
-        List<OpenBitSet> result = new LinkedList<OpenBitSet>();
-
-        OpenBitSet obs = new OpenBitSet();
+        BitSet obs = new BitSet();
         for (int i : currentPath) {
             obs.set(i);
         }
 
         for (int i : currentPath) {
 
-            OpenBitSet obs_ = obs.clone();
+            BitSet obs_ = (BitSet) obs.clone();
             obs_.flip(i);
             result.add(obs_);
 
