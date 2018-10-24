@@ -2,16 +2,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.metanome.algorithms.tane</groupId>
     <artifactId>tane_algorithm_helper</artifactId>
     <packaging>jar</packaging>
     <name>Fixtures for Tests</name>
 
     <parent>
-        <groupId>de.metanome.algorithms</groupId>
-        <artifactId>algorithms</artifactId>
+        <groupId>de.metanome.algorithms.tane</groupId>
+        <artifactId>TANEModules</artifactId>
         <version>1.2-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>

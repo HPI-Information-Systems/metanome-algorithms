@@ -10,6 +10,8 @@ release.properties
 *.class
 data/
 bin/
+io/
+temp/
 target/
 datasets/
 output/

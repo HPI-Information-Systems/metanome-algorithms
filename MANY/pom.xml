@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>de.metanome</groupId>
 			<artifactId>backend</artifactId>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>de.metanome</groupId>

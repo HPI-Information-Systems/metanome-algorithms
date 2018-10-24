@@ -10,6 +10,7 @@ import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.ConditionalUniqueColumnCombinationResultReceiver;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
@@ -62,7 +63,7 @@ public class BridgesFixture {
       cuccResultReceiver =
       mock(ConditionalUniqueColumnCombinationResultReceiver.class);
 
-  public BridgesFixture() throws CouldNotReceiveResultException {
+  public BridgesFixture() throws CouldNotReceiveResultException, ColumnNameMismatchException {
 //        doAnswer(new Answer() {
 //            public Object answer(InvocationOnMock invocation) {
 //                Object[] args = invocation.getArguments();
@@ -127,7 +128,7 @@ public class BridgesFixture {
     return cuccResultReceiver;
   }
 
-  public void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException {
+  public void verifyFunctionalDependencyResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnIdentifier
         expectedIdentifier1 =
         new ColumnIdentifier(this.relationName, this.columnNames.get(0));
@@ -611,7 +612,7 @@ public class BridgesFixture {
 //		verifyNoMoreInteractions(uccResultReceiver);
 //	}
 
-  public void verifyConditionalUniqueColumnCombination() throws CouldNotReceiveResultException {
+  public void verifyConditionalUniqueColumnCombination() throws CouldNotReceiveResultException, ColumnNameMismatchException {
 
     ColumnIdentifier
         c1 = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
@@ -658,7 +659,7 @@ public class BridgesFixture {
                                                      new ColumnConditionValue(c9, "THROUGH")))));
   }
 
-  public void verifyConditionalUniqueColumnCombinationOr90() throws CouldNotReceiveResultException {
+  public void verifyConditionalUniqueColumnCombinationOr90() throws CouldNotReceiveResultException, ColumnNameMismatchException {
 
     ColumnIdentifier
         c1 = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
@@ -693,7 +694,7 @@ public class BridgesFixture {
   }
 
   public void verifyConditionalUniqueColumnCombinationAndOr90()
-      throws CouldNotReceiveResultException {
+      throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnIdentifier
         c1 = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
     ColumnIdentifier

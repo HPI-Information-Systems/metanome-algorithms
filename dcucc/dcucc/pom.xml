@@ -15,10 +15,10 @@
     </properties>
 
     <parent>
-        <groupId>de.metanome.algorithms</groupId>
-        <artifactId>algorithms</artifactId>
+        <groupId>de.metanome.algorithms.dcucc</groupId>
+        <artifactId>DCUCC</artifactId>
         <version>1.2-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
@@ -43,10 +43,16 @@
         <dependency>
             <groupId>de.metanome</groupId>
             <artifactId>backend</artifactId>
+      		<scope>test</scope>
         </dependency>
         <dependency>
             <groupId>de.metanome.algorithms.ducc</groupId>
             <artifactId>DUCCAlgorithm</artifactId>
+            <version>1.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.metanome.algorithms.test_helper</groupId>
+            <artifactId>dcucc_test_helper</artifactId>
             <version>1.2-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -78,11 +84,6 @@
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.metanome.algorithms</groupId>
-            <artifactId>dcucc_test_helper</artifactId>
-            <version>1.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

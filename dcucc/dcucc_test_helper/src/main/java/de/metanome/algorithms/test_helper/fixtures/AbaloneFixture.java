@@ -131,7 +131,7 @@ public class AbaloneFixture {
     return this.cuccResultReceiver;
   }
 
-  public void verifyFdResultReceiver() throws CouldNotReceiveResultException {
+  public void verifyFdResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     verify(fdResultReceiver).receiveResult(new FunctionalDependency(
         new ColumnCombination(expectedIdentifier1, expectedIdentifier2, expectedIdentifier3,
                               expectedIdentifier4, expectedIdentifier6, expectedIdentifier8),
@@ -555,7 +555,7 @@ public class AbaloneFixture {
     verifyNoMoreInteractions(fdResultReceiver);
   }
 
-  public void verifyUccResultReceiver() throws CouldNotReceiveResultException {
+  public void verifyUccResultReceiver() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     verify(uccResultReceiver).receiveResult(
         new UniqueColumnCombination(expectedIdentifier5, expectedIdentifier6, expectedIdentifier8));
     verify(uccResultReceiver).receiveResult(

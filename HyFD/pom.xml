@@ -51,12 +51,8 @@
 
     <dependency>
       <groupId>de.metanome</groupId>
-      <artifactId>algorithm_helper</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>de.metanome</groupId>
       <artifactId>backend</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>

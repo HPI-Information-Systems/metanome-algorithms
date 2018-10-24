@@ -76,3 +76,5 @@ copy DVSuperLogLog\target\*.jar _COLLECTION_
 copy hydra\target\*.jar _COLLECTION_
 
 copy CFDFinder\target\*.jar _COLLECTION_
+
+copy Normalize\target\*.jar _COLLECTION_

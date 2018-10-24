@@ -6,6 +6,7 @@ import de.metanome.algorithm_integration.ColumnIdentifier;
 import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.ConditionalUniqueColumnCombinationResultReceiver;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
@@ -90,7 +91,7 @@ public class HepatitisFixture {
     return uniqueColumnCombinationResultReceiver;
   }
 
-  public void verifyConditionalUniqueColumnCombination() throws CouldNotReceiveResultException {
+  public void verifyConditionalUniqueColumnCombination() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnIdentifier
         c1 = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
     ColumnIdentifier

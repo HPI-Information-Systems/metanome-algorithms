@@ -10,6 +10,7 @@ import de.metanome.algorithm_integration.input.InputGenerationException;
 import de.metanome.algorithm_integration.input.InputIterationException;
 import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
+import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.ConditionalUniqueColumnCombinationResultReceiver;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
 import de.metanome.algorithm_integration.results.ConditionalUniqueColumnCombination;
@@ -46,7 +47,7 @@ public class ConditionalUniqueNotFixture {
       conditionalUniqueResultReceiver =
       mock(ConditionalUniqueColumnCombinationResultReceiver.class);
 
-  public ConditionalUniqueNotFixture() throws CouldNotReceiveResultException {
+  public ConditionalUniqueNotFixture() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     table.add(ImmutableList.of("1", "1", "1", "2"));
     table.add(ImmutableList.of("1", "2", "1", "1"));
     table.add(ImmutableList.of("1", "2", "2", "2"));
@@ -122,7 +123,7 @@ public class ConditionalUniqueNotFixture {
     return this.conditionalUniqueResultReceiver;
   }
 
-  public void verifyConditionalUniqueColumnCombinationFor() throws CouldNotReceiveResultException {
+  public void verifyConditionalUniqueColumnCombinationFor() throws CouldNotReceiveResultException, ColumnNameMismatchException {
     ColumnIdentifier
         A = new ColumnIdentifier(this.relationName, this.columnNames.get(0));
     ColumnIdentifier

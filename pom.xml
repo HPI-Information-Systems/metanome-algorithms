@@ -104,5 +104,6 @@
         <module>DVMinCount</module>
         <module>DVPCSA</module>
         <module>DVSuperLogLog</module>
+        <module>Normalize</module>
     </modules>
 </project>
