@@ -112,7 +112,7 @@
           <archive>
             <manifestEntries>
               <Algorithm-Bootstrap-Class>
-                de.metanome.algorithms.normi.Normi
+                de.metanome.algorithms.normalize.Normi
               </Algorithm-Bootstrap-Class>
             </manifestEntries>
           </archive>
