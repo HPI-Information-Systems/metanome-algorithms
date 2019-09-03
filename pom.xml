@@ -73,6 +73,7 @@
         <module>SPIDER</module>
         <module>HyUCC</module>
         <module>HyFD</module>
+	<module>dcfinder</module>
         <module>HyMD</module>
         <module>SCDP</module>
         <module>AIDFD</module>

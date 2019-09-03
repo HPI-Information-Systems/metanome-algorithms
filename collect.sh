@@ -16,6 +16,8 @@ cp MANY/target/*.jar _COLLECTION_
 
 cp HyFD/target/*.jar _COLLECTION_
 
+cp dcfinder/target/*.jar _COLLECTION_
+
 cp HyUCC/target/*.jar _COLLECTION_
 
 cp HyMD/metanome/target/*.jar _COLLECTION_
