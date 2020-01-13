@@ -1,6 +1,8 @@
 # Metanome Algorithm Repository
 
-This repository contains several data profiling algorithms for the [Metanome platform](https://github.com/HPI-Information-Systems/Metanome). The algorithms have been implemented by students of the [information systems group](https://hpi.de/naumann) at the Hasso-Plattner-Institut ([HPI](http://www.hpi.de)) in the context of the [Metanome project](https://hpi.de/naumann/projects/data-profiling-and-analytics/metanome-data-profiling.html).
+This repository contains several data profiling algorithms for the [Metanome platform](https://github.com/HPI-Information-Systems/Metanome). The algorithms have been implemented by students of the [information systems group](https://hpi.de/naumann) at the Hasso-Plattner-Institut ([HPI](http://www.hpi.de)) in the context of the [Metanome project](https://hpi.de/naumann/projects/data-profiling-and-analytics/metanome-data-profiling.html). All algorithms in the repository can be executed with the Metanome platform. Further, data profiling algorithms that have also been developed in the Metanome project but that are not (yet) compatible with the platform (because they are, for instance, distributed data profiling algorithms) are contained in the following repositories:
+
+* https://github.com/srfc/raida
 
 ## Installation
 
