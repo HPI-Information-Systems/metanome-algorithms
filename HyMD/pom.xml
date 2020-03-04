@@ -22,7 +22,7 @@
     <mockito.version>2.13.0</mockito.version>
     <slf4j.version>1.7.25</slf4j.version>
     <metrics.version>4.0.2</metrics.version>
-    <jackson.version>2.9.7</jackson.version>
+    <jackson.version>2.10.3</jackson.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
