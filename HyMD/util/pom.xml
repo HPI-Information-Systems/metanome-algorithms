@@ -11,7 +11,7 @@
 
   <artifactId>md-util</artifactId>
   <properties>
-    <guava.version>23.6-jre</guava.version>
+    <guava.version>24.1.1-jre</guava.version>
     <jool.version>0.9.12</jool.version>
   </properties>
 
