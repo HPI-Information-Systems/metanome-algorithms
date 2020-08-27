@@ -4,6 +4,7 @@ This repository contains several data profiling algorithms for the [Metanome pla
 
 * https://github.com/srfc/raida
 * https://github.com/alpreu/spin
+* https://github.com/CodeLionX/distod
 
 ## Installation
 
