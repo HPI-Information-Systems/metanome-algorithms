@@ -78,3 +78,6 @@ copy hydra\target\*.jar _COLLECTION_
 copy CFDFinder\target\*.jar _COLLECTION_
 
 copy Normalize\target\*.jar _COLLECTION_
+
+copy tireless\target\*.jar _COLLECTION_
+

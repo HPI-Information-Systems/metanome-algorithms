@@ -154,5 +154,6 @@
         <module>DVPCSA</module>
         <module>DVSuperLogLog</module>
         <module>Normalize</module>
+        <module>tireless</module>
     </modules>
 </project>
