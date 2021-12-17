@@ -84,3 +84,6 @@ cp hydra/target/*.jar _COLLECTION_
 cp CFDFinder/target/*.jar _COLLECTION_
 
 cp Normalize/target/*.jar _COLLECTION_
+
+cp tireless/target/*.jar _COLLECTION_
+
