@@ -81,3 +81,4 @@ copy Normalize\target\*.jar _COLLECTION_
 
 copy tireless\target\*.jar _COLLECTION_
 
+copy cody\cody-metanome\target\*.jar _COLLECTION_

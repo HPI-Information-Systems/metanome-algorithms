@@ -87,3 +87,5 @@ cp Normalize/target/*.jar _COLLECTION_
 
 cp tireless/target/*.jar _COLLECTION_
 
+cp cody/cody-metanome/target/*.jar _COLLECTION_
+
