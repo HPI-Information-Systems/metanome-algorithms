@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>de.metanome.algorithms.cody</groupId>
+  <artifactId>cody</artifactId>
+  <packaging>pom</packaging>
+  <version>1.2-SNAPSHOT</version>
+
+  <name>cody</name>
+
+  <parent>
+    <groupId>de.metanome.algorithms</groupId>
+    <artifactId>algorithms</artifactId>
+    <version>1.2-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <modules>
+    <module>cody-core</module>
+    <module>cody-metanome</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+
+    <!-- dependency versions -->
+    <roaring.version>0.9.28</roaring.version>
+    <univocity.version>2.9.1</univocity.version>
+    <guava.version>31.1-jre</guava.version>
+    <jcommander.version>1.82</jcommander.version>
+    <slf4j.version>1.7.36</slf4j.version>
+    <lombok.version>1.18.24</lombok.version>
+    <fastutil.version>8.5.8</fastutil.version>
+
+    <!-- Plugin versions -->
+    <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+    <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+  </properties>
+
+</project>
