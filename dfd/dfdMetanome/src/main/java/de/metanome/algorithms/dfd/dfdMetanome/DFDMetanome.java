@@ -14,6 +14,7 @@ import de.metanome.algorithm_integration.algorithm_types.FunctionalDependencyAlg
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementFileInput;
 import de.metanome.algorithm_integration.input.FileInputGenerator;
+import de.metanome.algorithm_integration.input.RelationalInput;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
 import fdiscovery.approach.runner.DFDMiner;
@@ -70,6 +71,11 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
       DFDMiner dfdMiner = new DFDMiner(inputFileProcessor);
       dfdMiner.run();
       FunctionalDependencies fds = dfdMiner.getDependencies();
+
+      RelationalInput input = fileInput.generateNewCopy();
+      String relationName = input.relationName();
+      List<String> columnNames = input.columnNames();
+
       for (ColumnCollection determining : fds.keySet()) {
         for (int dependentColumn : fds.get(determining).getSetBits()) {
           ColumnIdentifier[]
