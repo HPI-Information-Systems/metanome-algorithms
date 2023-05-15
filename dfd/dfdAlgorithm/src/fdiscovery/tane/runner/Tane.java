@@ -114,7 +114,7 @@ public class Tane extends Miner {
 	}
 	
 	private void writeOutputSuccessful(String outputFile, long time, String inputFileName) {
-		String timeString = (time != -1)? String.format("%.1f", (double)(time)/1000) : "-1";
+		String timeString = (time != -1)? String.format("%.1f", Double.valueOf((double)(time) / 1000)) : "-1";
 		
 		StringBuilder outputBuilder = new StringBuilder();
 		if (!inputFileName.isEmpty()) {

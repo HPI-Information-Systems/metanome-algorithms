@@ -59,7 +59,7 @@ public class Seed implements Comparable<Seed> {
 	
 	public String toString() {
 		StringBuilder outputBuilder = new StringBuilder();
-		outputBuilder.append(String.format("Seed: [%s]\t%f", this.indices, this.distinctiveness));
+		outputBuilder.append(String.format("Seed: [%s]\t%f", this.indices, Double.valueOf(this.distinctiveness)));
 		return outputBuilder.toString();
 	}
 }

@@ -20,7 +20,7 @@ public class Miner {
 	    if (bytes < unit) return bytes + " B";
 	    int exp = (int) (Math.log(bytes) / Math.log(unit));
 	    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
-	    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+	    return String.format("%.1f %sB", Double.valueOf(bytes / Math.pow(unit, exp)), pre);
 	}
 	
 	protected static final void createColumDirectory() {

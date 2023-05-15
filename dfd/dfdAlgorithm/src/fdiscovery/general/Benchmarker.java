@@ -182,7 +182,7 @@ public class Benchmarker {
 						resultHandler.waitFor(timeout);
 
 						long timeEnd = System.currentTimeMillis();
-						System.out.println(String.format("Time:%.1f", (double)(timeEnd - timeStart)/1000));
+						System.out.println(String.format("Time:%.1f", Double.valueOf((double)(timeEnd - timeStart) / 1000)));
 
 						int exitCode = 0;
 						if (resultHandler.hasResult()) {

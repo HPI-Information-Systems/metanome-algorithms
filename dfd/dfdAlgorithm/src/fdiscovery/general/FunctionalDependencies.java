@@ -42,7 +42,7 @@ public class FunctionalDependencies extends THashMap<ColumnCollection, ColumnCol
 			if (lhsForRhsToDelete.contains(lhs)) {
 				ColumnCollection rhs = this.get(lhs);
 				this.put(lhs, rhs.removeColumnCopy(rhsIndex));
-				System.out.println(String.format("Remove %s->%s", lhs, (char)(rhsIndex + 65)));
+				System.out.println(String.format("Remove %s->%s", lhs, Character.valueOf((char) (rhsIndex + 65))));
 			}
 		}
 	}
