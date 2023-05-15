@@ -44,6 +44,7 @@ public class Tane extends Miner {
 		return this.minimalDependencies;
 	}
 	
+	@SuppressWarnings("unused")
 	public static void main2(String[] args) {
 		createColumDirectory();
 		createResultDirectory();

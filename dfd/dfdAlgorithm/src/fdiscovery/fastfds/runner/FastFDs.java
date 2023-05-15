@@ -32,6 +32,7 @@ public class FastFDs extends Miner {
 	private FunctionalDependencies minimalDependencies;
 	private DifferenceSets differenceSets;
 	
+	@SuppressWarnings("unused")
 	public static void main2(String[] args) {
 		createColumDirectory();
 		createResultDirectory();

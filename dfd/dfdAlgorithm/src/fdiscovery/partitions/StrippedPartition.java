@@ -19,6 +19,7 @@ public class StrippedPartition extends TreeSet<TEquivalence> {
 		
 	}
 	
+	@SuppressWarnings("unused")
 	public StrippedPartition(StrippedPartition base, StrippedPartition additional) {
 		
 	}
