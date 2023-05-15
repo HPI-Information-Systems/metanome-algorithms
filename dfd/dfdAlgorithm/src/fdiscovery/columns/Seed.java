@@ -21,12 +21,10 @@ public class Seed implements Comparable<Seed> {
 		if (this.distinctiveness != o.distinctiveness) {
 			if (o.distinctiveness - this.distinctiveness < 0) {
 				return -1;
-			} else {
-				return 1;
 			}
-		} else {
-			return this.indices.compareTo(o.indices);
+			return 1;
 		}
+		return this.indices.compareTo(o.indices);
 	}
 	
 	@Override
@@ -39,10 +37,9 @@ public class Seed implements Comparable<Seed> {
 		}
 		if (!(o instanceof Seed)) {
 			return false;
-		} else {
-			Seed otherSeed = (Seed) o;
-			return this.distinctiveness == otherSeed.distinctiveness && this.indices.compareTo(otherSeed.indices) == 0;
 		}
+		Seed otherSeed = (Seed) o;
+		return this.distinctiveness == otherSeed.distinctiveness && this.indices.compareTo(otherSeed.indices) == 0;
 	}
 	
 	public ColumnCollection getBaseIndices() {

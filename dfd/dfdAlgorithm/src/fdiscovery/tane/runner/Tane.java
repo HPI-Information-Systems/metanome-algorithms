@@ -73,7 +73,6 @@ public class Tane extends Miner {
 		} catch (IOException e) {
 			System.out.println("The input reader could not be reset.");
 		}
-		
 	}
 	
 	public static void main(String[] args) {

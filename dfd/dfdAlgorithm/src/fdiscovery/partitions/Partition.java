@@ -61,9 +61,8 @@ public abstract class Partition extends TreeSet<TEquivalence> implements Compara
 	public int compareTo(Partition o) {
 		if (this.getDistinctiveness() == o.getDistinctiveness()) {
 			return this.indices.compareTo(o.indices);
-		} else {
-			return Double.valueOf(this.getDistinctiveness()).compareTo(o.getDistinctiveness());
 		}
+		return Double.valueOf(this.getDistinctiveness()).compareTo(Double.valueOf(o.getDistinctiveness()));
 	}
 	
 	public int getNumberOfRows() {
@@ -135,9 +134,8 @@ public abstract class Partition extends TreeSet<TEquivalence> implements Compara
 		resetProbeTable();
 		if (numberOfValues == 0) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 	
 	public String printIndices() {

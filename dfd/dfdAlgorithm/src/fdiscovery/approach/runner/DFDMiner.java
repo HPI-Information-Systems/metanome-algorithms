@@ -356,12 +356,11 @@ public class DFDMiner extends Miner implements Runnable {
 			this.observations.put(seed.getIndices(), observationOfLHS);
 			this.dependencies.add(seed.getIndices());
 			return observationOfLHS;
-		} else {
-			Observation observationOfLHS = this.observations.updateNonDependencyType(seed.getIndices(), currentRHSIndex);
-			this.observations.put(seed.getIndices(), observationOfLHS);
-			this.nonDependencies.add(seed.getIndices());
-			return observationOfLHS;
 		}
+		Observation observationOfLHS = this.observations.updateNonDependencyType(seed.getIndices(), currentRHSIndex);
+		this.observations.put(seed.getIndices(), observationOfLHS);
+		this.nonDependencies.add(seed.getIndices());
+		return observationOfLHS;
 	}
 
 	private Stack<Seed> nextSeeds(int currentRHSIndex) {

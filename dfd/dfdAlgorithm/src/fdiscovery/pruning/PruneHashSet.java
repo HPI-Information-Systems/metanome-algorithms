@@ -22,7 +22,6 @@ public class PruneHashSet extends HashMap<ColumnCollection, HashSet<ColumnCollec
 		for (ColumnCollection candidate : candidates) {
 			if (!dependencies.isRepresented(candidate) && !nonDependencies.isRepresented(candidate)) {
 				return candidate;
-			} else {
 			}
 		}
 		return null;

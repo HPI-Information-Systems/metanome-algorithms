@@ -21,9 +21,8 @@ public class EquivalenceGroupHashSet extends HashSet<Integer> implements Compara
 	public int compareTo(EquivalenceGroupHashSet o) {
 		if (this.size() != o.size()) {
 			return this.size() - o.size();
-		} else {
-			return this.identifier - o.identifier;
 		}
+		return this.identifier - o.identifier;
 	}
 
 	@Override
