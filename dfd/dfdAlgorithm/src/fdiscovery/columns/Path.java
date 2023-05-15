@@ -7,7 +7,7 @@ public class Path extends ColumnCollection {
 
 	private static final long serialVersionUID = -6451347203736964695L;
 
-	public Path(long numberOfColumns) {
+	public Path(int numberOfColumns) {
 		super(numberOfColumns);
 	}
 

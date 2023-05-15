@@ -11,7 +11,7 @@ public class DifferenceSet extends ColumnCollection {
 		super(agreeSet.getNumberOfColumns());
 		this.numberOfColumns = agreeSet.getNumberOfColumns();
 		
-		this.bits = agreeSet.getBits().clone();
+		this.or(agreeSet);
 		this.flip(0, this.numberOfColumns);
 	}
 }

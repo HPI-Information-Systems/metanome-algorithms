@@ -17,13 +17,13 @@ public class PartialOrder extends ArrayList<CoverOrder> {
 		
 		for (DifferenceSet differenceSet : differenceSets) {
 			// increase the cover count for set columns
-			long bitIndex = 0;
+			int bitIndex = 0;
 			while (bitIndex < differenceSet.getNumberOfColumns()) {
-				long currentNextSetBit = differenceSet.nextSetBit(bitIndex);
+				int currentNextSetBit = differenceSet.nextSetBit(bitIndex);
 				if (currentNextSetBit != -1) {
 					bitIndex = currentNextSetBit + 1;
-					orderMap.putIfAbsent((int) currentNextSetBit, 0);
-					orderMap.increment((int) currentNextSetBit);
+					orderMap.putIfAbsent(currentNextSetBit, 0);
+					orderMap.increment(currentNextSetBit);
 				} else {
 					bitIndex = differenceSet.getNumberOfColumns();
 				}
@@ -38,18 +38,18 @@ public class PartialOrder extends ArrayList<CoverOrder> {
 
 	}
 	
-	public PartialOrder(DifferenceSets differenceSets, long columnIndexToSkip) {
+	public PartialOrder(DifferenceSets differenceSets, int columnIndexToSkip) {
 		TIntIntHashMap orderMap = new TIntIntHashMap();
 
 		for (DifferenceSet differenceSet : differenceSets) {
 			// increase the cover count for set columns
-			long bitIndex = columnIndexToSkip;
+			int bitIndex = columnIndexToSkip;
 			while (bitIndex < differenceSet.getNumberOfColumns()) {
-				long currentNextSetBit = differenceSet.nextSetBit(bitIndex);
+				int currentNextSetBit = differenceSet.nextSetBit(bitIndex);
 				if (currentNextSetBit != -1) {
 					bitIndex = currentNextSetBit + 1;
-					orderMap.putIfAbsent((int) currentNextSetBit, 0);
-					orderMap.increment((int) currentNextSetBit);
+					orderMap.putIfAbsent(currentNextSetBit, 0);
+					orderMap.increment(currentNextSetBit);
 				} else {
 					bitIndex = differenceSet.getNumberOfColumns();
 				}
