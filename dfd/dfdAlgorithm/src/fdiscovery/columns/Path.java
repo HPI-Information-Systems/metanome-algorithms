@@ -16,10 +16,9 @@ public class Path extends ColumnCollection {
 		
 		if (this.isEmpty()) {
 			return new ArrayList<>();
-		} else {
-			for (Integer columnIndex : this.getSetBits()) {
-				maximalSubsetPaths.add((Path)this.removeColumnCopy(columnIndex));
-			}
+		}
+		for (int columnIndex : this.getSetBits()) {
+			maximalSubsetPaths.add((Path)this.removeColumnCopy(columnIndex));
 		}
 		
 		return maximalSubsetPaths;

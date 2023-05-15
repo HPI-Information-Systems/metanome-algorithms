@@ -63,7 +63,7 @@ public class Tane extends Miner {
 			Tane taneRunner = new Tane(inputFileProcessor);
 			taneRunner.run();
 			
-			System.out.println(String.format("Number of dependencies:\t%d", taneRunner.minimalDependencies.getCount()));;
+			System.out.println(String.format("Number of dependencies:\t%d", Integer.valueOf(taneRunner.minimalDependencies.getCount())));;
 			long timeFindFDs = System.currentTimeMillis();
 			System.out.println("Total time:\t" + (timeFindFDs - timeStart)/1000 + "s");
 			System.out.println(taneRunner.getDependencies());
@@ -95,10 +95,10 @@ public class Tane extends Miner {
 			resultFile = cli.getOptionValue("result");
 		}
 		if (cli.hasOption("columns")) {
-			numberOfColumns = Integer.valueOf(cli.getOptionValue("columns"));
+			numberOfColumns = Integer.valueOf(cli.getOptionValue("columns")).intValue();
 		}
 		if (cli.hasOption("rows")) {
-			numberOfRows = Integer.valueOf(cli.getOptionValue("rows"));
+			numberOfRows = Integer.valueOf(cli.getOptionValue("rows")).intValue();
 		}
 		ColumnFiles columnFiles = new ColumnFiles(new File(columnFileDirectory), numberOfColumns, numberOfRows);
 		long timeStart = System.currentTimeMillis();
@@ -120,19 +120,19 @@ public class Tane extends Miner {
 		if (!inputFileName.isEmpty()) {
 			outputBuilder.append(String.format("%s\t", inputFileName));
 		}
-		outputBuilder.append(String.format("%d\t", this.numberOfRows));
-		outputBuilder.append(String.format("%d\t", this.numberOfColumns));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.numberOfRows)));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.numberOfColumns)));
 		outputBuilder.append(String.format("%s\t", timeString));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCount()));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(2)));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(3)));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(4)));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(5)));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(6)));
-		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeGreaterThan(5)));
-		outputBuilder.append(String.format("%d\t", this.strippedPartitions.size()));
-		outputBuilder.append(String.format("%d\t", this.strippedPartitions.size()));
-		outputBuilder.append(String.format("%d\n", Runtime.getRuntime().totalMemory()));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCount())));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(2))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(3))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(4))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(5))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(6))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeGreaterThan(5))));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.strippedPartitions.size())));
+		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.strippedPartitions.size())));
+		outputBuilder.append(String.format("%d\n", Long.valueOf(Runtime.getRuntime().totalMemory())));
 		outputBuilder.append(String.format("#Memory: %s\n", Miner.humanReadableByteCount(Runtime.getRuntime().totalMemory(), false)));
 
 		try {
@@ -218,7 +218,7 @@ public class Tane extends Miner {
 				for (ColumnCollection z : k.tailSet(y)) {
 					ColumnCollection x = y.orCopy(z);
 					boolean xInNextLevel = true;
-					for (Integer a : x.getSetBits()) {
+					for (int a : x.getSetBits()) {
 						x.clear(a);
 						if (!currentLevel.contains(x)) {
 							xInNextLevel = false;
@@ -243,14 +243,14 @@ public class Tane extends Miner {
 		}
 		
 		for (ColumnCollection x : currentLevel) {
-			for (Integer a : x.andCopy(cPlus.get(x)).getSetBits()) {
-				boolean isDependency = isValidDependency(x.clearCopy(a), a);
+			for (int a : x.andCopy(cPlus.get(x)).getSetBits()) {
+				boolean isDependency = isValidDependency(x.clearCopy(a), Integer.valueOf(a));
 
 				if (isDependency) {
 					minimalDependencies.addRHSColumn(x.clearCopy(a), a);
 					cPlus.get(x).clear(a);
 
-					for (Integer B : rSet.removeCopy(x).getSetBits()) {
+					for (int B : rSet.removeCopy(x).getSetBits()) {
 						cPlus.get(x).clear(B);
 					}
 				}
@@ -268,7 +268,7 @@ public class Tane extends Miner {
 		} else {
 			cPlusOfX = (ColumnCollection) cPlusOfX.clone();
 		}
-		for (Integer a : x.getSetBits()) {
+		for (int a : x.getSetBits()) {
 			ColumnCollection nextCPlusOfX = cPlus.get(x.clearCopy(a));
 
 			if (nextCPlusOfX == null) {
@@ -302,7 +302,7 @@ public class Tane extends Miner {
 
 			boolean isSuperKey = isSuperKey(x);
 			if (isSuperKey) {
-				for (Integer a : cPlus.get(x).removeCopy(x).getSetBits()) {
+				for (int a : cPlus.get(x).removeCopy(x).getSetBits()) {
 					ColumnCollection firstCPlusCandidatesKey = x.setCopy(a).clearCopy(x.nextSetBit(0));
 					ColumnCollection firstCPlusCandidates = cPlus.get(firstCPlusCandidatesKey);
 					if (firstCPlusCandidates == null) {
@@ -310,7 +310,7 @@ public class Tane extends Miner {
 					} else {
 						firstCPlusCandidates = (ColumnCollection) firstCPlusCandidates.clone();
 					}
-					for (Integer b : x.getSetBits()) {
+					for (int b : x.getSetBits()) {
 
 						ColumnCollection nextCPlusCandidates = cPlus.get(x.setCopy(a).clearCopy(b));
 						if (nextCPlusCandidates == null) {
@@ -376,7 +376,7 @@ public class Tane extends Miner {
 			return false;
 		}
 		
-		return (this.error(strippedPartitions.get(LHS), strippedPartitions.get(LHS.setCopy(RHS))) == 0);
+		return (this.error(strippedPartitions.get(LHS), strippedPartitions.get(LHS.setCopy(RHS.intValue()))) == 0);
 	}
 	
 	public StrippedPartition strippedProduct(StrippedPartition yPartition, StrippedPartition zPartition) {
@@ -397,7 +397,7 @@ public class Tane extends Miner {
 				T[tValue] = i;
 				
 			}
-			S.put(i, new EquivalenceGroupTIntHashSet());
+			S.put(Integer.valueOf(i), new EquivalenceGroupTIntHashSet());
 			i++;
 		}
 		
@@ -405,17 +405,17 @@ public class Tane extends Miner {
 			for (TIntIterator tIt=cI.iterator(); tIt.hasNext(); ) {
 				int tValue = tIt.next();
 				if (T[tValue] != -1) {
-					TEquivalence sOld = S.get(T[tValue]);
+					TEquivalence sOld = S.get(Integer.valueOf(T[tValue]));
 					sOld.add(tValue);
 				}
 			}
 			for (TIntIterator tIt=cI.iterator(); tIt.hasNext(); ) {
 				int tValue = tIt.next();
-				TEquivalence s = S.get(T[tValue]);
+				TEquivalence s = S.get(Integer.valueOf(T[tValue]));
 				if (s != null && s.size() > 1) {
 					xPartition.add(s);
 				}
-				S.put(T[tValue], new EquivalenceGroupTIntHashSet());
+				S.put(Integer.valueOf(T[tValue]), new EquivalenceGroupTIntHashSet());
 			}
 		}
 		i = 1;

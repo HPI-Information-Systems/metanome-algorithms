@@ -46,6 +46,6 @@ public class EquivalenceGroupHashSet extends HashSet<Integer> implements Compara
 			this.identifier = value;
 		}
 		
-		super.add(value);
+		super.add(Integer.valueOf(value));
 	}
 }

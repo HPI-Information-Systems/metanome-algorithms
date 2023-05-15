@@ -198,8 +198,8 @@ public class ColumnCollection extends OpenBitSet implements Comparable<OpenBitSe
 	public String toString() {
 		StringBuilder outputBuilder = new StringBuilder();
 		if (this.cardinality() > 0) {
-			for (Integer columnIndex : this.getSetBits()) {
-				outputBuilder.append(String.format("%0" + formatStringWidth + "d,", columnIndex));
+			for (int columnIndex : this.getSetBits()) {
+				outputBuilder.append(String.format("%0" + formatStringWidth + "d,", Integer.valueOf(columnIndex)));
 
 			}
 		} else {

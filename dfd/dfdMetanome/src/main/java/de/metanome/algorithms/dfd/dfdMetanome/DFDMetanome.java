@@ -71,12 +71,12 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
       dfdMiner.run();
       FunctionalDependencies fds = dfdMiner.getDependencies();
       for (ColumnCollection determining : fds.keySet()) {
-        for (Integer dependentColumn : fds.get(determining).getSetBits()) {
+        for (int dependentColumn : fds.get(determining).getSetBits()) {
           ColumnIdentifier[]
               determiningColumns =
               new ColumnIdentifier[determining.getSetBits().length];
           int i = 0;
-          for (Integer determiningColumn : determining.getSetBits()) {
+          for (int determiningColumn : determining.getSetBits()) {
             determiningColumns[i] =
                 new ColumnIdentifier(this.identifier, "Column " + determiningColumn);
             i++;

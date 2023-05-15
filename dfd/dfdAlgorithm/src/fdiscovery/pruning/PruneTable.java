@@ -25,12 +25,12 @@ public abstract class PruneTable extends HashMap<ColumnCollection, HashMap<Long,
 		if (!this.containsKey(RHS)) {
 			this.put(RHS, new HashMap<Long, ArrayList<ColumnCollection>>());
 		}
-		if (!this.get(RHS).containsKey(LHS.cardinality())) {
-			this.get(RHS).put(LHS.cardinality(), new ArrayList<ColumnCollection>());
+		if (!this.get(RHS).containsKey(Integer.valueOf(LHS.cardinality()))) {
+			this.get(RHS).put(Integer.valueOf(LHS.cardinality()), new ArrayList<ColumnCollection>());
 		}
 //		System.out.println(this.get(RHS));
 //		System.out.println(String.format("Column:\t%s\t%d", LHS, LHS.cardinality()));
-		ArrayList<ColumnCollection> dependencies = this.get(RHS).get(LHS.cardinality());
+		ArrayList<ColumnCollection> dependencies = this.get(RHS).get(Integer.valueOf(LHS.cardinality()));
 //		System.out.println(dependencies);
 		dependencies.add(LHS);
 	}

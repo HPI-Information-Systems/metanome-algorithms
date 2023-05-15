@@ -141,7 +141,7 @@ public abstract class Partition extends TreeSet<TEquivalence> implements Compara
 	}
 	
 	public String printIndices() {
-		StringBuilder outputBuilder = new StringBuilder((int)this.indices.size());
+		StringBuilder outputBuilder = new StringBuilder(this.indices.size());
 		
 		for (int i=0; i < this.indices.size(); i++) {
 			if (this.indices.get(i)) {

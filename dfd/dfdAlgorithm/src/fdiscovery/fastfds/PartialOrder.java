@@ -30,7 +30,7 @@ public class PartialOrder extends ArrayList<CoverOrder> {
 			}
 		}
 		
-		for (Integer index : orderMap.keys()) {
+		for (int index : orderMap.keys()) {
 			this.add(new CoverOrder(index, orderMap.get(index)));
 		}
 		
@@ -56,7 +56,7 @@ public class PartialOrder extends ArrayList<CoverOrder> {
 			}
 		}
 		
-		for (Integer index : orderMap.keys()) {
+		for (int index : orderMap.keys()) {
 			this.add(new CoverOrder(index, orderMap.get(index)));
 		}
 		
@@ -67,7 +67,7 @@ public class PartialOrder extends ArrayList<CoverOrder> {
 	public ArrayList<Integer> getOrderedColumns() {
 		ArrayList<Integer> orderedColumns = new ArrayList<>();
 		for (CoverOrder order : this) {
-			orderedColumns.add(order.getColumnIndex());
+			orderedColumns.add(Integer.valueOf(order.getColumnIndex()));
 		}
 		
 		return orderedColumns;

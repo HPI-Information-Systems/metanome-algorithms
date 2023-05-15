@@ -11,7 +11,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 	private static final long serialVersionUID = 2932117192054503664L;
 	
 	public ColumnCollection getUncheckedMaximalSubset(ColumnCollection lhs) {
-		for (Integer columnIndex : lhs.getSetBits()) {
+		for (int columnIndex : lhs.getSetBits()) {
 			ColumnCollection subsetIndices = lhs.removeColumnCopy(columnIndex);
 			if (!this.containsKey(subsetIndices)) {
 				return subsetIndices;
@@ -24,7 +24,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 		THashSet<ColumnCollection> uncheckedMaximalSubsets = new THashSet<>();
 		
 //		if (lhs.cardinality() > 2) {
-			for (Integer columnIndex : order.getOrderHighDistinctCount(lhs)) { 
+			for (int columnIndex : order.getOrderHighDistinctCount(lhs)) {
 				ColumnCollection subsetIndices = lhs.removeColumnCopy(columnIndex);
 				if (!this.containsKey(subsetIndices)) {
 					uncheckedMaximalSubsets.add(subsetIndices);
@@ -39,7 +39,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 		
 		// we only want to check subsets with at least 2 columns
 		if (lhs.cardinality() > 2) {
-			for (Integer columnIndex : order.getOrderHighDistinctCount(lhs)) { 
+			for (int columnIndex : order.getOrderHighDistinctCount(lhs)) {
 				ColumnCollection subsetIndices = lhs.removeColumnCopy(columnIndex);
 				if (!this.containsKey(subsetIndices) || this.get(subsetIndices) == Observation.CANDIDATE_MINIMAL_DEPENDENCY) {
 					uncheckedMaximalSubsets.add(subsetIndices);
@@ -54,7 +54,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 		
 		// we only want to check subsets with at least 2 columns
 		if (lhs.cardinality() > 2) {
-			for (Integer columnIndex : order.getOrderHighDistinctCount(lhs)) { 
+			for (int columnIndex : order.getOrderHighDistinctCount(lhs)) {
 				ColumnCollection subsetIndices = lhs.removeColumnCopy(columnIndex);
 				uncheckedMaximalSubsets.add(subsetIndices);
 			}
@@ -63,7 +63,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 	}
 	
 	public ColumnCollection getUncheckedMinimalSuperset(ColumnCollection lhs, int rhsIndex) {
-		for (Integer columnIndex : lhs.setCopy(rhsIndex).complement().getSetBits()) {
+		for (int columnIndex : lhs.setCopy(rhsIndex).complement().getSetBits()) {
 			ColumnCollection supersetIndices = lhs.setCopy(columnIndex);
 			if (!this.containsKey(supersetIndices)) {
 				return supersetIndices;
@@ -75,7 +75,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 	public THashSet<ColumnCollection> getUncheckedOrCandidateMinimalSupersets(ColumnCollection lhs, int rhsIndex, ColumnOrder order) {
 		THashSet<ColumnCollection> uncheckedMinimalSupersets = new THashSet<>();
 		
-		for (Integer columnIndex : order.getOrderLowDistinctCount(lhs.setCopy(rhsIndex).complement())) {
+		for (int columnIndex : order.getOrderLowDistinctCount(lhs.setCopy(rhsIndex).complement())) {
 			ColumnCollection supersetIndices = lhs.setCopy(columnIndex);
 			if (!this.containsKey(supersetIndices) || this.get(supersetIndices) == Observation.CANDIDATE_MAXIMAL_NON_DEPENDENCY) {
 				uncheckedMinimalSupersets.add(supersetIndices);
@@ -87,7 +87,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 	public THashSet<ColumnCollection> getUncheckedMinimalSupersets(ColumnCollection lhs, int rhsIndex, ColumnOrder order) {
 		THashSet<ColumnCollection> uncheckedMinimalSupersets = new THashSet<>();
 		
-		for (Integer columnIndex : order.getOrderLowDistinctCount(lhs.setCopy(rhsIndex).complement())) {
+		for (int columnIndex : order.getOrderLowDistinctCount(lhs.setCopy(rhsIndex).complement())) {
 			ColumnCollection supersetIndices = lhs.setCopy(columnIndex);
 			if (!this.containsKey(supersetIndices)) {
 				uncheckedMinimalSupersets.add(supersetIndices);
@@ -99,7 +99,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 	public THashSet<ColumnCollection> getMinimalSupersets(ColumnCollection lhs, int rhsIndex, ColumnOrder order) {
 		THashSet<ColumnCollection> uncheckedMinimalSupersets = new THashSet<>();
 
-		for (Integer columnIndex : order.getOrderLowDistinctCount(lhs.setCopy(rhsIndex).complement())) {
+		for (int columnIndex : order.getOrderLowDistinctCount(lhs.setCopy(rhsIndex).complement())) {
 			ColumnCollection supersetIndices = lhs.setCopy(columnIndex);
 			uncheckedMinimalSupersets.add(supersetIndices);
 		}
@@ -109,7 +109,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 	public Observation updateDependencyType(ColumnCollection lhs) {
 		if (lhs.cardinality() > 1) {
 			boolean foundUncheckedSubset = false;
-			for (Integer columnIndex : lhs.getSetBits()) {
+			for (int columnIndex : lhs.getSetBits()) {
 				Observation observationOfSubset = this.get(lhs.removeColumnCopy(columnIndex));
 				if (observationOfSubset == null) {
 					foundUncheckedSubset = true;
@@ -126,7 +126,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 	
 	public Observation updateNonDependencyType(ColumnCollection lhs, int rhsIndex) {
 		boolean foundUncheckedSuperset = false;
-		for (Integer columnIndex : lhs.setCopy(rhsIndex).complementCopy().getSetBits()) {
+		for (int columnIndex : lhs.setCopy(rhsIndex).complementCopy().getSetBits()) {
 			Observation observationOfSuperset = this.get(lhs.setCopy(columnIndex));
 			if (observationOfSuperset == null) {
 				foundUncheckedSuperset = true;
