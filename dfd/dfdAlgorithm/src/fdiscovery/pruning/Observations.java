@@ -24,7 +24,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 		THashSet<ColumnCollection> uncheckedMaximalSubsets = new THashSet<>();
 		
 //		if (lhs.cardinality() > 2) {
-			for (int columnIndex : order.getOrderHighDistinctCount(lhs)) { 
+			for (int columnIndex : order.getOrderHighDistinctCount(lhs)) {
 				ColumnCollection subsetIndices = lhs.removeColumnCopy(columnIndex);
 				if (!this.containsKey(subsetIndices)) {
 					uncheckedMaximalSubsets.add(subsetIndices);
@@ -39,7 +39,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 		
 		// we only want to check subsets with at least 2 columns
 		if (lhs.cardinality() > 2) {
-			for (int columnIndex : order.getOrderHighDistinctCount(lhs)) { 
+			for (int columnIndex : order.getOrderHighDistinctCount(lhs)) {
 				ColumnCollection subsetIndices = lhs.removeColumnCopy(columnIndex);
 				if (!this.containsKey(subsetIndices) || this.get(subsetIndices) == Observation.CANDIDATE_MINIMAL_DEPENDENCY) {
 					uncheckedMaximalSubsets.add(subsetIndices);
@@ -54,7 +54,7 @@ public class Observations extends HashMap<ColumnCollection, Observation> {
 		
 		// we only want to check subsets with at least 2 columns
 		if (lhs.cardinality() > 2) {
-			for (int columnIndex : order.getOrderHighDistinctCount(lhs)) { 
+			for (int columnIndex : order.getOrderHighDistinctCount(lhs)) {
 				ColumnCollection subsetIndices = lhs.removeColumnCopy(columnIndex);
 				uncheckedMaximalSubsets.add(subsetIndices);
 			}

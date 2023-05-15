@@ -71,11 +71,11 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
       DFDMiner dfdMiner = new DFDMiner(inputFileProcessor);
       dfdMiner.run();
       FunctionalDependencies fds = dfdMiner.getDependencies();
-      
+
       RelationalInput input = fileInput.generateNewCopy();
       String relationName = input.relationName();
       List<String> columnNames = input.columnNames();
-      
+
       for (ColumnCollection determining : fds.keySet()) {
         for (int dependentColumn : fds.get(determining).getSetBits()) {
           ColumnIdentifier[]

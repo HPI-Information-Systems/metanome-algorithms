@@ -23,7 +23,7 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 		while (bitIndex < this.numberOfColumns) {
 			int currentNextSetBit = this.nextSetBit(bitIndex);
 			if (currentNextSetBit != -1) {
-				setBits[currentArrayIndex++] = currentNextSetBit; 
+				setBits[currentArrayIndex++] = currentNextSetBit;
 				bitIndex = currentNextSetBit + 1;
 			} else {
 				bitIndex = this.numberOfColumns;
@@ -143,10 +143,10 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 		}
 		return false;
 	}
-	
+
 	public int unionCount(ColumnCollection other) {
 		ColumnCollection union = (ColumnCollection) this.clone();
-		union.and(other);
+		union.or(other);
 		return union.cardinality();
 	}
 
@@ -177,7 +177,7 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 		
 		return copy;
 	}
-	
+
 	@Override
 	public int compareTo(BitSet other) {
 		ColumnCollection copy = (ColumnCollection) this.clone();

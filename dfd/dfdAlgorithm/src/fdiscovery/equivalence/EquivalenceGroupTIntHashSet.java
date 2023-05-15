@@ -43,6 +43,6 @@ public class EquivalenceGroupTIntHashSet extends TIntHashSet implements Comparab
 		if (this.size() != o.size()) {
 			return this.size() - o.size();
 		}
-		return this.identifier - o.identifier;		
+		return this.identifier - o.identifier;
 	}
 }
