@@ -1,4 +1,9 @@
-package de.metanome.algorithms.dfd.dfdMetanome;
+package de.metanome.algorithms.dfd;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
@@ -11,11 +16,6 @@ import de.metanome.algorithm_integration.configuration.ConfigurationRequirementF
 import de.metanome.algorithm_integration.input.FileInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import fdiscovery.approach.runner.DFDMiner;
 import fdiscovery.columns.ColumnCollection;
 import fdiscovery.general.FunctionalDependencies;

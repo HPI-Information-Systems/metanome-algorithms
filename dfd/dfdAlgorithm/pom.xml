@@ -2,17 +2,17 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>de.metanome.algorithms.dfd</groupId>
-    <artifactId>dfdAlgorithm</artifactId>
+
+    <artifactId>DFDAlgorithm</artifactId>
     <packaging>jar</packaging>
 
-    <name>dfdAlgorithm</name>
+    <name>DFDAlgorithm</name>
 
     <parent>
-        <groupId>de.metanome.algorithms</groupId>
-        <artifactId>algorithms</artifactId>
-        <version>${metanome.version}</version>
-        <relativePath>../../pom.xml</relativePath>
+        <groupId>de.metanome.algorithms.dfd</groupId>
+        <artifactId>DFDModules</artifactId>
+        <version>1.2-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <build>
@@ -20,10 +20,10 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
+        <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
     </plugins>
@@ -38,7 +38,6 @@
   	<dependency>
   		<groupId>com.google.guava</groupId>
   		<artifactId>guava</artifactId>
-  		<version>15.0</version>
   	</dependency>
 	<dependency>
 		<groupId>net.sf.trove4j</groupId>
@@ -54,11 +53,6 @@
 		<groupId>org.javatuples</groupId>
 		<artifactId>javatuples</artifactId>
 		<version>1.2</version>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.lucene</groupId>
-		<artifactId>lucene-core</artifactId>
-		<version>3.0.3</version>
 	</dependency>
 	<dependency>
 		<groupId>log4j</groupId>
