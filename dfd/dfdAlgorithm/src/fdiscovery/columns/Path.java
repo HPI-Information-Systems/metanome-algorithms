@@ -7,7 +7,7 @@ public class Path extends ColumnCollection {
 
 	private static final long serialVersionUID = -6451347203736964695L;
 
-	public Path(int numberOfColumns) {
+	public Path(long numberOfColumns) {
 		super(numberOfColumns);
 	}
 
@@ -16,9 +16,10 @@ public class Path extends ColumnCollection {
 		
 		if (this.isEmpty()) {
 			return new ArrayList<>();
-		}
-		for (int columnIndex : this.getSetBits()) {
-			maximalSubsetPaths.add((Path)this.removeColumnCopy(columnIndex));
+		} else {
+			for (Integer columnIndex : this.getSetBits()) {
+				maximalSubsetPaths.add((Path)this.removeColumnCopy(columnIndex));
+			}
 		}
 		
 		return maximalSubsetPaths;

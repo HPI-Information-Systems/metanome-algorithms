@@ -100,9 +100,10 @@ public class AprioriGeneration<T extends ColumnCollection> {
 //			System.out.println("true");
 //			System.out.println("---------------------------");
 			return true;
+		} else {
+//			System.out.println("false");
+//			System.out.println("---------------------------");
+			return false;
 		}
-//		System.out.println("false");
-//		System.out.println("---------------------------");
-		return false;
 	}
 }

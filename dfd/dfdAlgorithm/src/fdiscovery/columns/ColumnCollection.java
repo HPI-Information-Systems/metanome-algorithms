@@ -1,32 +1,33 @@
 package fdiscovery.columns;
 
-import java.util.BitSet;
+import org.apache.lucene.util.OpenBitSet;
 
-public class ColumnCollection extends BitSet implements Comparable<BitSet> {
+public class ColumnCollection extends OpenBitSet implements Comparable<OpenBitSet> {
 
 	private static final long serialVersionUID = -5256272139963505719L;
 
 	private int formatStringWidth;
-	protected int numberOfColumns;
+	protected long numberOfColumns;
 	protected int[] setBits;
 	
-	public ColumnCollection(int numberOfColumns ) {
+	public ColumnCollection(long numberOfColumns ) {
 		this.numberOfColumns = numberOfColumns;
 		this.formatStringWidth = (int)Math.ceil(Math.log10(this.numberOfColumns));
 	}
 	
 	public int[] getSetBits() {
-		int[] setBits = new int[this.cardinality()];
+		int[] setBits = new int[(int) this.cardinality()];
 		
-		int bitIndex = 0;
+		long bitIndex = 0;
 		int currentArrayIndex = 0;
 		while (bitIndex < this.numberOfColumns) {
-			int currentNextSetBit = this.nextSetBit(bitIndex);
+			long currentNextSetBit = this.nextSetBit(bitIndex);
 			if (currentNextSetBit != -1) {
-				setBits[currentArrayIndex++] = currentNextSetBit; 
+				setBits[currentArrayIndex++] = (int) currentNextSetBit; 
 				bitIndex = currentNextSetBit + 1;
 			} else {
 				bitIndex = this.numberOfColumns;
+
 			}
 		}
 		
@@ -37,7 +38,7 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 		return this.cardinality() == 1;
 	}
 	
-	public ColumnCollection addColumn(int columnIndex) {
+	public ColumnCollection addColumn(long columnIndex) {
 		ColumnCollection copy = (ColumnCollection) this.clone();
 		copy.set(columnIndex);
 		
@@ -74,7 +75,7 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 	
 	public ColumnCollection removeCopy(ColumnCollection other) {
 		ColumnCollection copy = (ColumnCollection)this.clone();
-		copy.andNot(other);
+		copy.remove(other);
 		
 		return copy;
 	}
@@ -113,11 +114,11 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 	}
 	
 	public boolean isSubsetOf(ColumnCollection other) {
-		return this.unionCount(other) == other.cardinality();
+		return ColumnCollection.unionCount(this, other) == other.cardinality();
 	}
 	
 	public boolean isSupersetOf(ColumnCollection other) {
-		return this.unionCount(other) == this.cardinality();
+		return ColumnCollection.unionCount(this, other) == this.cardinality();
 
 	}
 	
@@ -125,7 +126,7 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 		long cardinality = this.cardinality();
 		long otherCardinality = other.cardinality();
 		if (cardinality != otherCardinality) {
-			if (this.unionCount(other) == otherCardinality) {
+			if (ColumnCollection.unionCount(this, other) == otherCardinality) {
 				return true;
 			}
 		}
@@ -137,35 +138,30 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 		long cardinality = this.cardinality();
 		long otherCardinality = other.cardinality();
 		if (cardinality != otherCardinality) {
-			if (this.unionCount(other) == cardinality) {
+			if (ColumnCollection.unionCount(this, other) == cardinality) {
 				return true;
 			}
 		}
 		return false;
-	}
-	
-	public int unionCount(ColumnCollection other) {
-		ColumnCollection union = (ColumnCollection) this.clone();
-		union.and(other);
-		return union.cardinality();
 	}
 
 	public boolean isSubsetOrSupersetOf(ColumnCollection other) {
 		return isSubsetOf(other) || isSupersetOf(other);
 	}
 	
-	public int getNumberOfColumns() {
+	public long getNumberOfColumns() {
 		return this.numberOfColumns;
 	}
 
 	public long getMostRightBit() {
-		int bitIndex = 0;
+		long bitIndex = 0;
 		while (bitIndex < this.numberOfColumns) {
-			int currentNextSetBit = this.nextSetBit(bitIndex);
+			long currentNextSetBit = this.nextSetBit(bitIndex);
 			if (currentNextSetBit != -1) {
 				bitIndex = currentNextSetBit + 1;
 			} else {
 				return bitIndex - 1;
+
 			}
 		}
 		return bitIndex;
@@ -178,8 +174,15 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 		return copy;
 	}
 	
+	public ColumnCollection removeColumnCopy(long columnIndex) {
+		ColumnCollection copy = (ColumnCollection) this.clone();
+		copy.clear(columnIndex);
+		
+		return copy;
+	}
+	
 	@Override
-	public int compareTo(BitSet other) {
+	public int compareTo(OpenBitSet other) {
 		ColumnCollection copy = (ColumnCollection) this.clone();
 		copy.xor(other);
 		int lowestBit = copy.nextSetBit(0);
@@ -195,8 +198,8 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 	public String toString() {
 		StringBuilder outputBuilder = new StringBuilder();
 		if (this.cardinality() > 0) {
-			for (int columnIndex : this.getSetBits()) {
-				outputBuilder.append(String.format("%0" + formatStringWidth + "d,", Integer.valueOf(columnIndex)));
+			for (Integer columnIndex : this.getSetBits()) {
+				outputBuilder.append(String.format("%0" + formatStringWidth + "d,", columnIndex));
 
 			}
 		} else {
@@ -206,13 +209,4 @@ public class ColumnCollection extends BitSet implements Comparable<BitSet> {
 		return outputBuilder.toString();
 	}
 	
-	public void remove(ColumnCollection other) {
-		this.andNot(other);
-	}
-
-	public static int intersectionCount(ColumnCollection set1, ColumnCollection set2) {
-		ColumnCollection intersection = (ColumnCollection) set1.clone();
-		intersection.and(set2);
-		return intersection.cardinality();
-	}
 }

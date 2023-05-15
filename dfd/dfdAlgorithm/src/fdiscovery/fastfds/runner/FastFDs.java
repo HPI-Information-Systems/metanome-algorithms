@@ -32,7 +32,6 @@ public class FastFDs extends Miner {
 	private FunctionalDependencies minimalDependencies;
 	private DifferenceSets differenceSets;
 	
-	@SuppressWarnings("unused")
 	public static void main2(String[] args) {
 		createColumDirectory();
 		createResultDirectory();
@@ -51,7 +50,7 @@ public class FastFDs extends Miner {
 			FastFDs fastFDRunner = new FastFDs(inputFileProcessor);
 			
 			fastFDRunner.run();
-			System.out.println(String.format("Dependencies: %d.", Integer.valueOf(fastFDRunner.minimalDependencies.getCount())));
+			System.out.println(String.format("Dependencies: %d.", fastFDRunner.minimalDependencies.getCount()));
 			long timeFindFDs = System.currentTimeMillis();
 			System.out.println("Total time:\t" + (timeFindFDs - timeStart)/1000 + "s");
 			System.out.println(fastFDRunner.getDependencies());
@@ -81,10 +80,10 @@ public class FastFDs extends Miner {
 			resultFile = cli.getOptionValue("result");
 		}
 		if (cli.hasOption("columns")) {
-			numberOfColumns = Integer.valueOf(cli.getOptionValue("columns")).intValue();
+			numberOfColumns = Integer.valueOf(cli.getOptionValue("columns"));
 		}
 		if (cli.hasOption("rows")) {
-			numberOfRows = Integer.valueOf(cli.getOptionValue("rows")).intValue();
+			numberOfRows = Integer.valueOf(cli.getOptionValue("rows"));
 		}
 		ColumnFiles columnFiles = new ColumnFiles(new File(columnFileDirectory), numberOfColumns, numberOfRows);
 		long timeStart = System.currentTimeMillis();
@@ -100,25 +99,25 @@ public class FastFDs extends Miner {
 	}
 	
 	private void writeOutputSuccessful(String outputFile, long time, String inputFileName) {
-		String timeString = (time != -1)? String.format("%.1f", Double.valueOf((double)(time) / 1000)) : "-1";
+		String timeString = (time != -1)? String.format("%.1f", (double)(time)/1000) : "-1";
 		
 		StringBuilder outputBuilder = new StringBuilder();
 		if (!inputFileName.isEmpty()) {
 			outputBuilder.append(String.format("%s\t", inputFileName));
 		}
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.numberOfRows)));
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.numberOfColumns)));
+		outputBuilder.append(String.format("%d\t", this.numberOfRows));
+		outputBuilder.append(String.format("%d\t", this.numberOfColumns));
 		outputBuilder.append(String.format("%s\t", timeString));
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCount())));
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(2))));
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(3))));
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(4))));
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(5))));
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeLesserThan(6))));
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(this.minimalDependencies.getCountForSizeGreaterThan(5))));
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(0)));
-		outputBuilder.append(String.format("%d\t", Integer.valueOf(0)));
-		outputBuilder.append(String.format("%d\n", Long.valueOf(Runtime.getRuntime().totalMemory())));
+		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCount()));
+		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(2)));
+		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(3)));
+		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(4)));
+		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(5)));
+		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeLesserThan(6)));
+		outputBuilder.append(String.format("%d\t", this.minimalDependencies.getCountForSizeGreaterThan(5)));
+		outputBuilder.append(String.format("%d\t", 0));
+		outputBuilder.append(String.format("%d\t", 0));
+		outputBuilder.append(String.format("%d\n", Runtime.getRuntime().totalMemory()));
 		outputBuilder.append(String.format("#Memory: %s\n", Miner.humanReadableByteCount(Runtime.getRuntime().totalMemory(), false)));
 
 		try {
@@ -175,7 +174,7 @@ public class FastFDs extends Miner {
 			if (orig.isEmpty()) {
 				ColumnCollection lhs = new ColumnCollection(this.numberOfColumns);
 				
-				for (int lhsIndex : lhs.setCopy(rhsIndex).complement().getSetBits()) {
+				for (Integer lhsIndex : lhs.setCopy(rhsIndex).complement().getSetBits()) {
 					this.minimalDependencies.addRHSColumn(lhs.setCopy(lhsIndex), rhsIndex);
 				}
 			} 
@@ -203,7 +202,7 @@ public class FastFDs extends Miner {
 		}
 
 		// RECURSIVE CASE
-		for (int remainingColumn : currentOrder.getOrderedColumns()) {
+		for (Integer remainingColumn : currentOrder.getOrderedColumns()) {
 			DifferenceSets nextDifferenceSets = uncovered.removeCovered(remainingColumn);
 			PartialOrder nextOrder = new PartialOrder(nextDifferenceSets, remainingColumn);
 			Path nextPath = (Path) currentPath.addColumn(remainingColumn);

@@ -13,7 +13,7 @@ public class EquivalenceClass extends HashSet<Point> {
 		StringBuilder outputBuilder = new StringBuilder();
 		for (Iterator<Point> it = this.iterator(); it.hasNext(); ) {
 			Point identifier = it.next();
-			outputBuilder.append(String.format("(%s,%d),", Character.valueOf((char)(identifier.x + 65)), Integer.valueOf(identifier.y)));
+			outputBuilder.append(String.format("(%s,%d),", (char)(identifier.x+65), identifier.y));
 		}
 		
 		return outputBuilder.toString();

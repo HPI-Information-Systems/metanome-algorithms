@@ -43,7 +43,7 @@ public class CoverOrder implements Comparable<CoverOrder> {
 	
 	public String toString() {
 		StringBuilder outputBuilder = new StringBuilder();
-		outputBuilder.append(String.format("[%s:%d]", Character.valueOf((char)(this.columnIndex + 65)), Integer.valueOf(this.appearances)));
+		outputBuilder.append(String.format("[%s:%d]", (char)(this.columnIndex+65), this.appearances));
 
 		return outputBuilder.toString();
 	}

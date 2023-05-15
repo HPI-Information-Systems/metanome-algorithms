@@ -19,7 +19,6 @@ public class StrippedPartition extends TreeSet<TEquivalence> {
 		
 	}
 	
-	@SuppressWarnings("unused")
 	public StrippedPartition(StrippedPartition base, StrippedPartition additional) {
 		
 	}
@@ -36,12 +35,12 @@ public class StrippedPartition extends TreeSet<TEquivalence> {
 				valueToIndex.put(value, rowIndex);
 				TEquivalence equivalenceGroup = new EquivalenceGroupTIntHashSet();
 				equivalenceGroup.add(rowIndex);
-				helpMap.put(Integer.valueOf(rowIndex), equivalenceGroup);
+				helpMap.put(rowIndex, equivalenceGroup);
 			} 
 			// otherwise find the right equivalence class and add the current element index
 			else {
 				int equivalenceGroupIndex = valueToIndex.get(value);
-				TEquivalence equivalenceClass = helpMap.get(Integer.valueOf(equivalenceGroupIndex));
+				TEquivalence equivalenceClass = helpMap.get(equivalenceGroupIndex);
 				equivalenceClass.add(rowIndex);
 			}
 		}

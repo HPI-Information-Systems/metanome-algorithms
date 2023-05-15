@@ -42,7 +42,7 @@ public class FunctionalDependencies extends THashMap<ColumnCollection, ColumnCol
 			if (lhsForRhsToDelete.contains(lhs)) {
 				ColumnCollection rhs = this.get(lhs);
 				this.put(lhs, rhs.removeColumnCopy(rhsIndex));
-				System.out.println(String.format("Remove %s->%s", lhs, Character.valueOf((char) (rhsIndex + 65))));
+				System.out.println(String.format("Remove %s->%s", lhs, (char)(rhsIndex + 65)));
 			}
 		}
 	}
@@ -85,7 +85,7 @@ public class FunctionalDependencies extends THashMap<ColumnCollection, ColumnCol
 		return nonAtomicFDCount;
 	}
 	
-	public void addRHSColumn(ColumnCollection lhs, int rhsIndex) {
+	public void addRHSColumn(ColumnCollection lhs, Integer rhsIndex) {
 		ColumnCollection rhs = null;
 		if (!this.containsKey(lhs)) {
 			rhs = new ColumnCollection(lhs.getNumberOfColumns());
@@ -140,11 +140,11 @@ public class FunctionalDependencies extends THashMap<ColumnCollection, ColumnCol
 		StringBuilder outputBuilder = new StringBuilder();
 
 		for (ColumnCollection determining : this.keySet()) {
-			for (int dependentColumn : this.get(determining).getSetBits()) {
-				for (int determiningColumn : determining.getSetBits()) {
-					outputBuilder.append(String.format("c%04d\t", Integer.valueOf(determiningColumn)));
+			for (Integer dependentColumn : this.get(determining).getSetBits()) {
+				for (Integer determiningColumn : determining.getSetBits()) {
+					outputBuilder.append(String.format("c%04d\t", determiningColumn));
 				}
-				outputBuilder.append(String.format("->\tc%04d\n", Integer.valueOf(dependentColumn)));
+				outputBuilder.append(String.format("->\tc%04d\n", dependentColumn));
 			}
 		}
 		return outputBuilder.toString();

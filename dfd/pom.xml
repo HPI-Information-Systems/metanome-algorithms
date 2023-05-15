@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.metanome.algorithms.dfd</groupId>
-    <artifactId>DFDModules</artifactId>
+    <artifactId>dfd</artifactId>
     <packaging>pom</packaging>
 
-    <name>DFDModules</name>
+    <name>dfd</name>
 
     <modules>
         <module>dfdAlgorithm</module>
@@ -16,13 +16,14 @@
     </modules>
 
     <properties>
+        <metanome.version>0.0.2-SNAPSHOT</metanome.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <parent>
         <groupId>de.metanome.algorithms</groupId>
         <artifactId>algorithms</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>${metanome.version}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

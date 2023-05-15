@@ -25,12 +25,12 @@ public class PartitionStatistics extends TObjectIntHashMap<ColumnCollection> {
 		for (TLongObjectIterator<TIntObjectHashMap<ArrayList<ColumnCollection>>> statsByLevelIt = statsAndCountsByLevel.iterator(); statsByLevelIt.hasNext(); ) {
 			statsByLevelIt.advance();
 			long levelCardinality = statsByLevelIt.key();
-			statisticsBuilder.append(String.format("%d attributes {\n", Long.valueOf(levelCardinality)));
+			statisticsBuilder.append(String.format("%d attributes {\n", levelCardinality));
 			for (TIntObjectIterator<ArrayList<ColumnCollection>> countByLevelIt = statsByLevelIt.value().iterator(); countByLevelIt.hasNext(); ) {
 				countByLevelIt.advance();
 				int usageCount = countByLevelIt.key();
 				int numberOfElements = countByLevelIt.value().size();
-				statisticsBuilder.append(String.format("\t%d elements used %d times\n", Integer.valueOf(numberOfElements), Integer.valueOf(usageCount)));
+				statisticsBuilder.append(String.format("\t%d elements used %d times\n", numberOfElements, usageCount));
 			}
 			statisticsBuilder.append("}\n");
 		}

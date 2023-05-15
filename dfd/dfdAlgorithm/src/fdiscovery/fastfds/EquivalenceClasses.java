@@ -34,7 +34,7 @@ public class EquivalenceClasses extends TIntObjectHashMap<EquivalenceClass> {
 
 		for (TIntObjectIterator<EquivalenceClass> it = this.iterator(); it.hasNext(); ) {
 			it.advance();
-			outputBuilder.append(String.format("ec(%d(\t", Integer.valueOf(it.key())));
+			outputBuilder.append(String.format("ec(%d(\t", it.key()));
 			outputBuilder.append(String.format("{%s}\n", it.value().toString()));
 		}
 		outputBuilder.append("EquivalenceClasses\n");

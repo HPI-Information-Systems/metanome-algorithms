@@ -38,7 +38,7 @@ public class PartitionEquivalences extends THashMap<ColumnCollection, Equivalenc
 		if (!this.observedPartitions.contains(partition.getIndices()) && !this.containsSimilarPartition(partition)) {
 			this.observedPartitions.add(partition.getIndices());
 			long hashNumber = partition.getHashNumber();
-			System.out.println(String.format("Partition[%s]\t%d\tSize: %d", partition.getIndices(), Long.valueOf(hashNumber), Integer.valueOf(partition.size())));
+			System.out.println(String.format("Partition[%s]\t%d\tSize: %d", partition.getIndices(), hashNumber, partition.size()));
 			partitionHashes.putIfAbsent(hashNumber, new TIntObjectHashMap<THashSet<EquivalenceManagedPartition>>());
 			partitionHashes.get(hashNumber).putIfAbsent(partition.size(), new THashSet<EquivalenceManagedPartition>());
 			THashSet<EquivalenceManagedPartition> partitionGroup = partitionHashes.get(hashNumber).get(partition.size());

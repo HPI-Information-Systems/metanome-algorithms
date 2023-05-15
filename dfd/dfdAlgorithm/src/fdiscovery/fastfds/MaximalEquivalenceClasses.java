@@ -59,7 +59,7 @@ public class MaximalEquivalenceClasses extends THashSet<TEquivalence> {
 					}
 			}
 		
-		for (int groupSize : equivalenceGroupsBySize.keys()) {
+		for (Integer groupSize : equivalenceGroupsBySize.keys()) {
 			for (TEquivalence sizeGroup : equivalenceGroupsBySize.get(groupSize)) {
 				maximumGroupSize = Math.max(groupSize, maximumGroupSize);
 				this.add(sizeGroup);

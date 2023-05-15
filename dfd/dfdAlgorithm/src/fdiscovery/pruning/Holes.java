@@ -17,8 +17,9 @@ public class Holes extends TreeSet<ColumnCollection> {
 		public int compare(ColumnCollection o1, ColumnCollection o2) {
 			if (o1.isProperSupersetOf(o2)) {
 				return 0;
+			} else {
+				return o1.compareTo(o2);
 			}
-			return o1.compareTo(o2);
 		}
 	}; 
 	

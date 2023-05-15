@@ -4,16 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>DFD</artifactId>
+    <groupId>de.metanome.algorithms.dfd</groupId>
+    <artifactId>dfdMetanome</artifactId>
     <packaging>jar</packaging>
 
-    <name>DFD</name>
+    <name>dfdMetanome</name>
 
     <parent>
-        <groupId>de.metanome.algorithms.dfd</groupId>
-        <artifactId>DFDModules</artifactId>
-        <version>1.2-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <groupId>de.metanome.algorithms</groupId>
+        <artifactId>algorithms</artifactId>
+        <version>${metanome.version}</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <build>
@@ -29,10 +30,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+                <version>3.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <compilerArgument>-Xlint:all</compilerArgument>
@@ -41,12 +42,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>${maven-assembly-plugin.version}</version>
+                <version>2.4</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
                             <Algorithm-Bootstrap-Class>
-                                de.metanome.algorithms.dfd.DFDMetanome
+                                de.metanome.algorithms.dfd.dfdMetanome.DFDMetanome
                             </Algorithm-Bootstrap-Class>
                         </manifestEntries>
                     </archive>
@@ -72,12 +73,16 @@
         <dependency>
             <groupId>de.metanome</groupId>
             <artifactId>algorithm_integration</artifactId>
+            <version>${metanome.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>de.metanome.algorithms.dfd</groupId>
-            <artifactId>DFDAlgorithm</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <artifactId>dfdAlgorithm</artifactId>
+            <version>${metanome.version}</version>
+            <scope>compile</scope>
         </dependency>
+
     </dependencies>
 
 </project>

@@ -22,13 +22,14 @@ public class EquivalenceGroupTreeSet extends TreeSet<Integer> implements Compara
 	public int compareTo(EquivalenceGroupTreeSet o) {
 		if (this.size() != o.size()) {
 			return this.size() - o.size();
+		} else {
+			return this.first() - o.first();
 		}
-		return this.first().intValue() - o.first().intValue();
 	}
 
 	@Override
 	public int getIdentifier() {
-		return this.first().intValue();
+		return this.first();
 	}
 
 	@Override
@@ -46,6 +47,6 @@ public class EquivalenceGroupTreeSet extends TreeSet<Integer> implements Compara
 			this.identifier = value;
 		}
 		
-		super.add(Integer.valueOf(value));
+		super.add(value);
 	}
 }

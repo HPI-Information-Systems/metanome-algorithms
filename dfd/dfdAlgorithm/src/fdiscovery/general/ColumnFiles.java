@@ -58,6 +58,6 @@ public class ColumnFiles extends ArrayList<ColumnFile> implements FileFilter {
 	}
 
 	private final String getColumnFileName(final int columnIndex) {
-		return String.format(this.formatString, Integer.valueOf(columnIndex));	
+		return String.format(this.formatString, columnIndex);	
 	}
 }

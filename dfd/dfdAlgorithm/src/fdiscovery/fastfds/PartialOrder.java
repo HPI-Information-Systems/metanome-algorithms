@@ -17,20 +17,20 @@ public class PartialOrder extends ArrayList<CoverOrder> {
 		
 		for (DifferenceSet differenceSet : differenceSets) {
 			// increase the cover count for set columns
-			int bitIndex = 0;
+			long bitIndex = 0;
 			while (bitIndex < differenceSet.getNumberOfColumns()) {
-				int currentNextSetBit = differenceSet.nextSetBit(bitIndex);
+				long currentNextSetBit = differenceSet.nextSetBit(bitIndex);
 				if (currentNextSetBit != -1) {
 					bitIndex = currentNextSetBit + 1;
-					orderMap.putIfAbsent(currentNextSetBit, 0);
-					orderMap.increment(currentNextSetBit);
+					orderMap.putIfAbsent((int) currentNextSetBit, 0);
+					orderMap.increment((int) currentNextSetBit);
 				} else {
 					bitIndex = differenceSet.getNumberOfColumns();
 				}
 			}
 		}
 		
-		for (int index : orderMap.keys()) {
+		for (Integer index : orderMap.keys()) {
 			this.add(new CoverOrder(index, orderMap.get(index)));
 		}
 		
@@ -38,25 +38,25 @@ public class PartialOrder extends ArrayList<CoverOrder> {
 
 	}
 	
-	public PartialOrder(DifferenceSets differenceSets, int columnIndexToSkip) {
+	public PartialOrder(DifferenceSets differenceSets, long columnIndexToSkip) {
 		TIntIntHashMap orderMap = new TIntIntHashMap();
 
 		for (DifferenceSet differenceSet : differenceSets) {
 			// increase the cover count for set columns
-			int bitIndex = columnIndexToSkip;
+			long bitIndex = columnIndexToSkip;
 			while (bitIndex < differenceSet.getNumberOfColumns()) {
-				int currentNextSetBit = differenceSet.nextSetBit(bitIndex);
+				long currentNextSetBit = differenceSet.nextSetBit(bitIndex);
 				if (currentNextSetBit != -1) {
 					bitIndex = currentNextSetBit + 1;
-					orderMap.putIfAbsent(currentNextSetBit, 0);
-					orderMap.increment(currentNextSetBit);
+					orderMap.putIfAbsent((int) currentNextSetBit, 0);
+					orderMap.increment((int) currentNextSetBit);
 				} else {
 					bitIndex = differenceSet.getNumberOfColumns();
 				}
 			}
 		}
 		
-		for (int index : orderMap.keys()) {
+		for (Integer index : orderMap.keys()) {
 			this.add(new CoverOrder(index, orderMap.get(index)));
 		}
 		
@@ -67,7 +67,7 @@ public class PartialOrder extends ArrayList<CoverOrder> {
 	public ArrayList<Integer> getOrderedColumns() {
 		ArrayList<Integer> orderedColumns = new ArrayList<>();
 		for (CoverOrder order : this) {
-			orderedColumns.add(Integer.valueOf(order.getColumnIndex()));
+			orderedColumns.add(order.getColumnIndex());
 		}
 		
 		return orderedColumns;

@@ -100,7 +100,7 @@ public class Benchmarker {
 		}
 		if (cmdLine.contains("timeout")) {
 			System.out.println(String.format("Timeout:%s", cmdLine.get("timeout")));
-			timeout = Integer.valueOf(cmdLine.get("timeout")).intValue();
+			timeout = Integer.valueOf(cmdLine.get("timeout"));
 		}
 		if (cmdLine.containsKey("all")) {
 			System.out.println("Use all files.");
@@ -182,7 +182,7 @@ public class Benchmarker {
 						resultHandler.waitFor(timeout);
 
 						long timeEnd = System.currentTimeMillis();
-						System.out.println(String.format("Time:%.1f", Double.valueOf((double)(timeEnd - timeStart) / 1000)));
+						System.out.println(String.format("Time:%.1f", (double)(timeEnd - timeStart)/1000));
 
 						int exitCode = 0;
 						if (resultHandler.hasResult()) {
@@ -197,7 +197,7 @@ public class Benchmarker {
 							executor.getWatchdog().destroyProcess();
 						} else {
 						}
-						System.out.println(String.format("ExitCode %d", Integer.valueOf(exitCode)));
+						System.out.println(String.format("ExitCode %d", exitCode));
 						if (exitCode == Miner.STATUS_OK) {
 
 						} else if (exitCode == Miner.STATUS_OOT || exitCode == Miner.STATUS_OOM) {
