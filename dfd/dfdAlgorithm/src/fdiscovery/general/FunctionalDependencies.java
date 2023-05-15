@@ -85,7 +85,7 @@ public class FunctionalDependencies extends THashMap<ColumnCollection, ColumnCol
 		return nonAtomicFDCount;
 	}
 	
-	public void addRHSColumn(ColumnCollection lhs, Integer rhsIndex) {
+	public void addRHSColumn(ColumnCollection lhs, int rhsIndex) {
 		ColumnCollection rhs = null;
 		if (!this.containsKey(lhs)) {
 			rhs = new ColumnCollection(lhs.getNumberOfColumns());

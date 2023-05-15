@@ -84,18 +84,28 @@ public class DFDMetanome implements FunctionalDependencyAlgorithm,
           int i = 0;
           for (int determiningColumn : determining.getSetBits()) {
             determiningColumns[i] =
-                new ColumnIdentifier(this.identifier, "Column " + determiningColumn);
+                new ColumnIdentifier(relationName, columnNames.get(determiningColumn));
             i++;
           }
           FunctionalDependency fd =
               new FunctionalDependency(
                   new ColumnCombination(determiningColumns),
-                  new ColumnIdentifier(this.identifier, "Column " + dependentColumn));
+                  new ColumnIdentifier(relationName, columnNames.get(dependentColumn)));
           this.resultReceiver.receiveResult(fd);
         }
       }
 
     }
+  }
+
+  @Override
+  public String getAuthors() {
+  	return "Patrick Schulze";
+  }
+
+  @Override
+  public String getDescription() {
+	return "Random Walk-based FD discovery";
   }
 
 }
